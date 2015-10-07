@@ -20,6 +20,7 @@ RM          := rm -rf
 CFLAGS      += -std=c++0x  -g -fPIC -D_REENTRANT -Wall
 LIBNAME     := ds
 LIBNAMEFULL := lib$(LIBNAME).so
+LIBNAMECLI := lib$(LIBNAME)-cli.so
 INSTALL     := $(PWD)/install
 OBJS        := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 #$(PWD)/config should be first include path
@@ -47,6 +48,7 @@ all: install
 library: $(OBJS)
 	@echo "Building $(LIBNAMEFULL) ...."
 	$(CXX) $(OBJS) $(CFLAGS) $(DSHAL_LDFLAGS) -shared -o $(LIBNAMEFULL)
+	$(CXX) $(OBJS) $(CFLAGS) -L$(INSTALL)/lib -ldshalcli -shared -o $(LIBNAMECLI)
 
 %.o: %.cpp
 	@echo "Building $@ ...."
