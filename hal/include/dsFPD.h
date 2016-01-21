@@ -88,6 +88,21 @@ dsError_t dsSetFPBlink (dsFPDIndicator_t eIndicator, unsigned int uBlinkDuration
  */
 dsError_t dsSetFPBrightness (dsFPDIndicator_t eIndicator, dsFPDBrightness_t eBrightness);
 
+
+/**
+ * @brief This function will Get the ON or OFF state of Specified LEDs
+ * 
+ *
+ * @param[in] eIndicator FPD Indicator index (Power LED, Record LED and so on).
+ * @param[out] state Pointer to hold the state of the specified indicator.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE Indicates dsGetFPState API was successfully called using iarmbus call.
+ * @retval dsERR_GENERAL Indicates error due to general failure.
+ */
+dsError_t dsGetFPState(dsFPDIndicator_t eIndicator, dsFPDState_t* state);
+
+
 /**
  * @brief This function will enable or disable the specified discrete LED on the front
  * panel display.

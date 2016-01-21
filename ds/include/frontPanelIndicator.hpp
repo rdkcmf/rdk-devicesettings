@@ -188,7 +188,8 @@ public:
     
     /* we still need this API to toggle the LED Power i.e Remote/Power */
     void setState(const bool &enable);
-
+    /* Get LED ON/OFF state */
+    bool getState();
 
     const List<Color> getSupportedColors() const;;
     FrontPanelIndicator(int id, int maxBrightness, int maxCycleRate, int levels,int colorMode);

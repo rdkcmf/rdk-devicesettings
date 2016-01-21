@@ -127,6 +127,7 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsSetFPBlink			"dsSetFPBlink"
 #define IARM_BUS_DSMGR_API_dsGetFPBrightness	 "dsGetFPBrightness"
 #define IARM_BUS_DSMGR_API_dsSetFPBrightness	 "dsSetFPBrightness"
+#define IARM_BUS_DSMGR_API_dsGetFPState           "dsGetFPState"
 #define IARM_BUS_DSMGR_API_dsSetFPState			 "dsSetFPState"
 #define IARM_BUS_DSMGR_API_dsSetFPColor			 "dsSetFPColor"
 #define IARM_BUS_DSMGR_API_dsGetFPColor			  "dsGetFPColor"

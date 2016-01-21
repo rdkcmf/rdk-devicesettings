@@ -476,5 +476,29 @@ dsError_t dsSetFPTimeFormat (dsFPDTimeFormat_t eTimeFormat)
 	return dsERR_GENERAL ;
 }
 
+
+dsError_t dsGetFPState(dsFPDIndicator_t eIndicator, dsFPDState_t* state)
+{
+    _DEBUG_ENTER();
+    dsFPDStateParam_t param ;
+   
+    param.eIndicator = eIndicator;
+    param.state = dsFPD_STATE_OFF;
+    
+	IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+							(char *)IARM_BUS_DSMGR_API_dsGetFPState,
+							(void *)&param,
+							sizeof(param));
+
+	if (IARM_RESULT_SUCCESS == rpcRet)
+	{
+		*state = param.state;
+		return dsERR_NONE;
+	}
+	return dsERR_GENERAL ;
+}
+
 /** @} */
 /** @} */

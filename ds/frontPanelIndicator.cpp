@@ -308,6 +308,27 @@ void FrontPanelIndicator::setBrightness(const int &brightness,bool toPersist)
 }
 
 
+
+/**
+ * @fn FrontPanelIndicator::getState()
+ * @brief This API gets the State of the specified LED indicators.
+ *
+ * @return _state State of the specified LED indicators.
+ */
+bool FrontPanelIndicator::getState() 
+{
+	dsFPDState_t state;
+	bool _retState;
+	
+	if (dsERR_NONE == dsGetFPState((dsFPDIndicator_t)_id,&state))
+	{
+		_retState = ((state == dsFPD_STATE_ON )? true: false);
+		return _retState;
+	}
+}
+
+
+
 /**
  * @fn FrontPanelIndicator::setState(const bool &enable)
  * @brief This API is used to enable or disable the front panel indicator.

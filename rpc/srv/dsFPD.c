@@ -74,6 +74,7 @@ IARM_Result_t _dsSetFPBlink(void *arg);
 IARM_Result_t _dsGetFPBrightness(void *arg);
 IARM_Result_t _dsSetFPBrightness(void *arg);
 IARM_Result_t _dsSetFPState(void *arg);
+IARM_Result_t _dsGetFPState(void *arg);
 IARM_Result_t _dsSetFPColor(void *arg);
 IARM_Result_t _dsGetFPColor(void *arg);
 IARM_Result_t _dsSetFPTextBrightness(void *arg);
@@ -89,6 +90,19 @@ static  dsFPDBrightness_t _dsPowerBrightness = dsFPD_BRIGHTNESS_MAX ;
 static  dsFPDBrightness_t _dsTextBrightness  = dsFPD_BRIGHTNESS_MAX ;
 static  dsFPDColor_t     _dsPowerLedColor   = dsFPD_COLOR_BLUE;
 static  dsFPDTimeFormat_t _dsTextTimeFormat	= dsFPD_TIME_12_HOUR;
+
+
+
+
+/** Structure that defines internal data base for the FP */
+typedef struct _dsFPDSettings_t_
+{   
+    dsFPDBrightness_t brightness;
+    dsFPDState_t state;
+}_FPDSettings_t;
+
+/** Variable that stores the brightness and State for FP */
+static _FPDSettings_t srvFPDSettings[dsFPD_INDICATOR_MAX];
 
 
 
@@ -225,9 +239,10 @@ IARM_Result_t _dsFPInit(void *arg)
 {
     IARM_BUS_Lock(lock);
 
-	INFO("<<<<< called _dsFPInit >>>>>>>>\r\n");
 
     if (!m_isInitialized) {
+
+    	INFO("<<<<< called _dsFPInit >>>>>>>>\r\n");
 
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsFPTerm,_dsFPTerm);
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetFPText,_dsSetFPText);
@@ -236,6 +251,7 @@ IARM_Result_t _dsFPInit(void *arg)
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetFPBlink,_dsSetFPBlink);
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetFPBrightness,_dsGetFPBrightness);
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetFPState,_dsSetFPState);
+		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetFPState,_dsGetFPState);
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetFPBrightness,_dsSetFPBrightness);
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetFPColor,_dsSetFPColor);
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetFPColor,_dsGetFPColor);
@@ -245,6 +261,15 @@ IARM_Result_t _dsFPInit(void *arg)
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetTimeFormat,_dsGetTimeFormat);
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetTimeFormat,_dsSetTimeFormat);
 		
+        
+		memset (srvFPDSettings, 0, sizeof (srvFPDSettings));
+		
+		for (int i = dsFPD_INDICATOR_MESSAGE; i < dsFPD_INDICATOR_MAX; i++)
+		{
+			srvFPDSettings[i].brightness = dsFPD_BRIGHTNESS_MAX;
+			srvFPDSettings[i].state = dsFPD_STATE_OFF;
+		}
+
         m_isInitialized = 1;
     }
 
@@ -369,6 +394,8 @@ IARM_Result_t _dsSetFPBrightness(void *arg)
 	if (param->eBrightness <= dsFPD_BRIGHTNESS_MAX)
     {
 		dsSetFPBrightness(param->eIndicator, param->eBrightness);
+		srvFPDSettings[param->eIndicator].brightness = param->eBrightness;
+
 		try{
 			switch (param->eIndicator)
 			{
@@ -551,6 +578,8 @@ IARM_Result_t _dsSetFPState(void *arg)
 		dsSetFPBrightness(param->eIndicator,_dsPowerBrightness);
 		if(param->eIndicator == dsFPD_INDICATOR_POWER)
 			INFO("_dsSetFPState Setting Power LED to ON with Brightness %d \r\n",_dsPowerBrightness);
+	
+		srvFPDSettings[param->eIndicator].state = param->state;
 	}
 	else if (param->state == dsFPD_STATE_OFF)
 	{
@@ -558,6 +587,7 @@ IARM_Result_t _dsSetFPState(void *arg)
 		if(param->eIndicator == dsFPD_INDICATOR_POWER)
 			INFO("_dsSetFPState Setting Power LED to OFF with Brightness 0 \r\n");
 
+		srvFPDSettings[param->eIndicator].state = param->state;
 	}
 
     IARM_BUS_Unlock(lock);
@@ -640,6 +670,24 @@ IARM_Result_t _dsSetTimeFormat(void *arg)
 	
 	return IARM_RESULT_SUCCESS;
 }
+
+
+IARM_Result_t _dsGetFPState(void *arg)
+{
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+	dsFPDStateParam_t *param = (dsFPDStateParam_t *)arg;
+
+	if(param->eIndicator < dsFPD_INDICATOR_MAX)
+    {
+   		param->state = srvFPDSettings[param->eIndicator].state;
+	}
+	
+    IARM_BUS_Unlock(lock);
+	return IARM_RESULT_SUCCESS;
+}
+
 
 /** @} */
 /** @} */
