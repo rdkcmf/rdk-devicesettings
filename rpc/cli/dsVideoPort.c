@@ -456,14 +456,15 @@ dsError_t  dsEnableHDCP(int handle, bool contentProtect, char *hdcpKey, size_t k
 {
     _DEBUG_ENTER();
 
-    if ((keySize <= 0) || (keySize > HDCP_KEY_MAX_SIZE) )
+//    if ((keySize <= 0) || (keySize > HDCP_KEY_MAX_SIZE) )
+    if (((unsigned int) keySize > HDCP_KEY_MAX_SIZE) )
     {
         return dsERR_INVALID_PARAM;
     }
 
-    if (contentProtect && !hdcpKey) {
-        return dsERR_INVALID_PARAM;
-    }
+//    if (contentProtect && !hdcpKey) {
+//        return dsERR_INVALID_PARAM;
+//    }
 
     dsEnableHDCPParam_t param;
     

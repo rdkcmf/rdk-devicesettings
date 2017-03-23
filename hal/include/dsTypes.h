@@ -515,7 +515,9 @@ typedef struct _dsVideoPortTypeConfig_t {
     dsVideoPortResolution_t *supportedResolutions;    /**< List of supported resolutions.       */
 } dsVideoPortTypeConfig_t;
 
-#define HDCP_KEY_MAX_SIZE  (1280)
+//#define HDCP_KEY_MAX_SIZE  (1280)
+#define HDCP_KEY_MAX_SIZE  (4*1024)
+
 /**
  * Enumeration defines all of the standard HDR types.
  * Each bit of uint32_t represent a standard. 
