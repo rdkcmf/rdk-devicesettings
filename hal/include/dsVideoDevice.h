@@ -119,7 +119,27 @@ dsError_t  dsVideoDeviceTerm();
  */
 dsError_t dsGetHDRCapabilities(int handle, int *capabilities);
 
+/**
+ * @brief To find the Video formats supported by the SoC.
+ *
+ * This function is used to check which video formats the SoC supports
+ *
+ * @param [in]   handle              Handle for the video device (video decoder)
+ * @param [out]  supported_formats   OR-ed value of supported video codec formats.
+ *
+ * @return dsError_t Error code.
+ */
 dsError_t dsGetSupportedVideoCodingFormats(int handle, unsigned int * supported_formats);
+
+/**
+ * @brief This API is used to get the video codec information.
+ *
+ * @param [in]   handle  Handle for the video device (video decoder)
+ * @param [in]   codec   OR-ed value of supported video codec formats.
+ * @param [out]  info    Video codec information like profile, level etc.
+ *
+ * @return dsError_t Error code.
+ */
 dsError_t dsGetVideoCodecInfo(int handle, dsVideoCodingFormat_t codec, dsVideoCodecInfo_t * info); 
 
 dsError_t dsForceDisableHDRSupport(int handle, bool disable);

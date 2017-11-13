@@ -85,6 +85,10 @@ const int FrontPanelTextDisplay::kModeClock24Hr = dsFPD_TIME_24_HOUR;
 const int FrontPanelTextDisplay::kModeString    = dsFPD_TIME_STRING;
 const char * FrontPanelTextDisplay::kPropertyBrightness = ".brightness";
 
+/**
+ * @addtogroup dssettingsfptextdisplayapi
+ * @{
+ */ 
 
 /**
  * @fn FrontPanelTextDisplay::getInstance(int id)
@@ -350,6 +354,7 @@ void FrontPanelTextDisplay::setTime(const int uiHours, const int uiMinutes)
 
 }
 
+/** @} */
 
 /** @} */
 /** @} */

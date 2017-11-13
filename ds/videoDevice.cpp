@@ -43,7 +43,6 @@
 #include <iostream>
 #include <sstream>
 
-
 /**
  * @file videoDevice.cpp
  * @brief Video Device is also called "Decoder".
@@ -68,6 +67,10 @@ namespace device {
 const char * VideoDevice::kPropertyDFC = ".DFC";
 
 
+/**
+ * @addtogroup dssettingsvideodeviceapi
+ * @{
+ */
 /**
  * @fn  VideoDevice & VideoDevice::getInstance(int id)
  * @brief This API is used to get the instance of the video device port based on the port id returned by the getsupported videodevice config.
@@ -297,6 +300,7 @@ int VideoDevice::enableHDRDVSupport(bool enable)
 }
 }
 
+/** @} */
 
 /** @} */
 /** @} */

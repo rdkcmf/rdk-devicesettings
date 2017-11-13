@@ -46,7 +46,6 @@
 #include "unsupportedOperationException.hpp"
 #include "hostEDID.hpp"
 
-
 /**
  * @file host.cpp
  * @brief The host module is the central module of the Device Settings module.
@@ -74,6 +73,11 @@ namespace device
 		}
     }
 
+
+/**
+ * @addtogroup dssettingshostapi
+ * @{
+ */
 
 /**
  * @fn Host& Host::getInstance()
@@ -528,6 +532,7 @@ namespace device
 }
 
 
+/** @} */
 
 /** @} */
 /** @} */

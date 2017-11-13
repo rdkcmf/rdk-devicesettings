@@ -67,6 +67,11 @@ const int AudioOutputPortType::kSPDIF 			= dsAUDIOPORT_TYPE_SPDIF;
 
 
 /**
+ * @addtogroup dssettingsaudoutporttypeapi
+ * @{
+ */
+
+/**
  * @fn AudioOutputPortType & AudioOutputPortType::getInstance(int id)
  * @brief This function is used to get the instance of the AudioOutputPortType based on the port id,
  * only if the id passed is valid.
@@ -271,6 +276,7 @@ bool AudioOutputPortType::isModeSupported(int newMode)
 
 }
 
+/** @} */
 
 /** @} */
 /** @} */

@@ -39,7 +39,7 @@
  * - DTCP:    Digital Transmission Copy Protection.
  * - EDID:    Extended Display Information Data.
  * 
- * @ingroup COMCAST_RDK_HAL
+ * @ingroup DSSETTINGS_HAL
  */
 
 

@@ -19,7 +19,7 @@
 
 /**
  * @file audioEncoding.cpp
- * @brief brief This file contains implementation of AudioEncoding class methods,
+ * @brief This file contains implementation of AudioEncoding class methods,
  * support functions and variable assignments to manage the audio encoding types.
  */
 
@@ -65,7 +65,10 @@ const int AudioEncoding::kPCM 			= dsAUDIO_ENC_PCM;
 const int AudioEncoding::kAC3 			= dsAUDIO_ENC_AC3;
 const int AudioEncoding::kMax 			= dsAUDIO_ENC_MAX;
 
-
+/**
+ * @addtogroup dssettingsaudencodingapi
+ * @{
+ */
 /**
  * @fn AudioEncoding::getInstance(int id)
  * @brief This function gets an AudioEncoding instance against the id parameter, only if the id
@@ -151,6 +154,7 @@ AudioEncoding::~AudioEncoding()
 
 }
 
+/** @} */
 
 /** @} */
 /** @} */

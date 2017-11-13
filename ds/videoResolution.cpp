@@ -44,6 +44,10 @@ namespace device {
 
 
 /**
+ * @addtogroup dssettingsvidresolutionapi
+ * @{
+ */
+/**
  * @fn const VideoResolution & VideoResolution::getInstance(int id)
  * @brief This API is used to get the instance of the video resolution port based on the port id returned by the getsupported video resolution .
  *
@@ -198,6 +202,7 @@ bool VideoResolution::isEnabled() const{
 
 }
 
+/** @} */ //End of Doxygen tag
 
 /** @} */
 /** @} */

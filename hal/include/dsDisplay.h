@@ -64,7 +64,7 @@ typedef enum _dsDisplayEvent_t {
  *  Described herein are DeviceSettings HAL types and functions that are part of the
  *  Display subsystem. The Display subsystem manages operations relating to connected
  *  Vendors please add appropriate events needed for your implementation.
- *  display devices, e.g. TVs. *
+ *  display devices, e.g. TVs.
  *  @{
  */
 

@@ -125,6 +125,10 @@ const int FrontPanelIndicator::kRemote   	  = dsFPD_INDICATOR_REMOTE;
 const int FrontPanelIndicator::kRFBypass 	  = dsFPD_INDICATOR_RFBYPASS;
 const int FrontPanelIndicator::kMax      	  = dsFPD_INDICATOR_MAX;
 
+/**
+ * @addtogroup dssettingsfpindicatorapi
+ * @{
+ */
 
 /**
  * @fn FrontPanelIndicator::Color::getInstance(int id)
@@ -491,6 +495,7 @@ const List<FrontPanelIndicator::Color> FrontPanelIndicator::getSupportedColors()
 
 }
 
+/** @} */
 
 /** @} */
 /** @} */

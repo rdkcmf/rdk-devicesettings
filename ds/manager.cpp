@@ -68,7 +68,10 @@ Manager::~Manager() {
 	// TODO Auto-generated destructor stub
 }
 
-
+/**
+ * @addtogroup dssettingsmanagerapi
+ * @{
+ */
 /**
  * @fn Manager::Initialize()
  * @brief This API is used to initialize the Device Setting module.
@@ -145,6 +148,7 @@ void Manager::DeInitialize()
 
 }
 
+/** @} */
 
 /** @} */
 /** @} */
