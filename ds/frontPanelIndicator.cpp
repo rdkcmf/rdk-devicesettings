@@ -181,6 +181,7 @@ FrontPanelIndicator::Color::Color(int id)
 		
 	if (::isColorValid(id)) {
 		 _id = id;
+		 _name = std::string(_colorNames[id]);
 	}
 	else {
 		throw IllegalArgumentException();
