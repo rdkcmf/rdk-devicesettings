@@ -34,6 +34,7 @@
 
 
 #include <stdlib.h>  
+#include <unistd.h>
 #include "libIBus.h"
 
 

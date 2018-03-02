@@ -33,11 +33,11 @@
 **/
 
 
+#include "dsTypes.h"
+#include "dsUtl.h"
 #include "pixelResolution.hpp"
 #include "illegalArgumentException.hpp"
 #include "videoOutputPortConfig.hpp"
-#include "dsTypes.h"
-#include "dsUtl.h"
 #include "dslogger.h"
 
 namespace {

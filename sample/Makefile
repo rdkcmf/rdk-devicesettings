@@ -41,7 +41,7 @@ CFLAGS      +=   -g -fPIC -D_REENTRANT -Wall $(INCLUDE)
 BINARIES    := $(patsubst %.cpp,%,$(wildcard *.cpp))
 UNINSTALL   := $(patsubst %,$(PWD)/install/bin/%, $(BINARIES))
 
-all: $(BINARIES)  install
+all: $(BINARIES)
 	@echo "Build Finished...."
 
 #frontPanelTest:
