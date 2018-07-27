@@ -87,6 +87,7 @@ public:
     uint32_t  getVersion(void);
     void setVersion(uint32_t versionNumber);
     void getHostEDID(std::vector<uint8_t> &edid) const;
+    std::string getSocIDFromSDK();
 
 private:
 	Host();

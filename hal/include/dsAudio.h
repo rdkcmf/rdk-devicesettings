@@ -290,6 +290,17 @@ dsError_t  dsEnableMS12Config(int handle, dsMS12FEATURE_t feature,const bool ena
 dsError_t  dsEnableLEConfig(int handle, const bool enable);
 
 /**
+ * @brief To Get LE configuration
+ *
+ * This function is used to Get LE features
+ *
+ * @param [in] handle   Handle for the Output Audio port
+ * @param [in] *enable  true if LE is enabled else False
+ * @return dsError_t Error code.
+ */
+dsError_t dsGetLEConfig(int handle, bool *enable);
+
+/**
  * @brief Set the encoding type of an audio port.
  * 
  * This function sets the audio encoding type to be used on the specified audio port.

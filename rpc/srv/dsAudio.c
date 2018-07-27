@@ -79,6 +79,7 @@ IARM_Result_t _dsEnableAudioPort(void *arg);
 
 IARM_Result_t _dsEnableMS12Config(void *arg);
 IARM_Result_t _dsEnableLEConfig(void *arg);
+IARM_Result_t _dsGetLEConfig(void *arg);
 
 static void _GetAudioModeFromPersistent(void *arg);
 static dsAudioPortType_t _GetAudioPortType(int handle);
@@ -324,6 +325,7 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioPortTerm,_dsAudioPortTerm);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableMS12Config,_dsEnableMS12Config);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableLEConfig,_dsEnableLEConfig);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetLEConfig,_dsGetLEConfig);
 
         m_isInitialized = 1;
     }
@@ -850,6 +852,52 @@ IARM_Result_t _dsEnableLEConfig(void *arg)
     IARM_BUS_Unlock(lock);
 
     return result;
+}
+
+IARM_Result_t _dsGetLEConfig(void *arg)
+{
+
+#ifndef RDK_DSHAL_NAME
+    #warning   "RDK_DSHAL_NAME is not defined"
+    #define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t  (*dsGetLEConfig_t)(int handle, bool *enable);
+    static dsGetLEConfig_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetLEConfig_t) dlsym(dllib, "dsGetLEConfig");
+            if (func) {
+                __TIMESTAMP();printf("dsGetLEConfig(int , bool *) is defined and loaded\r\n");
+            }
+            else {
+                __TIMESTAMP();printf("dsGetLEConfig(int , bool *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            __TIMESTAMP();printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsGetLEConfigParam_t *param = (dsGetLEConfigParam_t*) arg;
+    if (param != NULL) {
+        param->result = dsERR_GENERAL;
+
+        if (func != NULL) {
+            param->result = func(param->handle, &param->enable);
+        }
+    }
+
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+
 }
 
 static void _GetAudioModeFromPersistent(void *arg)

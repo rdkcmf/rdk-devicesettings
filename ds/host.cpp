@@ -508,6 +508,23 @@ namespace device
             edid.clear();
         }
     }
+
+/**
+ * @fn Host::getSocIDFromSDK()
+ * @brief This API to get the SOC ID.
+ * dsGetSocIDFromSDK() function returns the SOC ID in string format.
+ *
+ * @param None
+ *
+ * @return Device ID
+ */
+   std::string Host::getSocIDFromSDK()
+   {
+        char socID[1024];
+        dsGetSocIDFromSDK(socID);
+        return std::string(socID);
+   }
+
 }
 
 

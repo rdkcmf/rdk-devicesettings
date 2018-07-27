@@ -136,6 +136,7 @@ public:
 	void setStereoMode(const std::string & mode,const bool toPersist = true);
 	void enableMS12Config(const dsMS12FEATURE_t feature,const bool enable);
 	void enableLEConfig(const bool enable);
+        bool GetLEConfig();
 
 
 	void setDB(const float db);

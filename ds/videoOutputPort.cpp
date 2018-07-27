@@ -653,6 +653,85 @@ int VideoOutputPort::forceDisable4KSupport(bool disable)
 	dsSetForceDisable4KSupport(_handle, disable);
 	return 0;
 }
+
+/**
+ * @fn  const void VideoOutputPort::IsOutputHDR()
+ * @brief This API is used to check if Video output is HDR or not.
+ *
+ * @return True if video output is HDR
+ */
+bool VideoOutputPort::IsOutputHDR()
+{
+    bool hdr;
+    dsIsOutputHDR(_handle, &hdr);
+    return hdr;
+}
+
+/**
+ * @fn  const void VideoOutputPort::ResetOutputToSDR()
+ * @brief This API is used to reset the video output to SDR if it is HDR.
+ *
+ * @return None
+ */
+
+void VideoOutputPort::ResetOutputToSDR()
+{
+    bool hdr;
+    hdr = IsOutputHDR();
+
+    if(hdr == true){
+        dsResetOutputToSDR();
+    }
+    else {
+        printf("ds: %s: Allready SDR\n",__FUNCTION__);
+    }
+}
+
+/**
+ * @fn bool VideoOutputPort::SetHdmiPreference(dsHdcpProtocolVersion_t hdcpProtocol)
+ * @brief This API is used to set the Preferred HDMI Protocol
+ *
+ * @param enum dsHdcpProtocolVersion
+ *  dsHDCP_VERSION_1X = 0,            < HDCP Protocol version 1.x
+ *  dsHDCP_VERSION_2X,                < HDCP Protocol version 2.x
+ *  dsHDCP_VERSION_MAX                < Maximum index for HDCP protocol.
+ *
+ * @return true if no error.
+ */
+
+bool VideoOutputPort::SetHdmiPreference(dsHdcpProtocolVersion_t hdcpProtocol)
+{
+    dsError_t ret = dsSetHdmiPreference(_handle, &hdcpProtocol);
+    if (ret != dsERR_NONE) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @fn bool VideoOutputPort::GetHdmiPreference()
+ * @brief This API is used to get the HDMI Preference
+ *
+ * @return int value corresponding to : enum dsHdcpProtocolVersion
+ *  dsHDCP_VERSION_1X = 0,            < HDCP Protocol version 1.x
+ *  dsHDCP_VERSION_2X,                < HDCP Protocol version 2.x
+ *  dsHDCP_VERSION_MAX                < Maximum index for HDCP protocol.
+ *
+ */
+
+int VideoOutputPort::GetHdmiPreference()
+{
+    dsHdcpProtocolVersion_t hdcpProtocol;
+    dsError_t ret = dsGetHdmiPreference(_handle, &hdcpProtocol);
+
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+
+    return hdcpProtocol;
+}
+
 }
 
 

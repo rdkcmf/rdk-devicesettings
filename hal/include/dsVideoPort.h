@@ -409,6 +409,64 @@ dsError_t dsSetScartParameter(int handle, const char* parameter_str, const char*
 
 
 /**
+ * @brief Check Video Output is HDR or not.
+ *
+ * This function checks if the video output is HDR or not.
+ *
+ * @param [in] handle         Handle of the video port.
+ * @param [in] *hdr           The bool pointer
+ *
+ * @return    Error Code.
+ * @retval    ::dsError_t
+ */
+dsError_t dsIsOutputHDR(int handle, bool *hdr);
+
+/**
+ * @brief Reset Video Output to SDR
+ *
+ * This function resets the video output to SDR
+ *
+ * @return    Error Code.
+ * @retval    ::dsError_t
+ */
+dsError_t dsResetOutputToSDR();
+
+/**
+ * @brief This API is used to set the Preferred HDMI Protocol
+ *
+ * This function sets the Preferred HDMI Protocol
+ *
+ * @param [in] handle                   Handle of the video port.
+ * @param [in] *hdcpCurrentProtocol     Address of the structure containing
+ *                                      HDCP Protocol version enums
+ *  dsHDCP_VERSION_1X = 0,            < HDCP Protocol version 1.x
+ *  dsHDCP_VERSION_2X,                < HDCP Protocol version 2.x
+ *  dsHDCP_VERSION_MAX                < Maximum index for HDCP protocol.
+ *
+ * @return    Error Code.
+ * @retval    ::dsError_t
+ */
+dsError_t dsSetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol);
+
+/**
+ * @brief This API is used to get the Preferred HDMI Protocol
+ *
+ * This function gets the Preferred HDMI Protocol and updates the
+ * *hdcpCurrentProtocol accordingly
+ *
+ * @param [in] handle                   Handle of the video port.
+ * @param [in] *hdcpCurrentProtocol     Address of the structure containing
+ *                                      HDCP Protocol version enums
+ *  dsHDCP_VERSION_1X = 0,            < HDCP Protocol version 1.x
+ *  dsHDCP_VERSION_2X,                < HDCP Protocol version 2.x
+ *  dsHDCP_VERSION_MAX                < Maximum index for HDCP protocol.
+ *
+ * @return    Error Code.
+ * @retval    ::dsError_t
+ */
+dsError_t dsGetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol);
+
+/**
  * @}
  */
 

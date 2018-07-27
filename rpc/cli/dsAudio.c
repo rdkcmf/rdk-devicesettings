@@ -506,5 +506,29 @@ dsError_t dsEnableLEConfig(int handle, const bool enable)
 
 	return dsERR_NONE;
 }
+
+dsError_t dsGetLEConfig(int handle, bool *enable)
+{
+        dsGetLEConfigParam_t param;
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+        param.handle = handle;
+        param.enable = false;
+
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *)IARM_BUS_DSMGR_API_dsGetLEConfig,
+                            (void *)&param,
+                            sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+
+        *enable = param.enable;
+        return dsERR_NONE;
+}
+
 /** @} */
 /** @} */

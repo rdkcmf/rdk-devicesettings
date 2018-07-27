@@ -37,6 +37,7 @@
 #include <vector>
 #include <stdint.h>
 
+#include "dsTypes.h"
 
 /**
  * @file videoOutputPort.hpp
@@ -261,6 +262,10 @@ public:
 	void getTVHDRCapabilities(int *capabilities) const;
 	void getSupportedTvResolutions(int *resolutions) const;
 	int forceDisable4KSupport(bool disable);
+        bool IsOutputHDR();
+        void ResetOutputToSDR();
+        bool SetHdmiPreference(dsHdcpProtocolVersion_t hdcpProtocol);
+        int GetHdmiPreference();
 
 	bool setScartParameter(const std::string parameter, const std::string value);
 

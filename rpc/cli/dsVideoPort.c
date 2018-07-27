@@ -609,5 +609,109 @@ dsError_t dsGetForceDisable4KSupport(int handle, bool *disable)
 
 	return dsERR_GENERAL ;
 }
+
+dsError_t dsIsOutputHDR(int handle, bool *hdr)
+{
+    _DEBUG_ENTER();
+
+    _RETURN_IF_ERROR(hdr != NULL, dsERR_INVALID_PARAM);
+
+    dsIsOutputHDRParam_t param;
+
+    param.handle = handle;
+    param.hdr = false;
+    param.result = dsERR_NONE;
+
+
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsIsOutputHDR,
+                                                        (void *)&param,
+                                                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                *hdr = param.hdr;
+                return param.result;
+        }
+
+        return dsERR_GENERAL ;
+}
+
+dsError_t dsResetOutputToSDR()
+{
+    _DEBUG_ENTER();
+
+    bool param =true;
+
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsResetOutputToSDR,
+                                                        (void *)&param,
+                                                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+
+        return dsERR_NONE ;
+}
+
+dsError_t dsSetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpProtocol)
+{
+    _DEBUG_ENTER();
+
+    _RETURN_IF_ERROR(hdcpProtocol != NULL, dsERR_INVALID_PARAM);
+
+    dsSetHdmiPreferenceParam_t param;
+
+    param.handle = handle;
+    param.hdcpCurrentProtocol = *hdcpProtocol;
+    param.result = dsERR_NONE;
+
+
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetHdmiPreference,
+                                                        (void *)&param,
+                                                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                return param.result;
+        }
+
+        return dsERR_GENERAL ;
+}
+
+dsError_t dsGetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpProtocol)
+{
+    _DEBUG_ENTER();
+
+    _RETURN_IF_ERROR(hdcpProtocol != NULL, dsERR_INVALID_PARAM);
+
+    dsGetHdmiPreferenceParam_t param;
+
+    param.handle = handle;
+    param.hdcpCurrentProtocol = dsHDCP_VERSION_MAX;
+    param.result = dsERR_NONE;
+
+
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsGetHdmiPreference,
+                                                        (void *)&param,
+                                                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                *hdcpProtocol = param.hdcpCurrentProtocol;
+                return param.result;
+        }
+
+        return dsERR_GENERAL ;
+}
+
 /** @} */
 /** @} */

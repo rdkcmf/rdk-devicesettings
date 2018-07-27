@@ -44,6 +44,7 @@
 #include "dsError.h"
 #include "dsTypes.h"
 #include "dsHost.h"
+#include <dlfcn.h>
 
 
 static int m_isInitialized = 0;
@@ -58,6 +59,7 @@ IARM_Result_t _dsSetPreferredSleepMode(void *arg);
 IARM_Result_t _dsGetCPUTemperature(void *arg);
 IARM_Result_t _dsGetVersion(void *arg);
 IARM_Result_t _dsSetVersion(void *arg);
+IARM_Result_t _dsGetSocIDFromSDK(void *arg);
 
 static dsSleepMode_t _SleepMode = dsHOST_SLEEP_MODE_LIGHT;
 
@@ -90,6 +92,7 @@ IARM_Result_t dsHostMgr_init()
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetCPUTemperature,_dsGetCPUTemperature);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetVersion,_dsGetVersion);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetVersion,_dsSetVersion);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetSocIDFromSDK,_dsGetSocIDFromSDK);
         
         uint32_t  halVersion = 0x10000;
         if (dsERR_NONE != dsGetVersion(&halVersion))
@@ -259,6 +262,47 @@ IARM_Result_t _dsSetVersion(void *arg)
     return ret;
 }
 
+IARM_Result_t _dsGetSocIDFromSDK(void *arg)
+{
+    dsGetSocIDFromSDKParam_t *param = (dsGetSocIDFromSDKParam_t*) arg;
+    IARM_Result_t ret = IARM_RESULT_SUCCESS;
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    printf("dsSRV:_dsGetSocIDFromSDK\r\n");
+    typedef dsError_t (*dsGetSocIDFromSDK_t)(char* socID);
+    static dsGetSocIDFromSDK_t  func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+
+        if (dllib != NULL) {
+            func = (dsGetSocIDFromSDK_t) dlsym(dllib, "dsGetSocIDFromSDK");
+            if (func != NULL) {
+                printf("dsSRV: dsGetSocIDFromSDK(char* socID) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSRV: dsGetSocIDFromSDK(char* socID) is not defined\r\n");
+                dlclose(dllib);
+            }
+        }
+        else {
+            printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    if (param != NULL) {
+        param->result = dsERR_GENERAL;
+
+        if (func != NULL) {
+            param->result = func(param->socID);
+        }
+    }
+    printf("dsSRV: _dsGetSocIDFromSDK SocID : %s\n",param->socID);
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+}
 
 /** @} */
 /** @} */

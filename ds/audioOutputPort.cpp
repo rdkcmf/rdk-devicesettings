@@ -546,6 +546,27 @@ void AudioOutputPort::enableLEConfig(const bool enable)
 }
 
 /**
+ * @fn AudioOutputPort::GetLEConfig()
+ * @brief This API is used to check if  Loudness Equivalence is enabled or not*
+ *
+ * @return true if Loudness Equivalence is enabled
+ */
+
+bool AudioOutputPort::GetLEConfig()
+{
+    bool enable;
+    dsError_t ret = dsERR_GENERAL;
+
+    ret = dsGetLEConfig(_handle, &enable);
+    if (ret != dsERR_NONE) throw Exception(ret);
+
+    if (enable == true)
+        return true;
+
+    return false;
+}
+
+/**
  * @fn AudioOutputPort::enableMS12Config(const dsMS12FEATURE_t feature,const bool enable)
  * @brief This API is used to enable MS12 features such as DAPV2 adn DE *
  * @param[in] feature enums for feature name.

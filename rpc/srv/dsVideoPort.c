@@ -93,6 +93,11 @@ IARM_Result_t _dsSupportedTvResolutions(void *arg);
 IARM_Result_t _dsSetForceDisable4K(void *arg);
 IARM_Result_t _dsGetForceDisable4K(void *arg);
 IARM_Result_t _dsSetScartParameter(void *arg);
+IARM_Result_t _dsIsOutputHDR(void *arg);
+IARM_Result_t _dsResetOutputToSDR(void *arg);
+IARM_Result_t _dsSetHdmiPreference(void *arg);
+IARM_Result_t _dsGetHdmiPreference(void *arg);
+
 
 static dsVideoPortType_t _GetVideoPortType(int handle);
 static int  _dsVideoPortPreResolutionCall(dsVideoPortResolution_t *resolution);
@@ -201,6 +206,10 @@ IARM_Result_t _dsVideoPortInit(void *arg)
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetForceDisable4K, _dsSetForceDisable4K); 
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetForceDisable4K, _dsGetForceDisable4K); 
         	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetScartParameter,_dsSetScartParameter);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsOutputHDR,_dsIsOutputHDR);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsResetOutputToSDR,_dsResetOutputToSDR);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetHdmiPreference,_dsSetHdmiPreference);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetHdmiPreference,_dsGetHdmiPreference);
 	
         m_isInitialized = 1;
     }
@@ -1183,6 +1192,170 @@ IARM_Result_t _dsSetScartParameter(void *arg)
     IARM_BUS_Unlock(lock);
 
     return IARM_RESULT_SUCCESS;
+
+}
+
+IARM_Result_t _dsIsOutputHDR(void *arg)
+{
+    dsIsOutputHDRParam_t *param = (dsIsOutputHDRParam_t*) arg;
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    printf("dsSRV::_dsIsOutputHDR\r\n");
+
+    typedef dsError_t (*dsIsOutputHDR_t)(int handle, bool *hdr);
+    static dsIsOutputHDR_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib != NULL) {
+            func = (dsIsOutputHDR_t) dlsym(dllib, "dsIsOutputHDR");
+            if (func != NULL) {
+                printf("dsSRV: dsIsOutputHDR(int handle, bool *hdr) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSRV: dsIsOutputHDR(int handle, bool *hdr) is not defined\r\n");
+                dlclose(dllib);
+            }
+        }
+        else {
+            printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    if (param != NULL) {
+        param->result = dsERR_GENERAL;
+
+        if (func != NULL) {
+            param->result = func(param->handle, &param->hdr);
+        }
+    }
+
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+
+}
+
+IARM_Result_t _dsResetOutputToSDR(void *arg)
+{
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    printf("dsSRV::_dsResetOutputToSDR\r\n");
+
+    typedef dsError_t (*dsResetOutputToSDR_t)();
+    static dsResetOutputToSDR_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib != NULL) {
+            func = (dsResetOutputToSDR_t) dlsym(dllib, "dsResetOutputToSDR");
+            if (func != NULL) {
+                printf("dsSRV: dsResetOutputToSDR() is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSRV: dsResetOutputToSDR() is not defined\r\n");
+                dlclose(dllib);
+            }
+        }
+        else {
+            printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+        if (func != NULL) {
+            dsError_t result = func();
+        }
+
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+
+}
+
+IARM_Result_t _dsSetHdmiPreference(void *arg)
+{
+    dsSetHdmiPreferenceParam_t *param = (dsSetHdmiPreferenceParam_t*) arg;
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    printf("dsSRV::_dsSetHdmiPreference\r\n");
+
+    typedef dsError_t (*dsSetHdmiPreference_t)(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol);
+    static dsSetHdmiPreference_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib != NULL) {
+            func = (dsSetHdmiPreference_t) dlsym(dllib, "dsSetHdmiPreference");
+            if (func != NULL) {
+                printf("dsSRV: dsSetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSRV: dsSetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol) is not defined\r\n");
+                dlclose(dllib);
+            }
+        }
+        else {
+            printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    if (param != NULL) {
+        param->result = dsERR_GENERAL;
+
+        if (func != NULL) {
+            param->result = func(param->handle, &param->hdcpCurrentProtocol);
+        }
+    }
+
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+
+}
+
+IARM_Result_t _dsGetHdmiPreference(void *arg)
+{
+    dsGetHdmiPreferenceParam_t *param = (dsGetHdmiPreferenceParam_t*) arg;
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    printf("dsSRV::_dsGetHdmiPreference\r\n");
+
+    typedef dsError_t (*dsGetHdmiPreference_t)(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol);
+    static dsGetHdmiPreference_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib != NULL) {
+            func = (dsGetHdmiPreference_t) dlsym(dllib, "dsGetHdmiPreference");
+            if (func != NULL) {
+                printf("dsSRV: dsGetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSRV: dsGetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol) is not defined\r\n");
+                dlclose(dllib);
+            }
+        }
+        else {
+            printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    if (param != NULL) {
+        param->result = dsERR_GENERAL;
+
+        if (func != NULL) {
+            param->result = func(param->handle, &param->hdcpCurrentProtocol);
+        }
+    }
+
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+
 }
 
 /** @} */

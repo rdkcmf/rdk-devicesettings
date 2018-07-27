@@ -56,6 +56,7 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsAudioPortTerm		"dsAudioPortTerm"
 #define  IARM_BUS_DSMGR_API_dsEnableMS12Config	"dsEnableMS12Config"
 #define  IARM_BUS_DSMGR_API_dsEnableLEConfig            "dsEnableLEConfig"
+#define IARM_BUS_DSMGR_API_dsGetLEConfig        "dsGetLEConfig"
 
 
 /*
@@ -161,6 +162,7 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsGetCPUTemperature 		"dsGetCPUTemperature"
 #define IARM_BUS_DSMGR_API_dsGetVersion				"dsGetVersion"
 #define IARM_BUS_DSMGR_API_dsSetVersion				"dsSetVersion"
+#define IARM_BUS_DSMGR_API_dsGetSocIDFromSDK               "dsGetSocIDFromSDK"
 
 
 typedef struct _dsAudioGetHandleParam_t {

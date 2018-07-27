@@ -157,6 +157,32 @@ dsError_t dsSetVersion(uint32_t versionNumber)
     return dsERR_NONE;
 }
 
+dsError_t dsGetSocIDFromSDK(char *socID)
+{
+    _DEBUG_ENTER();
+
+    dsGetSocIDFromSDKParam_t param;
+
+    param.result = dsERR_NONE;
+
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                (char *)IARM_BUS_DSMGR_API_dsGetSocIDFromSDK,
+                (void *)&param,
+                sizeof(param));
+
+   if (IARM_RESULT_SUCCESS != rpcRet)
+   {
+      return dsERR_GENERAL ;
+   }
+
+   strcpy(socID,param.socID);
+
+   return dsERR_NONE;
+
+}
+
 
 /** @} */
 /** @} */

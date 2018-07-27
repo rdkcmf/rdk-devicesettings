@@ -180,6 +180,16 @@ dsError_t dsGetVersion(uint32_t *versionNumber);
 dsError_t dsSetVersion(uint32_t versionNumber);
 
 /**
+ * @brief This function returns SOC ID
+ * @param[in] socID The address of a location to hold SOC ID
+ * @return Device Settings error code
+ * @retval dsERR_NONE If sucessfully dsSetPreferredSleepMode api has been called using IARM support.
+ * @retval dsERR_UNKNOWN General failure.
+ */
+
+dsError_t dsGetSocIDFromSDK(char *socID);
+
+/**
  * @}
  */
 #ifdef __cplusplus
