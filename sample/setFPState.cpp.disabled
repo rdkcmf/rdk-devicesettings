@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
 #include "frontPanelIndicator.hpp"
 #include "manager.hpp"
 

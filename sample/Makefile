@@ -28,7 +28,7 @@ INCLUDE      += $(HAL_INCLUDE)
 
 INSTALL     := $(PWD)/install
 
-LDFLAGS     := -L$(INSTALL)/lib -lds 
+#LDFLAGS     := -L$(INSTALL)/lib -lds 
 
 
 LDFLAGS		+= $(HAL_LDFLAGS)
@@ -41,6 +41,7 @@ CFLAGS      +=   -g -fPIC -D_REENTRANT -Wall $(INCLUDE)
 BINARIES    := $(patsubst %.cpp,%,$(wildcard *.cpp))
 UNINSTALL   := $(patsubst %,$(PWD)/install/bin/%, $(BINARIES))
 
+#all: $(BINARIES)  install
 all: $(BINARIES)
 	@echo "Build Finished...."
 
@@ -48,7 +49,7 @@ all: $(BINARIES)
 $(BINARIES):
 	@echo "Building $@ ...."
 	$(CXX) $(CFLAGS) $@.cpp -o $@ $(LDFLAGS)
-	@cp -f $@ $(INSTALL)/bin
+#	@cp -f $@ $(INSTALL)/bin
 
 install:
 	@echo "Copying the binaries to bin install folder..."

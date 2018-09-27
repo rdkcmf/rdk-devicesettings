@@ -31,7 +31,7 @@
 #include "host.hpp"
 #include "videoOutputPort.hpp"
 #include "videoOutputPortType.hpp"
-#include "videoOutputPortConfig.hpp"
+//#include "videoOutputPortConfig.hpp"
 #include "videoResolution.hpp"
 #include "videoDFC.hpp"
 #include "manager.hpp"
