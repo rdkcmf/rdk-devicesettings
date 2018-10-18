@@ -37,6 +37,7 @@
 #include "manager.hpp"
 #include <stdlib.h>  
 #include "libIBus.h"
+#include "exception.hpp"
 
 using namespace std;
 
@@ -78,9 +79,10 @@ int main(int argc, char *argv[])
             
     }
 
-    catch (...) 
+    catch (const device::Exception exp)
     {
     	printf("Exception Caught during [%s]\r\n", argv[0]);
+        printf("Details: message: %s. Code: %d\n", exp.getMessage().c_str(), exp.getCode());
     }
 
     device::Manager::DeInitialize();

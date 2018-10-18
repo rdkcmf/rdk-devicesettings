@@ -101,6 +101,7 @@ typedef struct _dsFPDSettings_t_
 {   
     dsFPDBrightness_t brightness;
     dsFPDState_t state;
+    dsFPDColor_t color;
 }_FPDSettings_t;
 
 /** Variable that stores the brightness and State for FP */
@@ -271,6 +272,7 @@ IARM_Result_t _dsFPInit(void *arg)
 		{
 			srvFPDSettings[i].brightness = dsFPD_BRIGHTNESS_MAX;
 			srvFPDSettings[i].state = dsFPD_STATE_OFF;
+                        srvFPDSettings[i].color = dsFPD_COLOR_BLUE;
 		}
 
         m_isInitialized = 1;
@@ -516,7 +518,7 @@ IARM_Result_t _dsGetFPColor(void *arg)
     IARM_BUS_Lock(lock);
 
 	dsFPDColorParam_t *param = (dsFPDColorParam_t *)arg;
-	param->eColor = _dsPowerLedColor;
+        param->eColor = srvFPDSettings[param->eIndicator].color;
 	IARM_BUS_Unlock(lock);
 	return IARM_RESULT_SUCCESS;
 
@@ -525,10 +527,14 @@ IARM_Result_t _dsGetFPColor(void *arg)
 IARM_Result_t _dsSetFPColor(void *arg)
 {
     _DEBUG_ENTER();
+    IARM_Result_t ret = IARM_RESULT_SUCCESS;
     IARM_BUS_Lock(lock);
 
 	dsFPDColorParam_t *param = (dsFPDColorParam_t *)arg;
-    dsSetFPColor(param->eIndicator, param->eColor);
+    dsError_t dsStatus = dsSetFPColor(param->eIndicator, param->eColor);
+    if(dsStatus == dsERR_NONE)
+    {
+    srvFPDSettings[param->eIndicator].color = param->eColor;
     INFO("_dsSetFPColor Value  From  App is %d for Indicator %d \r\n",param->eColor,param->eIndicator);
     try{
 			switch (param->eIndicator)
@@ -537,6 +543,7 @@ IARM_Result_t _dsSetFPColor(void *arg)
 				{	
 					if(param->toPersist)
 					{	
+                                                _dsPowerLedColor = param->eColor;
 						device::HostPersistence::getInstance().persistHostProperty("Power.Color",enumToColor(param->eColor));
 					}
 					break;
@@ -555,8 +562,14 @@ IARM_Result_t _dsSetFPColor(void *arg)
 		{
 			ERROR("Error in Persisting the Color  Value \r\n");
 		}
+    }
+    else
+    {
+       ERROR("Error in dsSetFPColor dsStatus:%d \r\n",dsStatus);
+       ret = IARM_RESULT_INVALID_PARAM;
+    }
     IARM_BUS_Unlock(lock);
-	return IARM_RESULT_SUCCESS;
+	return ret;
 }
 
 

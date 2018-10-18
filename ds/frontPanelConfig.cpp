@@ -108,7 +108,7 @@ FrontPanelIndicator &FrontPanelConfig::getIndicator(const string &name)
 		it++;
 	}
 
-	throw IllegalArgumentException();
+	throw IllegalArgumentException("Bad indicator name");
 }
 
 /**
@@ -181,7 +181,7 @@ FrontPanelIndicator::Color &FrontPanelConfig::getColor(const string &name)
 		it++;
 	}
 
-	throw IllegalArgumentException();
+	throw IllegalArgumentException("Bad color name");
 }
 
 
@@ -206,7 +206,7 @@ FrontPanelIndicator::Color &FrontPanelConfig::getColor(int id)
 		it++;
 	}
 
-	throw IllegalArgumentException();
+	throw IllegalArgumentException("Bad color id");
 }
 
 

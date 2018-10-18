@@ -39,6 +39,7 @@
 #include "frontPanelIndicator.hpp"
 #include "frontPanelConfig.hpp"
 #include "illegalArgumentException.hpp"
+#include "unsupportedOperationException.hpp"
 #include "host.hpp"
 
 #include "dslogger.h"
@@ -86,7 +87,7 @@ namespace {
 	};
 
 	inline const bool isColorValid(int id) {
-		return dsFPDColor_isValid(id);
+		return ((id >= 0) && (id < dsUTL_DIM(_colorNames)));
 	}
 
 	const char *_indicatorNames[] = {
@@ -147,7 +148,7 @@ const FrontPanelIndicator::Color & FrontPanelIndicator::Color::getInstance(int i
 		return FrontPanelConfig::getInstance().getColor(id);
 	}
 	else {
-		throw IllegalArgumentException();
+		throw IllegalArgumentException("Bad color id");
 	}
 }
 
@@ -167,13 +168,10 @@ const FrontPanelIndicator::Color & FrontPanelIndicator::Color::getInstance(const
 {
 	for (size_t i = 0; i < dsUTL_DIM(_colorNames); i++) {
 		if (name.compare(_colorNames[i]) == 0) {
-			/* TBD - revisit this change */
-			static device::FrontPanelIndicator::Color c(_colorsValues[i]);
-			return c;
+			return FrontPanelConfig::getInstance().getColor(i);
 		}
 	}
-
-	throw IllegalArgumentException();
+	throw IllegalArgumentException("Bad color name");
 }
 
 FrontPanelIndicator::Color::Color(int id)
@@ -184,7 +182,7 @@ FrontPanelIndicator::Color::Color(int id)
 		 _name = std::string(_colorNames[id]);
 	}
 	else {
-		throw IllegalArgumentException();
+		throw IllegalArgumentException("Constructor for color: bad color id");
 	}
 }
 
@@ -227,7 +225,7 @@ FrontPanelIndicator & FrontPanelIndicator::getInstance(int id)
 		return FrontPanelConfig::getInstance().getIndicator(id);
 	}
 	else {
-		throw IllegalArgumentException();
+		throw IllegalArgumentException("Bad front panel indicator id");
 	}
 
 }
@@ -254,7 +252,7 @@ FrontPanelIndicator & FrontPanelIndicator::getInstance(const std::string &name)
 		}
 	}
 
-	throw IllegalArgumentException();
+	throw IllegalArgumentException("Bad frontpanel indicator name");
 }
 
 
@@ -435,8 +433,10 @@ uint32_t FrontPanelIndicator::getColor()
 {
 	dsFPDColor_t color;
 
-	dsGetFPColor((dsFPDIndicator_t)_id,&color);
-
+        if (dsERR_NONE != dsGetFPColor((dsFPDIndicator_t)_id,&color) )
+        {
+            throw IllegalArgumentException("dsGetFPColor failed.");
+        }
 	_color_rgb32 = color;
 
 	return _color_rgb32;
@@ -456,8 +456,34 @@ void FrontPanelIndicator::setColor(const FrontPanelIndicator::Color & color,bool
 {
    
     bool IsPersist = toPersist;
-    dsSetFPDColor((dsFPDIndicator_t)_id, (dsFPDColor_t) color.getId(),IsPersist);
-	_color_rgb32 = (dsFPDColor_t) color.getId();
+    if(_colorMode == 0 || _colorMode == 1)
+    {
+        throw UnsupportedOperationException("This API not supported for the color mode");
+    }
+    else if(_colorMode == 2)
+    {
+        bool isValidColor = false;
+        const List<FrontPanelIndicator::Color> supportedColors = FrontPanelConfig::getInstance().getColors();
+        for (uint j = 0; j < supportedColors.size(); j++)
+        {
+            if( supportedColors.at(j).getId() == color.getId())
+            {
+               isValidColor = true;
+               break;
+            }
+        }
+        if(!isValidColor)
+        {
+           throw IllegalArgumentException("Invalid color object");
+        }
+    }
+    dsFPDColor_t colorValue = _colorsValues[color.getId()];
+
+    if (dsERR_NONE != dsSetFPDColor((dsFPDIndicator_t)_id, (dsFPDColor_t)colorValue,IsPersist) )
+    {
+        throw IllegalArgumentException("dsSetFPDColor failed");
+    }
+	_color_rgb32 = colorValue;
 	//std::cout << "_color_rgb32 = " << _color_rgb32 << std::endl;
 }
 
@@ -474,7 +500,15 @@ void FrontPanelIndicator::setColor(const FrontPanelIndicator::Color & color,bool
 void FrontPanelIndicator::setColor(uint32_t color,bool toPersist)
 {
     bool IsPersist = toPersist;
-    dsSetFPDColor((dsFPDIndicator_t)_id, (dsFPDColor_t) color,IsPersist);
+    bool isValidColor = false;
+    if(_colorMode == 0 || _colorMode == 2)
+    {
+        throw UnsupportedOperationException("This API not supported for the color mode");
+    }
+    if (dsERR_NONE != dsSetFPDColor((dsFPDIndicator_t)_id, (dsFPDColor_t) color,IsPersist) )
+    {
+        throw IllegalArgumentException();
+    }
 	_color_rgb32 = (dsFPDColor_t) color;
     //std::cout << "UINT _color_rgb32 = " << _color_rgb32 << std::endl;
 }
