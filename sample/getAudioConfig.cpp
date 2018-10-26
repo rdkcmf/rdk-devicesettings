@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
         printf("\t LoopThru- [%s]\r\n",       aPort.isLoopThru() ? "True" : "False");
         printf("\t Mute Status - [%s]\r\n",   aPort.isMuted()? "On" : "Off");
         printf("\t MS11 MultiStreamDecode Status - [%s]\r\n",aPort.isAudioMSDecode()? "On" : "Off");
+        printf("\t Loudness Equivalence - [%s]\r\n",aPort.GetLEConfig()? "Enabled" : "Disabled");
         printf("\t MaxDB - [%f]\r\n",         aPort.getMaxDB());
         printf("\t MinDB- [%f]\r\n",          aPort.getMinDB());
         printf("\t Optimal Level- [%f]\r\n",  aPort.getOptimalLevel());
