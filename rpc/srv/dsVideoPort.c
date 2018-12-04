@@ -1358,5 +1358,21 @@ IARM_Result_t _dsGetHdmiPreference(void *arg)
 
 }
 
+bool isComponentPortPresent()
+{
+    bool componentPortPresent = false;
+    int numPorts,i;
+
+    numPorts = dsUTL_DIM(kSupportedPortTypes);
+    for(i=0; i< numPorts; i++)
+    {
+        if (kSupportedPortTypes[i] == dsVIDEOPORT_TYPE_COMPONENT)
+        {
+            componentPortPresent = true;;
+        }
+    }
+    printf(" componentPortPresent :%d\n",componentPortPresent);
+    return componentPortPresent;
+}
 /** @} */
 /** @} */
