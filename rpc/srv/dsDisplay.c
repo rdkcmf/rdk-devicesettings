@@ -245,7 +245,6 @@ void _dsDisplayEventCallback(int handle, dsDisplayEvent_t event, void *eventData
 	{
 		printf("Err:HDMI Hot plug back has NULL Handle... !!!!!!..\r\n");
 	}
-    IARM_BUS_Lock(lock);
 	switch(event)
 	{
 		case dsDISPLAY_EVENT_CONNECTED:
@@ -283,7 +282,6 @@ void _dsDisplayEventCallback(int handle, dsDisplayEvent_t event, void *eventData
 			
 	}
     IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,(IARM_EventId_t)_eventId,(void *)&_eventData, sizeof(_eventData));
-    IARM_BUS_Unlock(lock);
 }
 
 static void filterEDIDResolution(int handle, dsDisplayEDID_t *edid)

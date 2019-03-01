@@ -347,6 +347,16 @@ typedef enum _dsVideoScanMode_t{
 }dsVideoScanMode_t;
 
 /**
+ * This enumeration defines background color for video port.
+ */
+typedef enum _dsVideoBackgroundColor_t{
+    dsVIDEO_BGCOLOR_BLUE,     /**< Background color BLUE.  */
+    dsVIDEO_BGCOLOR_BLACK,    /**< Background color BLACK  */
+    dsVIDEO_BGCOLOR_NONE,     /**< Background color NONE  */
+    dsVIDEO_BGCOLOR_MAX       /**< Maximum index for background color. */
+}dsVideoBackgroundColor_t;
+
+/**
  * Video scan mode type validation check.
  */
 #define dsVideoPortScanMode_isValid(t)  (((t) >= dsVIDEO_SCANMODE_INTERLACED ) && ((t) < dsVIDEO_SCANMODE_MAX))

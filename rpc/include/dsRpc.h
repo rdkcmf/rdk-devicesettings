@@ -119,7 +119,7 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsGetColorDepth          "dsGetColorDepths"
 #define IARM_BUS_DSMGR_API_dsGetColorSpace          "dsGetColorSpace"
 #define IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings "dsGetCurrentOutputSettings"
-
+#define IARM_BUS_DSMGR_API_dsSetBackgroundColor "dsSetBackgroundColor"
 /*
  * Declare RPC FP  API names 
  */
@@ -233,6 +233,10 @@ typedef struct _dsVideoPortGetHDCPProtocolVersion_t {
 	dsHdcpProtocolVersion_t protocolVersion;
 } dsVideoPortGetHDCPProtocolVersion_t;
 
+typedef struct _dsSetBackgroundColorParam_t{
+        int handle;
+        dsVideoBackgroundColor_t color;
+} dsSetBackgroundColorParam_t;
 
 typedef struct _dsVideoPortIsDisplayConnectedParam_t {
 	int handle;

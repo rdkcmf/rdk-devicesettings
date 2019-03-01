@@ -102,6 +102,7 @@ IARM_Result_t _dsGetMatrixCoefficients(void* arg);
 IARM_Result_t _dsGetColorDepth(void* arg);
 IARM_Result_t _dsGetColorSpace(void* arg);
 IARM_Result_t _dsGetCurrentOutputSettings(void* arg);
+IARM_Result_t _dsSetBackgroundColor(void *arg);
 
 
 static dsVideoPortType_t _GetVideoPortType(int handle);
@@ -220,6 +221,7 @@ IARM_Result_t _dsVideoPortInit(void *arg)
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetColorDepth,_dsGetColorDepth);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetColorSpace,_dsGetColorSpace);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings,_dsGetCurrentOutputSettings);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetBackgroundColor,_dsSetBackgroundColor);
 	
         m_isInitialized = 1;
     }
@@ -906,7 +908,6 @@ void _dsHdcpCallback (int handle, dsHdcpStatus_t status)
 	{
 		printf("Err:HDMI Hot plug back has NULL Handle... !!!!!!..\r\n");
 	}
-	IARM_BUS_Lock(lock);
 	switch(status)
 	{
 		case dsHDCP_STATUS_AUTHENTICATED:
@@ -931,7 +932,6 @@ void _dsHdcpCallback (int handle, dsHdcpStatus_t status)
 	}
 	
 	IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,(IARM_EventId_t)IARM_BUS_DSMGR_EVENT_HDCP_STATUS,(void *)&hdcp_eventData, sizeof(hdcp_eventData));
-	IARM_BUS_Unlock(lock);
 }
 
 IARM_Result_t _dsGetHDCPStatus (void *arg)
@@ -1578,6 +1578,42 @@ IARM_Result_t _dsGetHdmiPreference(void *arg)
     return IARM_RESULT_SUCCESS;
 
 }
+
+IARM_Result_t _dsSetBackgroundColor(void *arg)
+{
+    dsSetBackgroundColorParam_t *param = (dsSetBackgroundColorParam_t*) arg;
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetBackgroundColor_t)(int handle, dsVideoBackgroundColor_t color);
+    static dsSetBackgroundColor_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib != NULL) {
+            func = (dsSetBackgroundColor_t) dlsym(dllib, "dsSetBackgroundColor");
+            if (func != NULL) {
+                printf("dsSRV: dsError_t dsSetBackgroundColor(int handle, dsVideoBackgroundColor_t color)  is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSRV: dsError_t dsSetBackgroundColor(int handle, dsVideoBackgroundColor_t color) is not defined\r\n");
+                dlclose(dllib);
+            }
+        }
+        else {
+            printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    if (param != NULL && func != NULL) {
+          func(param->handle, param->color);
+    }
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+
+}
+
 
 bool isComponentPortPresent()
 {
