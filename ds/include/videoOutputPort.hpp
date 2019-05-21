@@ -268,6 +268,11 @@ public:
         int GetHdmiPreference();
 
 	bool setScartParameter(const std::string parameter, const std::string value);
+	int getVideoEOTF() const;
+	int getMatrixCoefficients() const;
+	int getColorSpace() const;
+	int getColorDepth() const;
+	void getCurrentOutputSettings(int &videoEOTF, int &matrixCoefficients, int &colorSpace, int &colorDepth) const;
 
 private:
 	Display _display;

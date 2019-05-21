@@ -156,6 +156,71 @@ bool VideoOutputPort::setScartParameter(const std::string parameter, const std::
 	return dsSetScartParameter(_handle, parameter.c_str(), value.c_str()) == dsERR_NONE;
 }
 
+int VideoOutputPort::getVideoEOTF() const
+{
+    dsHDRStandard_t videoEotf = dsHDRSTANDARD_NONE;
+    dsError_t ret = dsGetVideoEOTF(_handle, &videoEotf);
+
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+
+    return (int)videoEotf;
+}
+
+int VideoOutputPort::getMatrixCoefficients() const
+{
+    dsDisplayMatrixCoefficients_t matrixCoefficients = dsDISPLAY_MATRIXCOEFFICIENT_UNKNOWN;
+    dsError_t ret = dsGetMatrixCoefficients(_handle, &matrixCoefficients);
+
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+
+    return (int)matrixCoefficients;
+}
+
+int VideoOutputPort::getColorDepth() const
+{
+    unsigned int colorDepth = 0;
+    dsError_t ret = dsGetColorDepth(_handle, &colorDepth);
+
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+
+    return (int)colorDepth;
+}
+
+int VideoOutputPort::getColorSpace() const
+{
+    dsDisplayColorSpace_t colorSpace = dsDISPLAY_COLORSPACE_UNKNOWN;
+    dsError_t ret = dsGetColorSpace(_handle, &colorSpace);
+
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+
+    return (int)colorSpace;
+}
+
+void VideoOutputPort::getCurrentOutputSettings(int &videoEOTF, int &matrixCoefficients, int &colorSpace, int &colorDepth) const
+{
+    dsHDRStandard_t _videoEOTF = dsHDRSTANDARD_NONE;
+    dsDisplayMatrixCoefficients_t _matrixCoefficients = dsDISPLAY_MATRIXCOEFFICIENT_UNKNOWN;
+    dsDisplayColorSpace_t _colorSpace = dsDISPLAY_COLORSPACE_UNKNOWN;
+    unsigned int _colorDepth = 0;
+    dsError_t ret = dsGetCurrentOutputSettings(_handle, &_videoEOTF, &_matrixCoefficients, &_colorSpace, &_colorDepth);
+
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+
+    videoEOTF = _videoEOTF;
+    matrixCoefficients = _matrixCoefficients;
+    colorSpace = _colorSpace;
+    colorDepth = _colorDepth;
+}
 
 /**
  * @fn VideoOutputPort::~VideoOutputPort()

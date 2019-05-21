@@ -97,6 +97,11 @@ IARM_Result_t _dsIsOutputHDR(void *arg);
 IARM_Result_t _dsResetOutputToSDR(void *arg);
 IARM_Result_t _dsSetHdmiPreference(void *arg);
 IARM_Result_t _dsGetHdmiPreference(void *arg);
+IARM_Result_t _dsGetVideoEOTF(void *arg);
+IARM_Result_t _dsGetMatrixCoefficients(void* arg);
+IARM_Result_t _dsGetColorDepth(void* arg);
+IARM_Result_t _dsGetColorSpace(void* arg);
+IARM_Result_t _dsGetCurrentOutputSettings(void* arg);
 
 
 static dsVideoPortType_t _GetVideoPortType(int handle);
@@ -210,6 +215,11 @@ IARM_Result_t _dsVideoPortInit(void *arg)
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsResetOutputToSDR,_dsResetOutputToSDR);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetHdmiPreference,_dsSetHdmiPreference);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetHdmiPreference,_dsGetHdmiPreference);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetVideoEOTF,_dsGetVideoEOTF);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMatrixCoefficients,_dsGetMatrixCoefficients);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetColorDepth,_dsGetColorDepth);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetColorSpace,_dsGetColorSpace);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings,_dsGetCurrentOutputSettings);
 	
         m_isInitialized = 1;
     }
@@ -281,7 +291,218 @@ IARM_Result_t _dsIsVideoPortActive(void *arg)
 	return IARM_RESULT_SUCCESS;
 }
 
+IARM_Result_t _dsGetVideoEOTF(void* arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
 
+    typedef dsError_t (*dsGetVideoEOTF_t)(int handle, dsHDRStandard_t* video_eotf);
+    static dsGetVideoEOTF_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetVideoEOTF_t) dlsym(dllib, "dsGetVideoEOTF");
+            if (func) {
+                printf("dsGetVideoEOTF_t(int, dsHDRStandard_t*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetVideoEOTF_t(int, dsHDRStandard_t*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsEot_t* param = (dsEot_t*)arg;
+
+    if (func != 0) {
+        param->result = func(param->handle, &param->video_eotf);
+    }
+    else {
+        param->video_eotf = dsHDRSTANDARD_NONE;
+    }
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsGetMatrixCoefficients(void* arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetMatrixCoefficients_t)(int handle, dsDisplayMatrixCoefficients_t* matrix_coefficients);
+    static dsGetMatrixCoefficients_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetMatrixCoefficients_t) dlsym(dllib, "dsGetMatrixCoefficients");
+            if (func) {
+                printf("dsGetMatrixCoefficients_t(int, dsDisplayMatrixCoefficients_t*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetMatrixCoefficients_t(int, dsDisplayMatrixCoefficients_t*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsMatrixCoefficients_t* param = (dsMatrixCoefficients_t*)arg;
+
+    if (func != 0) {
+        param->result = func(param->handle, &param->matrix_coefficients);
+    }
+    else {
+        param->matrix_coefficients = dsDISPLAY_MATRIXCOEFFICIENT_UNKNOWN;
+    }
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsGetColorDepth(void* arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetColorDepth_t)(int handle, unsigned int* color_depth);
+    static dsGetColorDepth_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetColorDepth_t) dlsym(dllib, "dsGetColorDepth");
+            if (func) {
+                printf("dsGetColorDepth_t(int, unsigned int*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetColorDepth_t(int, unsigned int*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsColorDepth_t* param = (dsColorDepth_t*)arg;
+
+    if (func != 0) {
+        param->result = func(param->handle, &param->color_depth);
+    }
+    else {
+        param->color_depth = 0;
+    }
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsGetColorSpace(void* arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetColorSpace_t)(int handle, dsDisplayColorSpace_t* color_space);
+    static dsGetColorSpace_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetColorSpace_t) dlsym(dllib, "dsGetColorSpace");
+            if (func) {
+                printf("dsGetColorSpace_t(int, dsDisplayColorSpace_t*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetColorSpace_t(int, dsDisplayColorSpace_t*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsColorSpace_t* param = (dsColorSpace_t*)arg;
+
+    if (func != 0) {
+        param->result = func(param->handle, &param->color_space);
+    }
+    else {
+        param->color_space = dsDISPLAY_COLORSPACE_UNKNOWN;
+    }
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsGetCurrentOutputSettings(void* arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetCurrentOutputSettings_t)(int handle, dsHDRStandard_t* video_eotf, dsDisplayMatrixCoefficients_t* matrix_coefficients, dsDisplayColorSpace_t* color_space, unsigned int* color_depth);
+    static dsGetCurrentOutputSettings_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetCurrentOutputSettings_t) dlsym(dllib, "dsGetCurrentOutputSettings");
+            if (func) {
+                printf("dsGetCurrentOutputSettings_t(int, dsHDRStandard_t*, dsDisplayMatrixCoefficients_t*, dsDisplayColorSpace_t*, unsigned int*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetCurrentOutputSettings_t(int, dsHDRStandard_t*, dsDisplayMatrixCoefficients_t*, dsDisplayColorSpace_t*, unsigned int*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsCurrentOutputSettings_t* param = (dsCurrentOutputSettings_t*)arg;
+
+    if (func != 0) {
+        param->result = func(param->handle, &param->video_eotf, &param->matrix_coefficients, &param->color_space, &param->color_depth);
+    }
+    else {
+        param->color_space = dsDISPLAY_COLORSPACE_UNKNOWN;
+        param->color_depth = 0;
+        param->matrix_coefficients = dsDISPLAY_MATRIXCOEFFICIENT_UNKNOWN;
+        param->video_eotf = dsHDRSTANDARD_NONE;
+    }
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+}
 
 IARM_Result_t _dsIsHDCPEnabled(void *arg)
 {

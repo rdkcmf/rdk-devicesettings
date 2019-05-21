@@ -114,6 +114,11 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsGetHdmiPreference "dsGetHdmiPreference"
 #define IARM_BUS_DSMGR_API_dsEnableHDRDVSupport "dsEnableHDRDVSupport"
 #define IARM_BUS_DSMGR_API_dsSetScartParameter     "dsSetScartParameter"
+#define IARM_BUS_DSMGR_API_dsGetVideoEOTF           "dsGetVideoEOTF"
+#define IARM_BUS_DSMGR_API_dsGetMatrixCoefficients  "dsGetMatrixCoefficients"
+#define IARM_BUS_DSMGR_API_dsGetColorDepth          "dsGetColorDepths"
+#define IARM_BUS_DSMGR_API_dsGetColorSpace          "dsGetColorSpace"
+#define IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings "dsGetCurrentOutputSettings"
 
 /*
  * Declare RPC FP  API names 
@@ -517,6 +522,39 @@ typedef struct _dsScartParamParam_t {
     char param_bytes[DSSCART_PARAM_LEN_MAX];
     char value_bytes[DSSCART_VALUE_LEN_MAX];
 } dsScartParamParam_t;
+
+typedef struct _dsEot_t {
+    dsError_t result;
+    int handle;
+    dsHDRStandard_t video_eotf;
+} dsEot_t;
+
+typedef struct _dsMatrixCoefficients_t {
+    dsError_t result;
+    int handle;
+    dsDisplayMatrixCoefficients_t matrix_coefficients;
+} dsMatrixCoefficients_t;
+
+typedef struct _dsColorDepth_t {
+    dsError_t result;
+    int handle;
+    uint32_t color_depth;
+} dsColorDepth_t;
+
+typedef struct _dsColorSpace_t {
+    dsError_t result;
+    int handle;
+    dsDisplayColorSpace_t color_space;
+} dsColorSpace_t;
+
+typedef struct _dsCurrentOutputSettings_t {
+    dsError_t result;
+    int handle;
+    dsHDRStandard_t video_eotf;
+    dsDisplayMatrixCoefficients_t matrix_coefficients;
+    uint32_t color_depth;
+    dsDisplayColorSpace_t color_space;
+} dsCurrentOutputSettings_t;
 
 #ifdef __cplusplus
 }

@@ -702,6 +702,42 @@ typedef enum _dsPowerState_t{
 	dsPOWER_OFF,       /**< Host Power-off state. */
 }dsPowerState_t;
 
+typedef enum _dsDisplayMatrixCoefficients_t
+{
+    dsDISPLAY_MATRIXCOEFFICIENT_UNKNOWN = 0,  /* Unknown Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_BT_709,       /* ITU BT 709 Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_BT_470_2_BG,  /* ITU BT 470_2_BG Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_SMPTE_170M ,  /* SMPTE 170M Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_XvYCC_709,    /* XvYCC_709 Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_eXvYCC_601,   /* XvYCC_601 Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_BT_2020_NCL,  /* ITU BT 2020 non constant luminance Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_BT_2020_CL    /* ITU BT 2020 constant luminance Matrix Coefficient. */
+} dsDisplayMatrixCoefficients_t;
+
+typedef enum _dsDisplayColorimetryInfo_t
+{
+    dsDISPLAY_COLORIMETRY_INFO_UNKNOWN = 0,         /* Unknown Colorimetry */
+    dsDISPLAY_COLORIMETRY_INFO_XVYCC601 = 0x01,     /* Standard Definition Colorimetry based on IEC 61966-2-4 */
+    dsDISPLAY_COLORIMETRY_INFO_XVYCC709 = 0x02,     /* High Definition Colorimetry based on IEC 61966-2-4 */
+    dsDISPLAY_COLORIMETRY_INFO_SYCC601 = 0x04,      /* Colorimetry based on IEC 61966-2-1/Amendment 1 */
+    dsDISPLAY_COLORIMETRY_INFO_ADOBEYCC601 = 0x08,  /* Colorimetry based on IEC 61966-2-5 [32], Annex A */
+    dsDISPLAY_COLORIMETRY_INFO_ADOBERGB = 0x10,     /* Colorimetry based on IEC 61966-2-5 */
+    dsDISPLAY_COLORIMETRY_INFO_BT2020CL = 0x20,     /* Colorimetry based on ITU-R BT.2020 [39] Y’cC’BCC’RC */
+    dsDISPLAY_COLORIMETRY_INFO_BT2020NCL = 0x40,    /* Colorimetry based on ITU-R BT.2020 [39] Y’C’BC’R */
+    dsDISPLAY_COLORIMETRY_INFO_BT2020RGB = 0x80,    /* Colorimetry based on ITU-R BT.2020 [39] R’G’B’ */
+    dsDISPLAY_COLORIMETRY_INFO_DCI_P3 = 0x100       /* Colorimetry based on DCI-P3 */
+} dsDisplayColorimetryInfo_t;
+
+typedef enum _dsDisplayColorSpace_t
+{
+    dsDISPLAY_COLORSPACE_UNKNOWN = 0,     /* Unknown color space */
+    dsDISPLAY_COLORSPACE_RGB = 1,         /* RGB color space */
+    dsDISPLAY_COLORSPACE_YCbCr422 = 2,    /* YCbCr4.2.2 color space */
+    dsDISPLAY_COLORSPACE_YCbCr444 = 3,    /* YCbCr4.4.4 color space */
+    dsDISPLAY_COLORSPACE_YCbCr420 = 4,    /* YCbCr4.2.0 color space */
+    dsDISPLAY_COLORSPACE_AUTO = 5         /* Automatic color space */
+} dsDisplayColorSpace_t;
+
 /**
  * Sleep mode validation check.
  */

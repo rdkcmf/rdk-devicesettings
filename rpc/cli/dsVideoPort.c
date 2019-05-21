@@ -713,5 +713,153 @@ dsError_t dsGetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpProtocol)
         return dsERR_GENERAL ;
 }
 
+dsError_t dsGetVideoEOTF(int handle, dsHDRStandard_t* video_eotf)
+{
+  _DEBUG_ENTER();
+
+  if (video_eotf == NULL) {
+      return dsERR_INVALID_PARAM;
+  }
+
+  dsEot_t param;
+
+  memset(&param, 0, sizeof(param));
+  param.handle = handle;
+  param.result = dsERR_NONE;
+
+  IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+  rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsGetVideoEOTF,
+                        (void *)&param,
+                        sizeof(param));
+
+  if( (IARM_RESULT_SUCCESS == rpcRet) && (dsERR_NONE == param.result))
+  {
+    *video_eotf = param.video_eotf;
+    return dsERR_NONE;
+  }
+
+  return dsERR_GENERAL ;
+}
+
+dsError_t dsGetMatrixCoefficients(int handle, dsDisplayMatrixCoefficients_t *matrix_coefficients)
+{
+  _DEBUG_ENTER();
+
+  if (matrix_coefficients == NULL) {
+      return dsERR_INVALID_PARAM;
+  }
+
+  dsMatrixCoefficients_t param;
+
+  memset(&param, 0, sizeof(param));
+  param.handle = handle;
+  param.result = dsERR_NONE;
+
+  IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+  rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsGetMatrixCoefficients,
+                        (void *)&param,
+                        sizeof(param));
+
+  if( (IARM_RESULT_SUCCESS == rpcRet) && (dsERR_NONE == param.result))
+  {
+    *matrix_coefficients = param.matrix_coefficients;
+    return dsERR_NONE;
+  }
+
+  return dsERR_GENERAL ;
+}
+
+dsError_t dsGetColorDepth(int handle, unsigned int* color_depth)
+{
+  _DEBUG_ENTER();
+
+  if (color_depth == NULL) {
+      return dsERR_INVALID_PARAM;
+  }
+
+  dsColorDepth_t param;
+
+  memset(&param, 0, sizeof(param));
+  param.handle = handle;
+  param.result = dsERR_NONE;
+
+  IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+  rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsGetColorDepth,
+                        (void *)&param,
+                        sizeof(param));
+
+  if( (IARM_RESULT_SUCCESS == rpcRet) && (dsERR_NONE == param.result))
+  {
+    *color_depth = param.color_depth;
+    return dsERR_NONE;
+  }
+
+  return dsERR_GENERAL ;
+}
+
+dsError_t dsGetColorSpace(int handle, dsDisplayColorSpace_t* color_space)
+{
+  _DEBUG_ENTER();
+
+  if (color_space == NULL) {
+      return dsERR_INVALID_PARAM;
+  }
+
+  dsColorSpace_t param;
+
+  memset(&param, 0, sizeof(param));
+  param.handle = handle;
+  param.result = dsERR_NONE;
+
+  IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+  rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsGetColorSpace,
+                        (void *)&param,
+                        sizeof(param));
+
+  if( (IARM_RESULT_SUCCESS == rpcRet) && (dsERR_NONE == param.result))
+  {
+    *color_space = param.color_space;
+    return dsERR_NONE;
+  }
+
+  return dsERR_GENERAL ;
+}
+
+dsError_t dsGetCurrentOutputSettings(int handle, dsHDRStandard_t* video_eotf, dsDisplayMatrixCoefficients_t* matrix_coefficients, dsDisplayColorSpace_t* color_space, unsigned int* color_depth)
+{
+  _DEBUG_ENTER();
+
+  if (video_eotf == NULL || matrix_coefficients == NULL || color_space == NULL || color_depth == NULL) {
+      return dsERR_INVALID_PARAM;
+  }
+
+  dsCurrentOutputSettings_t param;
+
+  memset(&param, 0, sizeof(param));
+  param.handle = handle;
+  param.result = dsERR_NONE;
+
+  IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+  rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings,
+                        (void *)&param,
+                        sizeof(param));
+
+  if( (IARM_RESULT_SUCCESS == rpcRet) && (dsERR_NONE == param.result))
+  {
+    *video_eotf = param.video_eotf;
+    *matrix_coefficients = param.matrix_coefficients;
+    *color_space = param.color_space;
+    *color_depth = param.color_depth;
+    return dsERR_NONE;
+  }
+
+  return dsERR_GENERAL ;
+}
+
 /** @} */
 /** @} */

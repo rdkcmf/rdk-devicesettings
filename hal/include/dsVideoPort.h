@@ -407,6 +407,69 @@ dsError_t dsGetForceDisable4KSupport(int handle, bool *disable);
  */
 dsError_t dsSetScartParameter(int handle, const char* parameter_str, const char* value_str);
 
+/**
+ * @brief Get current video Electro-Optical Transfer Function (EOT) value;
+ *
+ * @param[in]  handle -  Handle of the display device.
+ * @param[out] video_eotf - pointer to EOFF value
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE on success
+ * @retval dsERR_GENERAL General failure.
+ */
+dsError_t dsGetVideoEOTF(int handle, dsHDRStandard_t *video_eotf);
+
+/**
+ * @brief Get current matrix coefficients value.
+ *
+ * @param[in]  handle -  Handle of the display device.
+ * @param[out] matrix_coefficients - pointer to matrix coefficients value
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE on success
+ * @retval dsERR_GENERAL General failure.
+ */
+dsError_t dsGetMatrixCoefficients(int handle, dsDisplayMatrixCoefficients_t *matrix_coefficients);
+
+/**
+ * @brief Get current color depth value.
+ *
+ * @param[in]  handle -  Handle of the display device.
+ * @param[out] color_depth - pointer to color depths value.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE on success
+ * @retval dsERR_GENERAL General failure.
+ */
+dsError_t dsGetColorDepth(int handle, unsigned int* color_depth);
+
+/**
+ * @brief Get current color space setting.
+ *
+ * @param[in]  handle -  Handle of the display device.
+ * @param[out] color_space - pointer to color space value.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE on success
+ * @retval dsERR_GENERAL General failure.
+ */
+dsError_t dsGetColorSpace(int handle, dsDisplayColorSpace_t* color_space);
+
+/**
+ * @brief Get current color space setting, color depth, matrix coefficients and video Electro-Optical Transfer Function (EOT)
+ *        in one call
+ *
+ * @param[in]  handle -  Handle of the display device.
+ * @param[out] video_eotf - pointer to EOFF value
+ * @param[out] matrix_coefficients - pointer to matrix coefficients value
+ * @param[out] color_space - pointer to color space value.
+ * @param[out] color_depth - pointer to color depths value.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE on success
+ * @retval dsERR_GENERAL General failure.
+ */
+dsError_t dsGetCurrentOutputSettings(int handle, dsHDRStandard_t* video_eotf, dsDisplayMatrixCoefficients_t* matrix_coefficients, dsDisplayColorSpace_t* color_space, unsigned int* color_depth);
 
 /**
  * @brief Check Video Output is HDR or not.
