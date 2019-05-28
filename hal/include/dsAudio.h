@@ -213,6 +213,28 @@ dsError_t  dsGetAudioMinDB(int handle, float *minDb);
 dsError_t  dsGetAudioOptimalLevel(int handle, float *optimalLevel);
 
 /**
+ * @brief Get the audio delay in milliseconds
+ *
+ * This function will get the audio delay in milliseconds.
+ *
+ * @param [in] handle        Handle for the Output Audio port
+ * @param [out] *audioDelayMs Audio delay in milliseconds
+ * @return dsError_t Error code.
+ */
+dsError_t dsGetAudioDelay(int handle, uint32_t *audioDelayMs);
+
+/**
+ * @brief Get the audio delay offset in milliseconds
+ *
+ * This function will get the audio delay offset in milliseconds.
+ *
+ * @param [in] handle        Handle for the Output Audio port
+ * @param [out] *audioDelayOffsetMs Audio delay offset in milliseconds
+ * @return dsError_t Error code.
+ */
+dsError_t dsGetAudioDelayOffset(int handle, uint32_t *audioDelayOffsetMs);
+
+/**
  * @brief Get the loop-through mode of an audio port.
  * 
  * This function is used to check if the audio port is configured for loop-through.
@@ -431,6 +453,27 @@ dsError_t  dsIsAudioMSDecode(int handle, bool *HasMS11Decode);
  */
 dsError_t  dsIsAudioMS12Decode(bool *HasMS12Decode);
 
+/**
+ * @brief Set the audio delay in milliseconds
+ * 
+ * This function will set the audio delay in milliseconds
+ *
+ * @param [in] handle      Handle for the Output Audio port
+ * @param [in] audioDelayMs  Amount of milliseconds of delay
+ * @return dsError_t Error code.
+ */
+dsError_t dsSetAudioDelay(int handle, const uint32_t audioDelayMs);
+
+/**
+ * @brief Set the audio delay offset in milliseconds
+ * 
+ * This function will set the audio delay offset in milliseconds
+ *
+ * @param [in] handle      Handle for the Output Audio port
+ * @param [in] audioDelayOffsetMs  Amount of milliseconds of delay offset
+ * @return dsError_t Error code.
+ */
+dsError_t dsSetAudioDelayOffset(int handle, const uint32_t audioDelayOffsetMs);
 
 /**
  * @brief Terminate the Audio Port sub-system.

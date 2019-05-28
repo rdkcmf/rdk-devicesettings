@@ -57,6 +57,10 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsEnableMS12Config	"dsEnableMS12Config"
 #define  IARM_BUS_DSMGR_API_dsEnableLEConfig            "dsEnableLEConfig"
 #define IARM_BUS_DSMGR_API_dsGetLEConfig        "dsGetLEConfig"
+#define  IARM_BUS_DSMGR_API_dsSetAudioDelay            "dsSetAudioDelay"
+#define  IARM_BUS_DSMGR_API_dsGetAudioDelay            "dsGetAudioDelay"
+#define  IARM_BUS_DSMGR_API_dsSetAudioDelayOffset      "dsSetAudioDelayOffset"
+#define  IARM_BUS_DSMGR_API_dsGetAudioDelayOffset      "dsGetAudioDelayOffset"
 
 
 /*
@@ -204,6 +208,20 @@ typedef struct _dsAudioGetMS11Param_t {
     bool ms11Enabled;
 } dsAudioGetMS11Param_t;
 
+typedef struct _dsGetAudioDelayParam_t {
+       int handle;
+       uint32_t audioDelayMs;
+} dsGetAudioDelayParam_t;
+
+typedef struct _dsSetAudioDelayParam_t {
+       int handle;
+       uint32_t audioDelayMs;
+} dsSetAudioDelayParam_t;
+
+typedef struct _dsAudioDelayOffsetParam_t {
+       int handle;
+       uint32_t audioDelayOffsetMs;
+} dsAudioDelayOffsetParam_t;
 
 typedef struct _dsVideoPortGetHandleParam_t {
 	dsVideoPortType_t type;

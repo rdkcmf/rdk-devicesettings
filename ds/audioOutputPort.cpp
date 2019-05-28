@@ -56,6 +56,8 @@ extern dsError_t dsSetStereoMode(int handle, dsAudioStereoMode_t mode,bool IsPer
 
 namespace device {
 
+const uint32_t audioDelayMsMax = 300;
+const uint32_t audioDelayOffsetMsMax = 200;
 
 /**
  * @addtogroup dssettingsaudoutportapi
@@ -109,7 +111,7 @@ AudioOutputPort::AudioOutputPort(const int type, const int index, const int id) 
 								 _handle(-1), _encoding(AudioEncoding::kNone),
 								 _compression(AudioCompression::kNone), _stereoMode(AudioStereoMode::kStereo), _stereoAuto(false),
 								 _gain(0.0), _db(0.0), _maxDb(0.0), _minDb(0.0), _optimalLevel(0.0),
-								 _level(0.0), _loopThru(false), _muted(false)
+								 _level(0.0), _loopThru(false), _muted(false), _audioDelayMs(0), _audioDelayOffsetMs(0)
 {
 	dsGetAudioPort((dsAudioPortType_t)_type, _index, &_handle);
 	{
@@ -130,6 +132,8 @@ AudioOutputPort::AudioOutputPort(const int type, const int index, const int id) 
 	dsGetAudioDB				(_handle, &_db);
 	dsIsAudioLoopThru		(_handle, &_loopThru);
 	dsIsAudioMute			(_handle, &_muted);
+        dsGetAudioDelay                 (_handle, &_audioDelayMs);
+        dsGetAudioDelayOffset      (_handle, &_audioDelayOffsetMs);
 }
 
 
@@ -347,6 +351,38 @@ float AudioOutputPort::getOptimalLevel() const
 	return _optimalLevel;
 }
 
+/**
+ * @fn bool AudioOutputPort::getAudioDelay(uint32_t& audioDelayMs) const
+ * @brief This API is used to get the current audio delay in milliseconds for audio  output port.
+ *
+ * @return true if call succeded, false otherwise
+ */
+bool AudioOutputPort::getAudioDelay(uint32_t& audioDelayMs) const
+{
+	if (dsGetAudioDelay(_handle, &audioDelayMs) != dsERR_NONE)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * @fn bool AudioOutputPort::getAudioDelayOffset(uint32_t& audioDelayOffsetMs) const
+ * @brief This API is used to get the current audio delay offset in milliseconds for audio  output port.
+ *
+ * @return true if call succeded, false otherwise
+ */
+bool AudioOutputPort::getAudioDelayOffset(uint32_t& audioDelayOffsetMs) const
+{
+	if (dsGetAudioDelayOffset(_handle, &audioDelayOffsetMs) != dsERR_NONE)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 
 /**
  * @fn float AudioOutputPort::getLevel() const
@@ -529,6 +565,75 @@ void AudioOutputPort::setStereoMode(const int newMode, const bool toPersist)
 	if (ret != dsERR_NONE) 
 		throw Exception(ret);
 
+}
+
+/**
+ * @fn AudioOutputPort::setAudioDelay(const uint32_t audioDelayMs)
+ * @brief This API is used to set audio delay in milliseconds
+ *
+ * @param[in] audioDelayMs Number of milliseconds to delay the audio (0 to +250)
+ *
+ * @return None
+ */
+void AudioOutputPort::setAudioDelay(const uint32_t audioDelayMs)
+{
+	dsError_t ret = dsERR_NONE;
+	uint32_t ms = audioDelayMs;
+
+	INFO("AudioOutputPort [%s], setting delay to [%lu] ms\n", _name.c_str(), audioDelayMs);
+
+	if (ms > audioDelayMsMax)
+	{
+		ERROR("AudioOutputPort [%s], delay [%lu] ms, exceeds max [%lu]. Setting Max \n",
+			_name.c_str(),
+			audioDelayMs,
+			audioDelayMsMax);
+
+		ms = audioDelayMsMax;
+	}
+
+	ret = dsSetAudioDelay(_handle, ms);
+
+	if (ret == dsERR_NONE)
+	{
+		_audioDelayMs = audioDelayMs;
+	}
+	else
+	{
+		throw Exception(ret);
+	}
+}
+
+/**
+ * @fn AudioOutputPort::setAudioDelayOffset(const uint32_t audioDelayOffsetMs)
+ * @brief This API is used to set audio delay offset in milliseconds
+ *
+ * @param[in] audioDelayOffsetMs Number of milliseconds to offset(additional delay) of the audio delay(0 to +200)
+ *
+ * @return None
+ */
+void AudioOutputPort::setAudioDelayOffset(const uint32_t audioDelayOffsetMs)
+{
+	dsError_t ret = dsERR_NONE;
+	uint32_t ms = audioDelayOffsetMs;
+
+	if (ms > audioDelayOffsetMsMax)
+	{
+		ERROR("AudioOutputPort [%s], delay offset [%lu] ms, exceeds max [%lu]. Setting Max \n",
+			_name.c_str(), audioDelayOffsetMs, audioDelayOffsetMsMax);
+		ms = audioDelayOffsetMsMax;
+	}
+
+	ret = dsSetAudioDelayOffset(_handle, ms);
+
+	if (ret == dsERR_NONE)
+	{
+		_audioDelayOffsetMs = audioDelayOffsetMs;
+	}
+	else
+	{
+		throw Exception(ret);
+	}
 }
 
 /**

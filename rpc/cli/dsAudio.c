@@ -485,6 +485,94 @@ dsError_t dsEnableMS12Config(int handle, dsMS12FEATURE_t feature,const bool enab
 	return dsERR_NONE;
 }
 
+dsError_t dsSetAudioDelay(int handle, const uint32_t audioDelayMs)
+{
+	IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+	dsSetAudioDelayParam_t param;
+	param.handle = handle;
+	param.audioDelayMs = audioDelayMs;
+
+	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+							(char *)IARM_BUS_DSMGR_API_dsSetAudioDelay,
+							(void *)&param,
+							sizeof(param));
+
+	if (IARM_RESULT_SUCCESS != rpcRet)
+	{
+		return dsERR_GENERAL;
+	}
+
+	return dsERR_NONE;
+
+}
+
+dsError_t dsSetAudioDelayOffset(int handle, const uint32_t audioDelayOffsetMs)
+{
+	IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+	dsAudioDelayOffsetParam_t param;
+	param.handle = handle;
+	param.audioDelayOffsetMs = audioDelayOffsetMs;
+
+	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+							(char *)IARM_BUS_DSMGR_API_dsSetAudioDelayOffset,
+							(void *)&param,
+							sizeof(param));
+
+	if (IARM_RESULT_SUCCESS != rpcRet)
+	{
+		return dsERR_GENERAL;
+	}
+
+	return dsERR_NONE;
+
+}
+
+dsError_t dsGetAudioDelay(int handle, uint32_t *audioDelayMs)
+{
+	IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+	dsGetAudioDelayParam_t param;
+
+	param.handle = handle;
+	param.audioDelayMs = 0;
+
+	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+						(char *)IARM_BUS_DSMGR_API_dsGetAudioDelay,
+						(void *)&param,
+						sizeof(param));
+
+	if (IARM_RESULT_SUCCESS != rpcRet)
+	{
+		ERROR("%s: AUDIODELAY CLIENT (GET) GENERAL ERROR\n", __FUNCTION__);
+		return dsERR_GENERAL;
+	}
+
+	*audioDelayMs = param.audioDelayMs;
+	return dsERR_NONE;
+}
+
+dsError_t dsGetAudioDelayOffset(int handle, uint32_t *audioDelayOffsetMs)
+{
+	IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+	dsAudioDelayOffsetParam_t param;
+
+	param.handle = handle;
+	param.audioDelayOffsetMs = 0;
+
+	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+						(char *)IARM_BUS_DSMGR_API_dsGetAudioDelayOffset,
+						(void *)&param,
+						sizeof(param));
+
+	if (IARM_RESULT_SUCCESS != rpcRet)
+	{
+		printf("%s: AUDIODELAY CLIENT (GET) GENERAL ERROR\n", __FUNCTION__);
+		return dsERR_GENERAL;
+	}
+
+	*audioDelayOffsetMs = param.audioDelayOffsetMs;
+	return dsERR_NONE;
+}
+
 dsError_t dsEnableLEConfig(int handle, const bool enable)
 {
 	_dsLEConfigParam_t param;

@@ -37,6 +37,7 @@
 #include "dsTypes.h"
 
 #include <string>
+#include <stdint.h>
 
 
 /**
@@ -65,6 +66,8 @@ class AudioOutputPort  : public Enumerable {
 	int _encoding; //!< Audio Encoding Types.
 	int _compression; //!< Audio Compression Types.
 	int _stereoMode; //!< Audio stereo mode Types.
+	uint32_t _audioDelayMs; //!< Audio delays
+	uint32_t _audioDelayOffsetMs; //!< Audio delay offset
 	bool _stereoAuto; //!< Audio stereo mode Types.
 
 	float _gain; //!< Audio gain value.
@@ -119,6 +122,8 @@ public:
 	float getMaxDB() const;
 	float getMinDB() const;
 	float getOptimalLevel() const;
+	bool getAudioDelay(uint32_t& audioDelayMs) const;
+	bool getAudioDelayOffset(uint32_t& audioDelayOffsetMs) const;
 	bool isLoopThru() const;
 	bool isMuted() const;
 	bool isConnected() const;
@@ -137,6 +142,8 @@ public:
 	void enableMS12Config(const dsMS12FEATURE_t feature,const bool enable);
 	void enableLEConfig(const bool enable);
         bool GetLEConfig();
+        void setAudioDelay(const uint32_t audioDelayMs);
+        void setAudioDelayOffset(const uint32_t audioDelayOffsetMs);
 
 
 	void setDB(const float db);

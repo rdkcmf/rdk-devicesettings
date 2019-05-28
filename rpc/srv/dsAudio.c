@@ -80,6 +80,10 @@ IARM_Result_t _dsEnableAudioPort(void *arg);
 IARM_Result_t _dsEnableMS12Config(void *arg);
 IARM_Result_t _dsEnableLEConfig(void *arg);
 IARM_Result_t _dsGetLEConfig(void *arg);
+IARM_Result_t _dsSetAudioDelay(void *arg);
+IARM_Result_t _dsGetAudioDelay(void *arg);
+IARM_Result_t _dsSetAudioDelayOffset(void *arg);
+IARM_Result_t _dsGetAudioDelayOffset(void *arg);
 
 static void _GetAudioModeFromPersistent(void *arg);
 static dsAudioPortType_t _GetAudioPortType(int handle);
@@ -348,6 +352,10 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableMS12Config,_dsEnableMS12Config);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableLEConfig,_dsEnableLEConfig);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetLEConfig,_dsGetLEConfig);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioDelay, _dsSetAudioDelay);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioDelay, _dsGetAudioDelay);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioDelayOffset, _dsSetAudioDelayOffset);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioDelayOffset, _dsGetAudioDelayOffset);
 
         m_isInitialized = 1;
     }
@@ -817,6 +825,180 @@ IARM_Result_t _dsEnableMS12Config(void *arg)
     IARM_BUS_Unlock(lock);
 
     return result;
+}
+
+IARM_Result_t _dsSetAudioDelay(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetAudioDelay_t)(int handle, uint32_t audioDelayMs);
+    static dsSetAudioDelay_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetAudioDelay_t) dlsym(dllib, "dsSetAudioDelay");
+            if (func) {
+                printf("dsSetAudioDelay_t(int, uint32_t) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetAudioDelay_t(int, uint32_t) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsSetAudioDelayParam_t *param = (dsSetAudioDelayParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->audioDelayMs) != dsERR_NONE)
+        {
+            __TIMESTAMP();printf("%s: (SERVER) Unable to set audiodelay\n", __FUNCTION__);
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+
+}
+
+IARM_Result_t _dsGetAudioDelay(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetAudioDelay_t)(int handle, uint32_t *audioDelayMs);
+    static dsGetAudioDelay_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetAudioDelay_t) dlsym(dllib, "dsGetAudioDelay");
+            if (func) {
+                printf("dsGetAudioDelay_t(int, uint32_t*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetAudioDelay_t(int, uint32_t*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsGetAudioDelayParam_t *param = (dsGetAudioDelayParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        uint32_t audioDelayMs = 0;
+        param->audioDelayMs = 0;
+        if (func(param->handle, &audioDelayMs) == dsERR_NONE)
+        {
+            param->audioDelayMs = audioDelayMs;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsSetAudioDelayOffset(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetAudioDelayOffset_t)(int handle, uint32_t audioDelayOffsetMs);
+    static dsSetAudioDelayOffset_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetAudioDelayOffset_t) dlsym(dllib, "dsSetAudioDelayOffset");
+            if (func) {
+                printf("dsSetAudioDelayOffset_t(int, uint32_t) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetAudioDelayOffset_t(int, uint32_t) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAudioDelayOffsetParam_t *param = (dsAudioDelayOffsetParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->audioDelayOffsetMs) != dsERR_NONE)
+        {
+            __TIMESTAMP();printf("%s: (SERVER) Unable to set audiodelay offset\n", __FUNCTION__);
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+
+}
+
+IARM_Result_t _dsGetAudioDelayOffset(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetAudioDelayOffset_t)(int handle, uint32_t *audioDelayOffsetMs);
+    static dsGetAudioDelayOffset_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetAudioDelayOffset_t) dlsym(dllib, "dsGetAudioDelayOffset");
+            if (func) {
+                printf("dsGetAudioDelayOffset_t(int, uint32_t*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetAudioDelayOffset_t(int, uint32_t*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAudioDelayOffsetParam_t *param = (dsAudioDelayOffsetParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        uint32_t audioDelayOffsetMs = 0;
+        param->audioDelayOffsetMs = 0;
+        if (func(param->handle, &audioDelayOffsetMs) == dsERR_NONE)
+        {
+            param->audioDelayOffsetMs = audioDelayOffsetMs;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsEnableLEConfig(void *arg)
