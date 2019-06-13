@@ -37,6 +37,7 @@
 #include "dslogger.h"
 #include "dsVideoPort.h"
 #include "dsDisplay.h"
+#include "edid-parser.hpp"
 
 #include "illegalArgumentException.hpp"
 #include "unsupportedOperationException.hpp"
@@ -45,6 +46,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sstream>
+#include <thread>
+#include <chrono>
 using namespace std;
 
 
@@ -61,6 +64,10 @@ namespace device {
 
 const char * VideoOutputPort::kPropertyResolution = ".resolution";
 
+enum {
+    READ_EDID_RETRY_MS = 500,
+    READ_EDID_RETRY_TOTAL_MS = 2000
+};
 
 /**
  * @addtogroup dssettingsvidoutportapi
@@ -594,8 +601,13 @@ int VideoOutputPort::Display::getSurroundMode(void) const
 /**
  * @fn void VideoOutputPort::Display::getEDIDBytes(std::vector<uint8_t> &edid) const
  * @brief This function is used to get the EDID information of the connected video display.
- * After it gets the EDID information , it clears the old edid information and inserts the
- * If ret is not equal to dsERR_NONE, it will throw the ret to exception handler and it will pass message as "No message for this Exception".
+ * After it gets the EDID information , it clears the old edid information and inserts it.
+ * The EDID bytes are verified before returning them. If invalid EDID bytes are detected, the
+ * EDID bytes are read again after READ_EDID_RETRY_MS millis. This repeats for a maximum
+ * of READ_EDID_RETRY_TOTAL_MS millis.
+ * If ret is not equal to dsERR_NONE, it will throw the ret to exception handler and it will pass message as "dsGetEDIDBytes failed".
+ * If invalid EDID is read, even after retries, it throws exception with message "EDID verification failed"
+ * If EDID bytes length > 1024 it throws exception with message "EDID length > 1024"
  *
  * @param edid The EDID raw buffer of the display. The HAL implementation should
  *                      malloc() the buffer and return it to the application. The
@@ -606,27 +618,59 @@ int VideoOutputPort::Display::getSurroundMode(void) const
  */
 void VideoOutputPort::Display::getEDIDBytes(std::vector<uint8_t> &edid) const
 {
+    using namespace std::chrono;
+
     printf("VideoOutputPort::Display::getEDIDBytes \r\n");
 
     dsError_t ret = dsERR_NONE;
-    unsigned char *edidBytes = NULL;
     int length = 0;
-    ret = dsGetEDIDBytes(_handle, &edidBytes, &length);
-    printf("VideoOutputPort::Display::getEDIDBytes has ret %d\r\n", ret);
-    if (ret == dsERR_NONE) {
-        if (length <= 1024) {
-            printf("VideoOutputPort::Display::getEDIDBytes has %d bytes\r\n", length);
-            edid.clear();
-            edid.insert(edid.begin(), edidBytes, edidBytes + length); 
-            free(edidBytes);
+
+    struct MemGuard {
+        MemGuard() : edidBytes(NULL) {}
+        ~MemGuard() {
+            if (edidBytes) {
+                free(edidBytes);
+                edidBytes = NULL;
+            }
         }
-        else {
-            ret = dsERR_OPERATION_NOT_SUPPORTED;
+        unsigned char *edidBytes;
+    } memguard;
+
+    const auto reading_edid_start = system_clock::now();
+    const char* exceptionstr = "";
+    bool retry_get_edid;
+    do {
+        retry_get_edid = false;
+        const auto get_edid_bytes_start = system_clock::now();
+        ret = dsGetEDIDBytes(_handle, &memguard.edidBytes, &length);
+
+        printf("VideoOutputPort::Display::getEDIDBytes has ret %d\r\n", ret);
+        if (ret == dsERR_NONE) {
+            if (length <= 1024) {
+                printf("VideoOutputPort::Display::getEDIDBytes has %d bytes\r\n", length);
+                if (edid_parser::EDID_STATUS_OK == edid_parser::EDID_Verify(memguard.edidBytes, length)) {
+                    edid.clear();
+                    edid.insert(edid.begin(), memguard.edidBytes, memguard.edidBytes + length);
+                } else {
+                    ret = dsERR_GENERAL;
+                    exceptionstr = "EDID verification failed";
+                    auto now = system_clock::now();
+                    if (now + milliseconds(READ_EDID_RETRY_MS) < reading_edid_start + milliseconds(READ_EDID_RETRY_TOTAL_MS)) {
+                        std::this_thread::sleep_for(milliseconds(READ_EDID_RETRY_MS) - (now - get_edid_bytes_start));
+                        retry_get_edid = true;
+                    }
+                }
+            } else {
+                ret = dsERR_OPERATION_NOT_SUPPORTED;
+                exceptionstr = "EDID length > 1024";
+            }
+        } else {
+            exceptionstr = "dsGetEDIDBytes failed";
         }
-    }
+    } while (retry_get_edid);
 
     if (ret != dsERR_NONE) {
-		throw Exception(ret);
+        throw Exception(ret, exceptionstr);
     }
 }
 
