@@ -421,6 +421,16 @@ dsError_t  dsSetAudioMute(int handle, bool mute);
  */
 dsError_t  dsIsAudioMSDecode(int handle, bool *HasMS11Decode);
 
+/**
+ * @brief This function is used to check whether the audio port supports Dolby MS12 Multistream Decode
+ *
+ * @param[out] Address to hold the MS12 Multistream Decode setting of the specified audio port.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates dsIsAudioMS12Decode call is not implemented.
+ */
+dsError_t  dsIsAudioMS12Decode(bool *HasMS12Decode);
+
 
 /**
  * @brief Terminate the Audio Port sub-system.

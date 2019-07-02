@@ -83,25 +83,47 @@ IARM_Result_t _dsGetLEConfig(void *arg);
 
 static void _GetAudioModeFromPersistent(void *arg);
 static dsAudioPortType_t _GetAudioPortType(int handle);
-
-static bool rfc_get_ms12_status()
+static bool Is_Audio_MS12_Decode()
 {
-    bool isMS12Enabled = false;
-    int sysRet = system(". /lib/rdk/isFeatureEnabled.sh MS12");
-    if((WEXITSTATUS(sysRet) == true) && (WIFEXITED(sysRet) == true))
-    {
-        isMS12Enabled = true;
+#ifndef RDK_DSHAL_NAME
+    #warning   "RDK_DSHAL_NAME is not defined"
+    #define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    bool isMS12Decode = false;
+    typedef dsError_t  (*dsIsAudioMS12DecodeConfig_t)(bool *enable);
+    static dsIsAudioMS12DecodeConfig_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsIsAudioMS12DecodeConfig_t) dlsym(dllib, "dsIsAudioMS12Decode");
+            if (func) {
+                __TIMESTAMP();printf("dsIsAudioMS12Decode(bool *) is defined and loaded\r\n");
+            }
+            else {
+                __TIMESTAMP();printf("dsIsAudioMS12Decode(bool *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            __TIMESTAMP();printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
     }
 
-    __TIMESTAMP();printf("RFC MS12 feature status:%d",isMS12Enabled);
-    return isMS12Enabled;
+    if (func != NULL)
+    {
+        dsError_t ret = func(&isMS12Decode);
+    }
+
+    __TIMESTAMP();printf("Is_Audio_MS12_Decode status:%d",isMS12Decode);
+    return isMS12Decode;
 }
 
 void ms12ConfigInit()
 {
     typedef dsError_t  (*dsEnableMS12Config_t)(int handle, dsMS12FEATURE_t feature,const bool enable);
     int handle = 0;
-    if(rfc_get_ms12_status() == false)
+    if(Is_Audio_MS12_Decode() == false)
     {
     	return;
     }
@@ -757,7 +779,7 @@ IARM_Result_t _dsEnableMS12Config(void *arg)
     }
 
     _dsMS12ConfigParam_t *param = (_dsMS12ConfigParam_t *)arg;
-    if ((func != NULL) && (rfc_get_ms12_status() == true)) {
+    if ((func != NULL) && (Is_Audio_MS12_Decode() == true)) {
     	__TIMESTAMP();printf("MS12: %s feature :%s enable status:%d \r\n",__FUNCTION__,((param->feature==dsMS12FEATURE_DAPV2)?"DAPV2":"DE"),param->enable);
 
         if((param->feature == dsMS12FEATURE_DAPV2)  && (param->enable != m_MS12DAPV2Enabled) )
