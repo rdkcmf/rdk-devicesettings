@@ -422,9 +422,15 @@ namespace device
  */
     SleepMode Host::getPreferredSleepMode()
     {
-        dsSleepMode_t mode;
-        dsGetPreferredSleepMode(&mode);
-        return SleepMode::getInstance(mode);
+        dsSleepMode_t mode = dsHOST_SLEEP_MODE_LIGHT;
+        dsError_t ret = dsGetPreferredSleepMode(&mode);
+        if (ret == dsERR_NONE) {
+          return SleepMode::getInstance(mode);
+        }
+        else {
+          printf("Host::getPreferredSleepMode failed IPC, returning default LIGHT_SLEEP\r\n");
+          return SleepMode::getInstance(dsHOST_SLEEP_MODE_LIGHT);
+        }
     }
 
 
