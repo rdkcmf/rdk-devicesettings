@@ -514,6 +514,7 @@ typedef enum _dsHDRStandard_t {
     dsHDRSTANDARD_HLG = 0x02,
     dsHDRSTANDARD_DolbyVision = 0x04,
     dsHDRSTANDARD_TechnicolorPrime = 0x08,
+    dsHDRSTANDARD_Invalid = 0x80,
 } dsHDRStandard_t;
 
 /**
