@@ -97,6 +97,10 @@ static   dsFPDColorConfig_t  kIndicatorColors[dsFPD_COLOR_MAX] = {
 		/*.Id = */ 4,
 		/*.color = */ dsFPD_COLOR_ORANGE,
 	},
+	{
+		/*.Id = */ 5,
+		/*.color = */ dsFPD_COLOR_WHITE,
+	},
 
 };
 
