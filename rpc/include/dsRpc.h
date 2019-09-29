@@ -145,6 +145,7 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsFPEnableCLockDisplay "dsFPEnableCLockDisplay"
 #define IARM_BUS_DSMGR_API_dsGetTimeFormat         "dsGetTimeFormat"
 #define IARM_BUS_DSMGR_API_dsSetTimeFormat          "dsSetTimeFormat"
+#define IARM_BUS_DSMGR_API_dsSetFPDMode          "dsSetFPDMode"
 
 
 /*
@@ -379,6 +380,11 @@ typedef struct _dsFPDColorParam
     dsFPDColor_t eColor;
     bool toPersist;
 }dsFPDColorParam_t;
+
+typedef struct _dsFPDModeParam
+{
+    dsFPDMode_t eMode;
+}dsFPDModeParam_t;
 
 typedef struct _dsEnableHDCPParam 
 {

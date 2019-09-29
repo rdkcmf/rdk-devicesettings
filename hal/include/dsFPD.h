@@ -321,6 +321,16 @@ dsError_t dsSetFPTimeFormat (dsFPDTimeFormat_t eTimeFormat);
 
 dsError_t dsGetFPTimeFormat (dsFPDTimeFormat_t *pTimeFormat);
 
+/**
+ * @brief This function sets the display mode of the FPD text display
+ *
+ * @param[in] eMode Indicates the mode (any, clock or text)
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE Indicates dsSetFPDMode API was successfully called using iarmbus call.
+ * @retval dsERR_GENERAL Indicates error due to general failure.
+ */
+dsError_t dsSetFPDMode (dsFPDMode_t eMode);
 
 /**
  * @}

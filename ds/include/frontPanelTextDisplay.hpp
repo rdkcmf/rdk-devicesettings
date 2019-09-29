@@ -169,6 +169,22 @@ public:
     void setTime(const int uiHours, const int uiMinutes);
 
 
+/**
+ * @fn setMode(int mode)
+ * @brief This API sets the display mode of the LED display to any, text only or clock only.
+ *
+ * @param[in] mode Indicates display mode.
+ * <ul>
+ * <li>  0 indicates both text and clock are supported (default mode).
+ * <li>  1 indicates only text mode is supported (trying to set clock results in no change).
+ * <li>  2 indicates only clock mode is supported (trying to set text results in no change).
+ * </ul>
+ *
+ * @return None
+ */
+    void setMode(int mode);
+
+
     FrontPanelTextDisplay(int id, int maxBrightness, int maxCycleRate, int levels,
                           int maxHorizontalIterations, int maxVerticalIterations,
                           const std::string &supportedCharacters,int colorMode);

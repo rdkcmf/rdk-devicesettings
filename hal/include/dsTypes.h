@@ -657,6 +657,16 @@ typedef enum __dsFPDTimeFormat_t
  */
 typedef uint32_t dsFPDBrightness_t;
 
+/**
+ * This enumeration defines the front panel display mode.
+ */
+typedef enum __dsFPDMode_t{
+    dsFPD_MODE_ANY = 0,   /**< All modes (text/clock) are supported*/
+    dsFPD_MODE_TEXT,   /**< only Text mode is supported*/
+    dsFPD_MODE_CLOCK,   /**< only clock mode is supported*/
+} dsFPDMode_t;
+
+
 /* End of DSHAL_FPD_TYPES doxygen group */
 /**
  * @}

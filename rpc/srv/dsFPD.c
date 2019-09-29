@@ -82,6 +82,7 @@ IARM_Result_t _dsGetFPTextBrightness(void *arg);
 IARM_Result_t _dsFPEnableCLockDisplay(void *arg);
 IARM_Result_t _dsGetTimeFormat(void *arg);
 IARM_Result_t _dsSetTimeFormat(void *arg);
+IARM_Result_t _dsSetFPDMode(void *arg);
 
 /*TBD - Only Text and Power Brigghtness settings for the time being
  * Create an Array of all inidcator and test display
@@ -90,6 +91,7 @@ static  dsFPDBrightness_t _dsPowerBrightness = dsFPD_BRIGHTNESS_MAX ;
 static  dsFPDBrightness_t _dsTextBrightness  = dsFPD_BRIGHTNESS_MAX ;
 static  dsFPDColor_t     _dsPowerLedColor   = dsFPD_COLOR_BLUE;
 static  dsFPDTimeFormat_t _dsTextTimeFormat	= dsFPD_TIME_12_HOUR;
+static  dsFPDMode_t _dsFPDMode  = dsFPD_MODE_ANY;
 
 
 
@@ -260,6 +262,7 @@ IARM_Result_t _dsFPInit(void *arg)
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsFPEnableCLockDisplay,_dsFPEnableCLockDisplay);
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetTimeFormat,_dsGetTimeFormat);
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetTimeFormat,_dsSetTimeFormat);
+		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetFPDMode,_dsSetFPDMode);
 		
         
 		memset (srvFPDSettings, 0, sizeof (srvFPDSettings));
@@ -307,7 +310,12 @@ IARM_Result_t _dsSetFPText(void *arg)
      #ifdef HAS_CLOCK_DISPLAY
     IARM_BUS_Lock(lock);
 
+    if ((_dsFPDMode  == dsFPD_MODE_ANY) || (_dsFPDMode  == dsFPD_MODE_TEXT)) {
 	dsSetFPText((char *) arg);
+    }
+    else {
+       INFO("_dsSetFPText: Not setting Text, Clock mode enabled \r\n");
+    }
 
     IARM_BUS_Unlock(lock);
     #endif
@@ -322,8 +330,13 @@ IARM_Result_t _dsSetFPTime(void *arg)
     #ifdef HAS_CLOCK_DISPLAY
     IARM_BUS_Lock(lock);
 
+    if ((_dsFPDMode  == dsFPD_MODE_ANY) || (_dsFPDMode  == dsFPD_MODE_CLOCK)) {
 	dsFPDTimeParam_t *param = (dsFPDTimeParam_t *)arg;
-    dsSetFPTime(_dsTextTimeFormat, param->nHours, param->nMinutes);
+        dsSetFPTime(_dsTextTimeFormat, param->nHours, param->nMinutes);
+    }
+    else {
+       INFO("_dsSetFPTime: Not setting Clock, Text mode enabled \r\n");
+    }
 
     IARM_BUS_Unlock(lock);
     #endif
@@ -686,6 +699,28 @@ IARM_Result_t _dsGetFPState(void *arg)
 	
     IARM_BUS_Unlock(lock);
 	return IARM_RESULT_SUCCESS;
+}
+
+
+IARM_Result_t _dsSetFPDMode(void *arg)
+{
+    _DEBUG_ENTER();
+
+                IARM_BUS_Lock(lock);
+
+                dsFPDModeParam_t *param = (dsFPDModeParam_t *)arg;
+                if ((param->eMode == dsFPD_MODE_ANY) || (param->eMode == dsFPD_MODE_TEXT) || (param->eMode == dsFPD_MODE_CLOCK)) {
+                    _dsFPDMode = param->eMode;
+                    INFO("_dsSetFPDMode: Mode set to %d \r\n",param->eMode);
+                }
+                else {
+                    INFO("Error:_dsSetFPDMode : Invalid Param ... \r\n");
+                    IARM_BUS_Unlock(lock);
+                    return IARM_RESULT_INVALID_PARAM;
+                }
+
+                IARM_BUS_Unlock(lock);
+        return IARM_RESULT_SUCCESS;
 }
 
 

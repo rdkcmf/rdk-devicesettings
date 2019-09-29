@@ -500,5 +500,27 @@ dsError_t dsGetFPState(dsFPDIndicator_t eIndicator, dsFPDState_t* state)
 	return dsERR_GENERAL ;
 }
 
+
+dsError_t dsSetFPDMode (dsFPDMode_t eMode)
+{
+    _DEBUG_ENTER();
+        dsFPDModeParam_t  param ;
+
+    param.eMode = eMode;
+
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetFPDMode,
+                                                        (void *)&param,
+                                                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
+}
+
 /** @} */
 /** @} */
