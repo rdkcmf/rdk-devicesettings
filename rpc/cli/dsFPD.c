@@ -503,6 +503,7 @@ dsError_t dsGetFPState(dsFPDIndicator_t eIndicator, dsFPDState_t* state)
 
 dsError_t dsSetFPDMode (dsFPDMode_t eMode)
 {
+#ifndef USE_WPE_THUNDER_PLUGIN
     _DEBUG_ENTER();
         dsFPDModeParam_t  param ;
 
@@ -519,6 +520,9 @@ dsError_t dsSetFPDMode (dsFPDMode_t eMode)
         {
                 return dsERR_NONE;
         }
+#else
+    printf("%s currently not supported in Thunder Framework\n",__FUNCTION__);
+#endif
         return dsERR_GENERAL ;
 }
 
