@@ -550,6 +550,51 @@ dsError_t dsGetAudioDelayOffset(int handle, uint32_t *audioDelayOffsetMs)
 	return dsERR_NONE;
 }
 
+
+dsError_t dsSetAudioAtmosOutputMode(int handle, bool enable)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsAudioSetAtmosOutputModeParam_t param;
+
+        param.handle = handle;
+        param.enable = enable;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsSetAudioAtmosOutputMode,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: AUDIODELAY CLIENT (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        return dsERR_NONE;
+}
+dsError_t dsGetSinkDeviceAtmosCapability(int handle, dsATMOSCapability_t *capability)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsGetAudioAtmosCapabilityParam_t param;
+
+        param.handle = handle;
+        param.capability= dsAUDIO_ATMOS_NOTSUPPORTED;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetSinkDeviceAtmosCapability,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: AUDIODELAY CLIENT (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *capability = param.capability;
+        return dsERR_NONE;
+}
+
 dsError_t dsEnableLEConfig(int handle, const bool enable)
 {
 	_dsLEConfigParam_t param;

@@ -144,7 +144,8 @@ public:
         bool GetLEConfig();
         void setAudioDelay(const uint32_t audioDelayMs);
         void setAudioDelayOffset(const uint32_t audioDelayOffsetMs);
-
+        void getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCapability);
+        void setAudioAtmosOutputMode(bool enable);  
 
 	void setDB(const float db);
 	void setLevel(const float level);

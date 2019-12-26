@@ -84,6 +84,8 @@ IARM_Result_t _dsSetAudioDelay(void *arg);
 IARM_Result_t _dsGetAudioDelay(void *arg);
 IARM_Result_t _dsSetAudioDelayOffset(void *arg);
 IARM_Result_t _dsGetAudioDelayOffset(void *arg);
+IARM_Result_t _dsGetSinkDeviceAtmosCapability(void *arg);
+IARM_Result_t _dsSetAudioAtmosOutputMode(void *arg);
 
 static void _GetAudioModeFromPersistent(void *arg);
 static dsAudioPortType_t _GetAudioPortType(int handle);
@@ -356,6 +358,8 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioDelay, _dsGetAudioDelay);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioDelayOffset, _dsSetAudioDelayOffset);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioDelayOffset, _dsGetAudioDelayOffset);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetSinkDeviceAtmosCapability, _dsGetSinkDeviceAtmosCapability);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioAtmosOutputMode, _dsSetAudioAtmosOutputMode);      
 
         m_isInitialized = 1;
     }
@@ -995,6 +999,91 @@ IARM_Result_t _dsGetAudioDelayOffset(void *arg)
     IARM_BUS_Unlock(lock);
     return IARM_RESULT_SUCCESS;
 }
+
+IARM_Result_t _dsSetAudioAtmosOutputMode(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetAudioAtmosOutputMode_t)(int handle, bool enable);
+    static dsSetAudioAtmosOutputMode_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetAudioAtmosOutputMode_t) dlsym(dllib, "dsSetAudioAtmosOutputMode");
+            if (func) {
+                printf("dsSetAudioAtmosOutputMode_t (int handle, bool enable ) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetAudioAtmosOutputMode_t (int handle, bool enable) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAudioSetAtmosOutputModeParam_t *param = (dsAudioSetAtmosOutputModeParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        func(param->handle, param->enable);
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsGetSinkDeviceAtmosCapability(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetSinkDeviceAtmosCapability_t)(int handle, dsATMOSCapability_t *capability);
+    static dsGetSinkDeviceAtmosCapability_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetSinkDeviceAtmosCapability_t) dlsym(dllib, "dsGetSinkDeviceAtmosCapability");
+            if (func) {
+                printf("dsGetSinkDeviceAtmosCapability_t (int handle, dsATMOSCapability_t *capability ) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetSinkDeviceAtmosCapability_t (int handle, dsATMOSCapability_t *capability ) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsGetAudioAtmosCapabilityParam_t *param = (dsGetAudioAtmosCapabilityParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        dsATMOSCapability_t capability = dsAUDIO_ATMOS_NOTSUPPORTED;
+
+        param->capability= dsAUDIO_ATMOS_NOTSUPPORTED;
+        if (func(param->handle, &capability) == dsERR_NONE)
+        {
+            param->capability = capability;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
 
 IARM_Result_t _dsEnableLEConfig(void *arg)
 {

@@ -234,6 +234,28 @@ dsError_t dsGetAudioDelay(int handle, uint32_t *audioDelayMs);
 dsError_t dsGetAudioDelayOffset(int handle, uint32_t *audioDelayOffsetMs);
 
 /**
+ * @brief Set the audio ATMOS outout mode
+ *
+ * This function will set the Audio Atmos output mode 
+ *
+ * @param [in] handle        Handle for the Output Audio port
+ * @param [in] enable set audio ATMOS output mode
+ * @return dsError_t Error code.
+ */
+dsError_t dsSetAudioAtmosOutputMode(int handle, bool enable);
+  
+/**
+ * @brief Get the sink device ATMOS capability
+ *
+ * This function will get the sink device ATMOS capability
+ *
+ * @param [in] handle        Handle for the Output Audio port
+ * @param [out] *capability sink device ATMOS capability
+ * @return dsError_t Error code.
+ */
+dsError_t dsGetSinkDeviceAtmosCapability(int handle, dsATMOSCapability_t *capability);
+
+/**
  * @brief Get the loop-through mode of an audio port.
  * 
  * This function is used to check if the audio port is configured for loop-through.

@@ -61,7 +61,8 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsGetAudioDelay            "dsGetAudioDelay"
 #define  IARM_BUS_DSMGR_API_dsSetAudioDelayOffset      "dsSetAudioDelayOffset"
 #define  IARM_BUS_DSMGR_API_dsGetAudioDelayOffset      "dsGetAudioDelayOffset"
-
+#define  IARM_BUS_DSMGR_API_dsGetSinkDeviceAtmosCapability "dsGetSinkDeviceAtmosCapability"
+#define  IARM_BUS_DSMGR_API_dsSetAudioAtmosOutputMode "dsSetAudioAtmosOutputMode"
 
 /*
  * Declare RPC dsDisplay API names 
@@ -214,6 +215,16 @@ typedef struct _dsGetAudioDelayParam_t {
        int handle;
        uint32_t audioDelayMs;
 } dsGetAudioDelayParam_t;
+
+typedef struct _dsAudioSetAtmosOutputModeParam_t {
+    int handle;
+    bool enable;
+} dsAudioSetAtmosOutputModeParam_t;
+  
+typedef struct _dsGetAudioAtmosCapabilityParam_t {
+       int handle;
+       dsATMOSCapability_t capability;
+} dsGetAudioAtmosCapabilityParam_t;
 
 typedef struct _dsSetAudioDelayParam_t {
        int handle;

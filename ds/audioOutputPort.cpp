@@ -630,6 +630,51 @@ void AudioOutputPort::setAudioDelayOffset(const uint32_t audioDelayOffsetMs)
 }
 
 /**
+ * @fn AudioOutputPort::setAudioAtmosOutputMode(bool enable)
+ * @brief
+ *
+ * @param[in] Enable/Disable always Atmos output mode
+ *
+ * @return None
+ */
+void AudioOutputPort::setAudioAtmosOutputMode(bool enable)
+{
+        dsError_t ret = dsERR_NONE;
+
+        ret = dsSetAudioAtmosOutputMode(_handle,enable);
+
+        if (ret != dsERR_NONE)
+        {
+                throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCapability)
+ * @brief
+ *
+ * @param[in/out] Sink device ATMOS capability
+ *
+ * @return None
+ */
+void AudioOutputPort::getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCapability)
+{
+        dsError_t ret = dsERR_NONE;
+        dsATMOSCapability_t capability;
+
+        ret = dsGetSinkDeviceAtmosCapability(_handle, &capability);
+
+        if (ret == dsERR_NONE)
+        {
+                atmosCapability = capability;
+        }
+        else
+        {
+                throw Exception(ret);
+        }
+}
+
+/**
  * @fn AudioOutputPort::enableLEConfig(const bool enable)
  * @brief This API is used to enable Loudness Equivalence *
  * @param[in] enable true/false to control feature.

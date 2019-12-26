@@ -219,6 +219,14 @@ typedef enum StereoMode{
     dsAUDIO_STEREO_MAX        /**< Maximum index for audio stereo types. */
 } dsAudioStereoMode_t;
 
+/* This enumeration defines HDCP protocol version types */
+
+typedef enum _dsATMOSCapability_t{
+    dsAUDIO_ATMOS_NOTSUPPORTED= 0,            /**< ATMOS audio not supported */
+    dsAUDIO_ATMOS_DDPLUSSTREAM,            /**< can handle dd plus stream which is only way to pass ATMOS metadata */
+    dsAUDIO_ATMOS_ATMOSMETADATA,                /**< capable of parsing ATMOS metadata */
+} dsATMOSCapability_t;
+
 /**
  * Audio stereo mode type validation check.
  */
