@@ -406,7 +406,7 @@ dsError_t dsSetScartParameter(int handle, const char* parameter_str, const char*
 	return dsERR_GENERAL;
 }
 
-dsError_t  dsSetResolution(int handle, dsVideoPortResolution_t *resolution)
+dsError_t  dsSetResolution(int handle, dsVideoPortResolution_t *resolution, bool persist)
 {
     _DEBUG_ENTER();
     _RETURN_IF_ERROR(resolution != NULL, dsERR_INVALID_PARAM);
@@ -414,7 +414,7 @@ dsError_t  dsSetResolution(int handle, dsVideoPortResolution_t *resolution)
 	dsVideoPortSetResolutionParam_t param;
     
     param.handle = handle;
-    param.toPersist = true;
+    param.toPersist = persist;
     param.forceCompatible = true;
     param.resolution = *resolution;
 

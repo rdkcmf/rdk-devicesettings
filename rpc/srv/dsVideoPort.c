@@ -743,7 +743,7 @@ IARM_Result_t _dsSetResolution(void *arg)
 		_dsVideoPortPreResolutionCall(&param->resolution);
 
 		/*!< Set Platform Resolution  */
-		ret = dsSetResolution(param->handle, &param->resolution);
+		ret = dsSetResolution(param->handle, &param->resolution, param->toPersist);
 		
 		/*!< Resolution Post Change Event  - IARM_BUS_DSMGR_EVENT_RES_POSTCHANGE */
 		_dsSendVideoPortPostResolutionCall(&param->resolution);

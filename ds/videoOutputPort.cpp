@@ -435,7 +435,7 @@ bool VideoOutputPort::isDynamicResolutionSupported() const
  *
  * @return None
  */
-void VideoOutputPort::setResolution(const std::string &resolutionName)
+void VideoOutputPort::setResolution(const std::string &resolutionName, bool persist/* = true*/)
 {
 
 	if (0 && resolutionName.compare(_resolution) == 0) {
@@ -452,7 +452,7 @@ void VideoOutputPort::setResolution(const std::string &resolutionName)
 	resolution.stereoScopicMode = (dsVideoStereoScopicMode_t)newResolution.getStereoscopicMode().getId();
 	strcpy(resolution.name,resolutionName.c_str());
 
-	dsError_t ret = dsSetResolution(_handle, &resolution);
+	dsError_t ret = dsSetResolution(_handle, &resolution, persist);
 
 	if (ret != dsERR_NONE) {
 		throw Exception(ret);

@@ -228,11 +228,12 @@ dsError_t  dsEnableVideoPort(int handle, bool enabled);
  * @param [in] handle         Handle of the video port.
  * @param [in] *resolution    The address of a structure containing the video port
  *                            resolution settings.
+ * @param [in] persist        In false state allows disabling persist of resolution value.
  * @return Device Settings error code
  * @retval dsERR_NONE If sucessfully dsSetResolution api has been called using IARM support.
  * @retval dsERR_GENERAL General failure.
  */
-dsError_t  dsSetResolution(int handle, dsVideoPortResolution_t *resolution);
+dsError_t  dsSetResolution(int handle, dsVideoPortResolution_t *resolution, bool persist);
 
 /**
  * @brief Get the video display resolution.
