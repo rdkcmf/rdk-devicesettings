@@ -131,6 +131,7 @@ dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode)
 
     param.handle = handle;
     param.mode = dsAUDIO_STEREO_STEREO; /* Default to stereo */
+    param.toPersist = false;
 
 	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                             (char *)IARM_BUS_DSMGR_API_dsGetStereoMode,
