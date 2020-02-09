@@ -51,6 +51,8 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsGetEncoding                "dsGetEncoding"
 #define  IARM_BUS_DSMGR_API_dsSetAudioMute		"dsSetAudioMute"
 #define  IARM_BUS_DSMGR_API_dsIsAudioMSDecode    "dsIsAudioMSDecode"
+#define  IARM_BUS_DSMGR_API_dsIsAudioMS12Decode    "dsIsAudioMS12Decode"
+
 #define  IARM_BUS_DSMGR_API_dsIsAudioPortEnabled  "dsIsAudioPortEnabled"
 #define  IARM_BUS_DSMGR_API_dsEnableAudioPort      "dsEnableAudioPort"
 #define  IARM_BUS_DSMGR_API_dsAudioPortTerm		"dsAudioPortTerm"
@@ -63,6 +65,15 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsGetAudioDelayOffset      "dsGetAudioDelayOffset"
 #define  IARM_BUS_DSMGR_API_dsGetSinkDeviceAtmosCapability "dsGetSinkDeviceAtmosCapability"
 #define  IARM_BUS_DSMGR_API_dsSetAudioAtmosOutputMode "dsSetAudioAtmosOutputMode"
+
+#define  IARM_BUS_DSMGR_API_dsSetAudioCompression         "dsSetAudioCompression"
+#define  IARM_BUS_DSMGR_API_dsGetAudioCompression         "dsGetAudioCompression"
+#define  IARM_BUS_DSMGR_API_dsSetDialogEnhancement        "dsSetDialogEnhancement"
+#define  IARM_BUS_DSMGR_API_dsGetDialogEnhancement        "dsGetDialogEnhancement"
+#define  IARM_BUS_DSMGR_API_dsSetDolbyVolumeMode          "dsSetDolbyVolumeMode"
+#define  IARM_BUS_DSMGR_API_dsGetDolbyVolumeMode          "dsGetDolbyVolumeMode"
+#define  IARM_BUS_DSMGR_API_dsSetIntelligentEqualizerMode  "dsSetIntelligentEqualizerMode"
+#define  IARM_BUS_DSMGR_API_dsGetIntelligentEqualizerMode  "dsGetIntelligentEqualizerMode"
 
 /*
  * Declare RPC dsDisplay API names 
@@ -211,6 +222,11 @@ typedef struct _dsAudioGetMS11Param_t {
     bool ms11Enabled;
 } dsAudioGetMS11Param_t;
 
+typedef struct _dsAudioGetMS12Param_t {
+    int handle;
+    bool ms12Enabled;
+} dsAudioGetMS12Param_t;
+
 typedef struct _dsGetAudioDelayParam_t {
        int handle;
        uint32_t audioDelayMs;
@@ -235,6 +251,26 @@ typedef struct _dsAudioDelayOffsetParam_t {
        int handle;
        uint32_t audioDelayOffsetMs;
 } dsAudioDelayOffsetParam_t;
+
+typedef struct _dsAudioCompressionParam_t {
+       int handle;
+       int compression;
+} dsAudioCompressionParam_t;
+
+typedef struct _dsDialogEnhancementParam_t {
+       int handle;
+       int enhancerLevel;
+} dsDialogEnhancementParam_t;
+
+typedef struct _dsSetDolbyVolumeParam_t {
+       int handle;
+       bool enable;
+} dsSetDolbyVolumeParam_t;
+
+typedef struct _dsIntelligentEqualizerModeParam_t {
+       int handle;
+       int mode;
+} dsIntelligentEqualizerModeParam_t;
 
 typedef struct _dsVideoPortGetHandleParam_t {
 	dsVideoPortType_t type;

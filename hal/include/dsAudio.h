@@ -82,7 +82,7 @@ dsError_t  dsGetAudioPort(dsAudioPortType_t type, int index, int *handle);
 
 /**
  * @brief Get the encoding type of an audio port.
- * 
+ *
  * This function returns the current audio encoding setting for the specified audio port.
  *
  * @param[in] handle Handle for the audio port.
@@ -95,7 +95,7 @@ dsError_t  dsGetAudioEncoding(int handle, dsAudioEncoding_t *encoding);
 
 /**
  * @brief Get the audio compressionof an audio port.
- * 
+ *
  * This function returns the audio compression setting used in the specified audio port.
  *
  * @param[in] handle Handle for the audio port.
@@ -104,7 +104,47 @@ dsError_t  dsGetAudioEncoding(int handle, dsAudioEncoding_t *encoding);
  * @return Device Settings error code
  * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
  */
-dsError_t  dsGetAudioCompression(int handle, dsAudioCompression_t *compression);
+dsError_t  dsGetAudioCompression(int handle, int *compression);
+
+/**
+ * @brief Get the Dialog Enhancement level of an audio port.
+ *
+ * This function returns the audio compression setting used in the specified audio port.
+ *
+ * @param[in] handle Handle for the audio port.
+ * @param[out] Dialog Enhancement level.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
+ */
+dsError_t  dsGetDialogEnhancement(int handle, int *level);
+
+/**
+ * @brief Get the dolby audio mode status.
+ *
+ * This function returns the dolby audio mode status used in the specified audio port.
+ *
+ * @param[in] handle Handle for the audio port.
+ * @param[out] Dolby volume mode.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
+ */
+dsError_t  dsGetDolbyVolumeMode(int handle, bool *mode);
+
+/**
+ * @brief Get the Intelligent Equalizer Mode.
+ *
+ * This function returns the Intelligent Equalizer Mode setting used in the specified audio port.
+ *
+ * @param[in] handle Handle for the audio port.
+ * @param[out] .
+ *
+ * @return Device Settings error code
+ * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
+ */
+dsError_t  dsGetIntelligentEqualizerMode(int handle, int *mode);
+
 
 /**
  * @brief Get the stereo mode of an audio port.
@@ -365,7 +405,47 @@ dsError_t  dsSetAudioEncoding(int handle, dsAudioEncoding_t encoding);
  *
  * @return dsERR_NONE Indicates the call was successful.
  */
-dsError_t  dsSetAudioCompression(int handle, dsAudioCompression_t compression);
+dsError_t  dsSetAudioCompression(int handle, int compression);
+
+/**
+ * @brief Get the Dialog Enhancement level of an audio port.
+ * 
+ * This function returns the audio compression setting used in the specified audio port.
+ *
+ * @param[in] handle Handle for the audio port.
+ * @param[out] Dialog Enhancement level.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
+ */
+dsError_t  dsSetDialogEnhancement(int handle, int level);
+
+/**
+ * @brief Get the dolby audio mode status.
+ * 
+ * This function returns the dolby audio mode status used in the specified audio port.
+ *
+ * @param[in] handle Handle for the audio port.
+ * @param[out] Dolby volume mode.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
+ */
+dsError_t  dsSetDolbyVolumeMode(int handle, bool mode);
+
+/**
+ * @brief Get the Intelligent Equalizer Mode.
+ * 
+ * This function returns the Intelligent Equalizer Mode setting used in the specified audio port.
+ *
+ * @param[in] handle Handle for the audio port.
+ * @param[out] .
+ *
+ * @return Device Settings error code
+ * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
+ */
+dsError_t  dsSetIntelligentEqualizerMode(int handle, int mode);
+
 
 /**
  * @brief Set the stereo mode of an audio port.
@@ -472,7 +552,7 @@ dsError_t  dsIsAudioMSDecode(int handle, bool *HasMS11Decode);
  * @return Device Settings error code
  * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates dsIsAudioMS12Decode call is not implemented.
  */
-dsError_t  dsIsAudioMS12Decode(bool *HasMS12Decode);
+dsError_t  dsIsAudioMS12Decode(int handle, bool *HasMS12Decode);
 
 /**
  * @brief Set the audio delay in milliseconds

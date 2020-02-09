@@ -115,13 +115,6 @@ dsError_t dsGetAudioEncoding(int handle, dsAudioEncoding_t *encoding)
 }
 
 
-dsError_t dsGetAudioCompression(int handle, dsAudioCompression_t *compression)
-{
-    dsError_t ret = dsERR_NONE;
-    ret = dsERR_OPERATION_NOT_SUPPORTED;
-	return ret;
-}
-
 dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode, bool isPersist);
 dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode, bool isPersist)
 {
@@ -283,13 +276,6 @@ dsError_t dsSetAudioEncoding(int handle, dsAudioEncoding_t encoding)
 	return ret;
 }
 
-dsError_t dsSetAudioCompression(int handle, dsAudioCompression_t compression)
-{
-	dsError_t ret = dsERR_NONE;
-	/* This is a empty operation in RNG150 */
-	return ret;
-}
-
 
 dsError_t dsSetStereoMode(int handle, dsAudioStereoMode_t mode,bool isPersist);
 dsError_t dsSetStereoMode(int handle, dsAudioStereoMode_t mode,bool isPersist)
@@ -439,6 +425,29 @@ dsError_t dsIsAudioMSDecode(int handle, bool *HasMS11Decode)
 	return dsERR_NONE;
 }
 
+dsError_t dsIsAudioMS12Decode(int handle, bool *HasMS12Decode)
+{
+	dsAudioGetMS12Param_t param;
+	IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+	param.handle = handle;
+	param.ms12Enabled = false;
+
+	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *)IARM_BUS_DSMGR_API_dsIsAudioMS12Decode,
+                            (void *)&param,
+                            sizeof(param));
+	
+	if (IARM_RESULT_SUCCESS == rpcRet)
+	{
+		*HasMS12Decode = param.ms12Enabled;
+		return dsERR_NONE;
+	}
+
+	return dsERR_NONE;
+}
+
+
+
 dsError_t dsEnableMS12Config(int handle, dsMS12FEATURE_t feature,const bool enable)
 {
 	_dsMS12ConfigParam_t param;
@@ -502,6 +511,172 @@ dsError_t dsSetAudioDelayOffset(int handle, const uint32_t audioDelayOffsetMs)
 
 	return dsERR_NONE;
 
+}
+
+
+dsError_t  dsSetDialogEnhancement(int handle, int level)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsDialogEnhancementParam_t param;
+        param.handle = handle;
+        param.enhancerLevel = level;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetDialogEnhancement,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsSetAudioCompression(int handle, int compression)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsAudioCompressionParam_t param;
+        param.handle = handle;
+        param.compression = compression;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetAudioCompression,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsSetDolbyVolumeMode(int handle, bool mode)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsSetDolbyVolumeParam_t param;
+        param.handle = handle;
+        param.enable = mode;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetDolbyVolumeMode,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsSetIntelligentEqualizerMode(int handle, int mode)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsIntelligentEqualizerModeParam_t param;
+        param.handle = handle;
+        param.mode = mode;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetIntelligentEqualizerMode,
+                                                        (void *)&param,
+                                                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsGetAudioCompression(int handle, int *compression)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsAudioCompressionParam_t param;
+
+        param.handle = handle;
+        param.compression = 0;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetAudioCompression,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: AudioCompression (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *compression = param.compression;
+        return dsERR_NONE;
+}
+
+dsError_t dsGetDialogEnhancement(int handle, int *level)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsDialogEnhancementParam_t param;
+
+        param.handle = handle;
+        param.enhancerLevel = 0;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetDialogEnhancement,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: DialogEnhancement (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *level = param.enhancerLevel;
+        return dsERR_NONE;
+}
+
+dsError_t dsGetDolbyVolumeMode(int handle, bool *mode)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsSetDolbyVolumeParam_t param;
+
+        param.handle = handle;
+        param.enable = false;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetDolbyVolumeMode,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: IntelligentEqualizerMode (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *mode = param.enable;
+        return dsERR_NONE;
+}
+
+dsError_t dsGetIntelligentEqualizerMode(int handle, int *mode)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsIntelligentEqualizerModeParam_t param;
+
+        param.handle = handle;
+        param.mode = 0;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetIntelligentEqualizerMode,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: IntelligentEqualizerMode (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *mode = param.mode;
+        return dsERR_NONE;
 }
 
 dsError_t dsGetAudioDelay(int handle, uint32_t *audioDelayMs)
