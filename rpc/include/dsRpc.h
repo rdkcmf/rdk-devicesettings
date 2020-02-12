@@ -192,6 +192,7 @@ typedef struct _dsAudioSetStereoModeParam_t {
 typedef struct _dsAudioSetStereoAutoParam_t {
 	int handle;
     int autoMode;
+    bool toPersist;
 } dsAudioSetStereoAutoParam_t;
 
 typedef struct _dsAudioSetMutedParam_t {

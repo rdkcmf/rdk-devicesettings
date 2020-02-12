@@ -52,7 +52,9 @@
  * connected to the AudioOutputPort: VideoOutputPort::getAudioOutputPort()
  */
 
-extern dsError_t dsSetStereoMode(int handle, dsAudioStereoMode_t mode,bool IsPersist);
+extern dsError_t dsSetStereoMode(int handle, dsAudioStereoMode_t mode, bool isPersist);
+extern dsError_t dsSetStereoAuto(int handle, int autoMode, bool isPersist);
+extern dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode, bool isPersist);
 
 namespace device {
 
@@ -123,7 +125,7 @@ AudioOutputPort::AudioOutputPort(const int type, const int index, const int id) 
 
 	dsGetAudioCompression	(_handle, (dsAudioCompression_t *)&_compression);
 	dsGetAudioEncoding		(_handle, (dsAudioEncoding_t *)&_encoding);
-	dsGetStereoMode			(_handle, (dsAudioStereoMode_t *)&_stereoMode);
+	dsGetStereoMode			(_handle, (dsAudioStereoMode_t *)&_stereoMode, false);
 	dsGetAudioGain			(_handle, &_gain);
 	dsGetAudioLevel			(_handle, &_level);
 	dsGetAudioOptimalLevel	(_handle, &_optimalLevel);
@@ -230,20 +232,11 @@ const AudioCompression & AudioOutputPort::getCompression() const
  */
 const AudioStereoMode & AudioOutputPort::getStereoMode(bool usePersist)
 {
-    if (usePersist) {
-        std::cout << "AudioOutputPort::getStereoMode from persistence" << std::endl;
-        int _localmode = 0;
-        dsGetPersistedStereoMode	(_handle, (dsAudioStereoMode_t *)&_localmode);
-        _stereoMode = _localmode;
-        return AudioStereoMode::getInstance(_stereoMode);
-    }
-    else {
-        std::cout << "AudioOutputPort::getStereoMode from effective " << std::endl;
-	    int _localmode = 0;
-	    dsGetStereoMode	(_handle, (dsAudioStereoMode_t *)&_localmode);
-	    _stereoMode = _localmode;
-	    return AudioStereoMode::getInstance(_stereoMode);
-    }
+    std::cout << "AudioOutputPort::getStereoMode from " << (usePersist ? "persistence" : "effective") << std::endl;
+    int _localmode = 0;
+    dsGetStereoMode(_handle, (dsAudioStereoMode_t *)&_localmode, usePersist);
+    _stereoMode = _localmode;
+    return AudioStereoMode::getInstance(_stereoMode);
 }
 
 
@@ -707,11 +700,11 @@ void AudioOutputPort::enableMS12Config(const dsMS12FEATURE_t feature,const bool 
  *
  * @return None
  */
-void AudioOutputPort::setStereoAuto(const bool autoMode)
+void AudioOutputPort::setStereoAuto(const bool autoMode, const bool toPersist)
 {
 	dsError_t ret = dsERR_NONE;
 
-	if ( (ret = dsSetStereoAuto(_handle, autoMode ? 1 : 0)) == dsERR_NONE) {
+	if ( (ret = dsSetStereoAuto(_handle, autoMode ? 1 : 0, toPersist)) == dsERR_NONE) {
 		_stereoAuto = (autoMode);
 	}
 

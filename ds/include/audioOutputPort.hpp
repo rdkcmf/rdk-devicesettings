@@ -134,7 +134,7 @@ public:
 	void setEncoding(const int encoding);
 	void setCompression(const int compression);
 	void setStereoMode(const int mode, const bool toPersist = true);
-	void setStereoAuto(const bool autoMode);
+	void setStereoAuto(const bool autoMode, const bool toPersist = true);
 
 	void setEncoding(const std::string & encoding);
 	void setCompression(const std::string & compression);

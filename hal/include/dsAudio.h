@@ -119,7 +119,6 @@ dsError_t  dsGetAudioCompression(int handle, dsAudioCompression_t *compression);
  * @retval dsERR_NONE Indicates dsGetStereoMode was successfully called using iarmbus.
  */
 dsError_t  dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode);
-dsError_t  dsGetPersistedStereoMode(int handle, dsAudioStereoMode_t *stereoMode);
 
 /**
  * @brief This function is used to get the current auto mode setting of the specified

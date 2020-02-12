@@ -555,20 +555,15 @@ IARM_Result_t _dsGetStereoAuto(void *arg)
 IARM_Result_t _dsSetStereoAuto(void *arg)
 {
     _DEBUG_ENTER();
-    IARM_Bus_DSMgr_EventData_t eventData;
-
     IARM_BUS_Lock(lock);
 
     dsAudioSetStereoAutoParam_t *param = (dsAudioSetStereoAutoParam_t *)arg;
 
-    if (param->autoMode)  {
-        device::HostPersistence::getInstance().persistHostProperty("HDMI0.AudioMode.AUTO","TRUE");
-        _srv_AudioAuto = 1;
+    if (param->toPersist) {
+        device::HostPersistence::getInstance().persistHostProperty("HDMI0.AudioMode.AUTO", param->autoMode ? "TRUE" : "FALSE");
     }
-    else {
-        device::HostPersistence::getInstance().persistHostProperty("HDMI0.AudioMode.AUTO","FALSE");
-        _srv_AudioAuto = 0;
-    }
+
+    _srv_AudioAuto = param->autoMode ? 1 : 0;
 
     IARM_BUS_Unlock(lock);
     return IARM_RESULT_SUCCESS;

@@ -122,7 +122,8 @@ dsError_t dsGetAudioCompression(int handle, dsAudioCompression_t *compression)
 	return ret;
 }
 
-dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode)
+dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode, bool isPersist);
+dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode, bool isPersist)
 {
 	dsError_t ret = dsERR_NONE;
 	dsAudioSetStereoModeParam_t param;
@@ -131,32 +132,7 @@ dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode)
 
     param.handle = handle;
     param.mode = dsAUDIO_STEREO_STEREO; /* Default to stereo */
-    param.toPersist = false;
-
-	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
-                            (char *)IARM_BUS_DSMGR_API_dsGetStereoMode,
-                            (void *)&param,
-                            sizeof(param));
-	
-	if (IARM_RESULT_SUCCESS == rpcRet)
-	{
-		*stereoMode = param.mode;
-		return dsERR_NONE;
-	}
-
-	return dsERR_NONE;
-}
-
-dsError_t dsGetPersistedStereoMode(int handle, dsAudioStereoMode_t *stereoMode)
-{
-	dsError_t ret = dsERR_NONE;
-	dsAudioSetStereoModeParam_t param;
-
-	IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
-
-    param.handle = handle;
-    param.toPersist = 1;
-    param.mode = dsAUDIO_STEREO_STEREO; /* Default to stereo */
+    param.toPersist = isPersist;
 
 	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                             (char *)IARM_BUS_DSMGR_API_dsGetStereoMode,
@@ -315,34 +291,34 @@ dsError_t dsSetAudioCompression(int handle, dsAudioCompression_t compression)
 }
 
 
-dsError_t dsSetStereoMode(int handle, dsAudioStereoMode_t mode,bool IsPersist);
-dsError_t dsSetStereoMode(int handle, dsAudioStereoMode_t mode,bool IsPersist)
+dsError_t dsSetStereoMode(int handle, dsAudioStereoMode_t mode,bool isPersist);
+dsError_t dsSetStereoMode(int handle, dsAudioStereoMode_t mode,bool isPersist)
 {
     _DEBUG_ENTER();
     _RETURN_IF_ERROR(dsAudioStereoMode_isValid(mode), dsERR_INVALID_PARAM);
 
-	dsAudioSetStereoModeParam_t param;
+    dsAudioSetStereoModeParam_t param;
 
     param.handle = handle;
     param.mode = mode;
     param.rpcResult = dsERR_NONE;
-	param.toPersist = IsPersist;
-	  
-	IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+    param.toPersist = isPersist;
+
+    IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                  (char *)IARM_BUS_DSMGR_API_dsSetStereoMode,
                  (void *)&param,
                  sizeof(param));
-	
 
-	if (dsERR_NONE == param.rpcResult)
-	{
-		return dsERR_NONE;
-	}
- 
+    if (dsERR_NONE == param.rpcResult)
+    {
+        return dsERR_NONE;
+    }
+
    return dsERR_GENERAL ;
 }
 
-dsError_t dsSetStereoAuto(int handle, int autoMode)
+dsError_t dsSetStereoAuto(int handle, int autoMode, bool isPersist);
+dsError_t dsSetStereoAuto(int handle, int autoMode, bool isPersist)
 {
     _DEBUG_ENTER();
 
@@ -351,9 +327,9 @@ dsError_t dsSetStereoAuto(int handle, int autoMode)
 
     param.handle = handle;
     param.autoMode = autoMode;
+    param.toPersist = isPersist;
 
 
-  
 	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                             (char *)IARM_BUS_DSMGR_API_dsSetStereoAuto,
                             (void *)&param,
