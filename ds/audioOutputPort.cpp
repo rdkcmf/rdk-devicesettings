@@ -575,6 +575,144 @@ void AudioOutputPort::setIntelligentEqualizerMode(const int mode)
 }
 
 /**
+ * @fn AudioOutputPort::setVolumeLeveller(const int level)
+ * @brief This API is used to set the volume leveller amount in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] volume leveller amount for the given audio Output port.
+ *
+ * @return None
+ */
+void AudioOutputPort::setVolumeLeveller(const int level)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsSetVolumeLeveller(_handle, level)) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::setBassEnhancer(const bool enable)
+ * @brief This API is used to enable/disable the Bass in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] enable/disable bass for the given audio Output port.
+ *
+ * @return None
+ */
+void AudioOutputPort::setBassEnhancer(const bool enable)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsSetBassEnhancer(_handle, enable)) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::enableSurroundDecoder(const bool enable)
+ * @brief This API is used to enable/disable surround decoder in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] enable/disable surround decoder for the given audio Output port.
+ *
+ * @return None
+ */
+void AudioOutputPort::enableSurroundDecoder(const bool enable)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsEnableSurroundDecoder(_handle, enable)) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::setDRCMode(const int mode)
+ * @brief This API is used to set the Dynamic Range control mode in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] dynamic range control mode for the given audio Output port.
+ *
+ * @return None
+ */
+void AudioOutputPort::setDRCMode(const int mode)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsSetDRCMode(_handle, mode)) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::setSurroundVirtualizer(const int boost)
+ * @brief This API is used to set the surround virtualizer boost value in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] surround virtualizer boost value for the given audio Output port.
+ *
+ * @return None
+ */
+void AudioOutputPort::setSurroundVirtualizer(const int boost)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsSetSurroundVirtualizer(_handle, boost)) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::setMISteering(const bool enable)
+ * @brief This API is used to enable/disable the Media Intelligent Steering in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] enable/disable MI Steering for the given audio Output port.
+ *
+ * @return None
+ */
+void AudioOutputPort::setMISteering(const bool enable)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsSetMISteering(_handle, enable)) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
  * @fn const AudioCompression & AudioOutputPort::getCompression() const
  * @brief This API is used to get the current compression of the output port.
  *
@@ -654,6 +792,127 @@ int AudioOutputPort::getIntelligentEqualizerMode() const
 	}
 }
 
+
+/**
+ * @fn const int AudioOutputPort::getVolumeLeveller()
+ * @brief This API is used to get the current volume leveller value.
+ *
+ * @return Current audio volume leveller value 
+ */
+int AudioOutputPort::getVolumeLeveller() const
+{
+        dsError_t ret = dsERR_NONE;
+        int _level = 0;
+        if ((ret = dsGetVolumeLeveller(_handle, &_level)) == dsERR_NONE)
+        {
+        return _level;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+
+/**
+ * @fn  bool AudioOutputPort::getBassEnhancer()
+ * @brief This API is used to get the current auto mode Bass value
+ *
+ * @return Current audio bass value
+ */
+bool AudioOutputPort::getBassEnhancer() const
+{
+        dsError_t ret = dsERR_NONE;
+        bool _enable = 0;
+        if ( (ret = dsGetBassEnhancer(_handle, &_enable)) == dsERR_NONE)
+        {
+            return _enable;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
+ * @fn  bool AudioOutputPort::isSurroundDecoderEnabled()
+ * @brief This API is used to get status of surround decoder 
+ *
+ * @return Current status of surround decoder
+ */
+bool AudioOutputPort::isSurroundDecoderEnabled() const
+{
+        dsError_t ret = dsERR_NONE;
+        bool _enable = 0;
+        if ( (ret = dsIsSurroundDecoderEnabled(_handle, &_enable)) == dsERR_NONE)
+        {
+            return _enable;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
+ * @fn const int AudioOutputPort::getDRCMode()
+ * @brief This API is used to get the Dynamic Range Control mode
+ *
+ * @return Current Dynamic Range control mode (line => 0, RF => 1)
+ */
+int AudioOutputPort::getDRCMode() const
+{
+        dsError_t ret = dsERR_NONE;
+        int _mode = 0;
+        if ((ret = dsGetDRCMode(_handle, &_mode)) == dsERR_NONE)
+        {
+        return _mode;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
+ * @fn const int AudioOutputPort::getSurroundVirtualizer()
+ * @brief This API is used to get the Surround Virtualizer Boost value
+ *
+ * @return Current Surround Virtualizer boost value
+ */
+int AudioOutputPort::getSurroundVirtualizer() const
+{
+        dsError_t ret = dsERR_NONE;
+        int _boost = 0;
+        if ((ret = dsGetSurroundVirtualizer(_handle, &_boost)) == dsERR_NONE)
+        {
+        return _boost;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
+ * @fn  bool AudioOutputPort::getMISteering()
+ * @brief This API is used to get status of Media Intelligent Steering
+ *
+ * @return Current status of Media Intelligent Steering
+ */
+bool AudioOutputPort::getMISteering() const
+{
+        dsError_t ret = dsERR_NONE;
+        bool _enable = 0;
+        if ( (ret = dsGetMISteering(_handle, &_enable)) == dsERR_NONE)
+        {
+            return _enable;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
 
 /**
  * @fn AudioOutputPort::setStereoMode(const int newMode,const bool toPersist)
@@ -919,6 +1178,30 @@ void AudioOutputPort::setDB(const float newDb)
 
 }
 
+/**
+ * @fn void AudioOutputPort::setGain(const float newGain)
+ * @brief This API is used to set the audio gain to be used in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] newLevel New Audio gain for a given audio output port
+ *
+ * @return None
+ */
+void AudioOutputPort::setGain(const float newGain)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ((newGain < -2080) || (newGain > 480)) {
+                ret = dsERR_INVALID_PARAM;
+    } else if ( (ret = dsSetAudioGain(_handle, newGain)) == dsERR_NONE) {
+                _gain = newGain;
+        }
+
+        if (ret != dsERR_NONE) throw Exception(ret);
+
+}
 
 /**
  * @fn void AudioOutputPort::setLevel(const float newLevel)

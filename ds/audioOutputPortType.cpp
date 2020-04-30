@@ -49,6 +49,7 @@ namespace {
 			"IDLR",
 			"HDMI",
 			"SPDIF",
+                        "SPEAKER",
 	};
 
 	inline const bool isValid(int id) {
@@ -63,6 +64,7 @@ typedef int _SafetyCheck[(dsUTL_DIM(_names) == dsAUDIOPORT_TYPE_MAX) ? 1 : -1];
 const int AudioOutputPortType::kIDLR 			= dsAUDIOPORT_TYPE_ID_LR;
 const int AudioOutputPortType::kHDMI 			= dsAUDIOPORT_TYPE_HDMI;
 const int AudioOutputPortType::kSPDIF 			= dsAUDIOPORT_TYPE_SPDIF;
+const int AudioOutputPortType::kSPEAKER                   = dsAUDIOPORT_TYPE_SPEAKER;
 
 
 

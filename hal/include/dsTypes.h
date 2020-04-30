@@ -166,6 +166,7 @@ typedef enum _dsAudioPortType_t{
     dsAUDIOPORT_TYPE_ID_LR,   /**< RCA audio output.                  */
     dsAUDIOPORT_TYPE_HDMI,    /**< HDMI audio output.                 */
     dsAUDIOPORT_TYPE_SPDIF,   /**< S/PDIF audio output.               */
+    dsAUDIOPORT_TYPE_SPEAKER,  /**< SPEAKER audio output.             */
     dsAUDIOPORT_TYPE_MAX      /**< Maximum index for audio port type. */
 } dsAudioPortType_t;
 

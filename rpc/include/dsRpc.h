@@ -66,6 +66,10 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsGetSinkDeviceAtmosCapability "dsGetSinkDeviceAtmosCapability"
 #define  IARM_BUS_DSMGR_API_dsSetAudioAtmosOutputMode "dsSetAudioAtmosOutputMode"
 #define  IARM_BUS_DSMGR_API_dsSetAudioDuckingLevel    "dsSetAudioDuckingLevel"
+#define  IARM_BUS_DSMGR_API_dsSetAudioLevel            "dsSetAudioLevel"
+#define  IARM_BUS_DSMGR_API_dsGetAudioLevel            "dsGetAudioLevel"
+#define  IARM_BUS_DSMGR_API_dsSetAudioGain            "dsSetAudioGain"
+#define  IARM_BUS_DSMGR_API_dsGetAudioGain            "dsGetAudioGain"
 
 #define  IARM_BUS_DSMGR_API_dsSetAudioCompression         "dsSetAudioCompression"
 #define  IARM_BUS_DSMGR_API_dsGetAudioCompression         "dsGetAudioCompression"
@@ -75,6 +79,18 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsGetDolbyVolumeMode          "dsGetDolbyVolumeMode"
 #define  IARM_BUS_DSMGR_API_dsSetIntelligentEqualizerMode  "dsSetIntelligentEqualizerMode"
 #define  IARM_BUS_DSMGR_API_dsGetIntelligentEqualizerMode  "dsGetIntelligentEqualizerMode"
+#define  IARM_BUS_DSMGR_API_dsGetVolumeLeveller  "dsGetVolumeLeveller"
+#define  IARM_BUS_DSMGR_API_dsSetVolumeLeveller  "dsSetVolumeLeveller"
+#define  IARM_BUS_DSMGR_API_dsGetBassEnhancer  "dsGetBassEnhancer"
+#define  IARM_BUS_DSMGR_API_dsSetBassEnhancer  "dsSetBassEnhancer"
+#define  IARM_BUS_DSMGR_API_dsIsSurroundDecoderEnabled  "dsIsSurroundDecoderEnabled"
+#define  IARM_BUS_DSMGR_API_dsEnableSurroundDecoder  "dsEnableSurroundDecoder"
+#define  IARM_BUS_DSMGR_API_dsGetDRCMode  "dsGetDRCMode"
+#define  IARM_BUS_DSMGR_API_dsSetDRCMode  "dsSetDRCMode"
+#define  IARM_BUS_DSMGR_API_dsGetSurroundVirtualizer  "dsGetSurroundVirtualizer"
+#define  IARM_BUS_DSMGR_API_dsSetSurroundVirtualizer  "dsSetSurroundVirtualizer"
+#define  IARM_BUS_DSMGR_API_dsGetMISteering  "dsGetMISteering"
+#define  IARM_BUS_DSMGR_API_dsSetMISteering  "dsSetMISteering"
 
 /*
  * Declare RPC dsDisplay API names 
@@ -217,6 +233,11 @@ typedef struct _dsAudioSetLevelParam_t {
         float level;
 } dsAudioSetLevelParam_t;
 
+typedef struct _dsAudioGainParam_t {
+        int handle;
+        float gain;
+} dsAudioGainParam_t;
+
 typedef struct _dsAudioGetEncodingModeParam_t {
 	int handle;
 	dsAudioEncoding_t encoding;
@@ -276,6 +297,37 @@ typedef struct _dsIntelligentEqualizerModeParam_t {
        int handle;
        int mode;
 } dsIntelligentEqualizerModeParam_t;
+
+typedef struct _dsVolumeLevellerParam_t {
+       int handle;
+       int level;
+} dsVolumeLevellerParam_t;
+
+typedef struct _dsBassEnhancerParam_t {
+       int handle;
+       bool enable;
+} dsBassEnhancerParam_t;
+
+typedef struct _dsSurroundDecoderParam_t {
+       int handle;
+       bool enable;
+} dsSurroundDecoderParam_t;
+
+typedef struct _dsDRCModeParam_t {
+       int handle;
+       int mode;
+} dsDRCModeParam_t;
+
+typedef struct _dsSurroundVirtualizerParam_t {
+       int handle;
+       int boost;
+} dsSurroundVirtualizerParam_t;
+
+typedef struct _dsMISteeringParam_t {
+       int handle;
+       bool enable;
+} dsMISteeringParam_t;
+
 
 typedef struct _dsVideoPortGetHandleParam_t {
 	dsVideoPortType_t type;

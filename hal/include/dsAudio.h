@@ -145,6 +145,83 @@ dsError_t  dsGetDolbyVolumeMode(int handle, bool *mode);
  */
 dsError_t  dsGetIntelligentEqualizerMode(int handle, int *mode);
 
+/**
+ * @brief To get the Dolby volume leveller
+ *
+ * This function will get the Volume leveller value used in a given audio port
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [out] *level  Volume Leveller value
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetVolumeLeveller(int handle, int* level);
+
+
+/**
+ * @brief To get the audio Bass
+ *
+ * This function will get the Bass used in a given audio port
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [out] *enabled   Bass Enhancer enable/disable
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetBassEnhancer(int handle, bool *enabled);
+
+
+/**
+ * @brief To get the audio Surround Decoder
+ *
+ * This function will get enable/disable status of surround decoder
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [out] *enabled  Surround Decoder enable/disable
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsIsSurroundDecoderEnabled(int handle, bool *enabled);
+
+
+/**
+ * @brief To get the DRC Mode
+ *
+ * This function will get the Dynamic Range Control used in a given audio port
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [out] *mode     line/RF mode
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetDRCMode(int handle, int *mode);
+
+
+/**
+ * @brief To get the audio Surround Virtualizer level
+ *
+ * This function will get the Surround Virtualizer level used in a given audio port
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [out] *boost    Surround virtualizer level
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetSurroundVirtualizer(int handle, int* boost);
+
+
+/**
+ * @brief To get the audio Media intelligent Steering
+ *
+ * This function will get the Media Intelligent Steerinf
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [out] *enabled      enable/disable MI Steering
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetMISteering(int handle, bool *enabled);
+
 
 /**
  * @brief Get the stereo mode of an audio port.
@@ -445,6 +522,83 @@ dsError_t  dsSetDolbyVolumeMode(int handle, bool mode);
  * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
  */
 dsError_t  dsSetIntelligentEqualizerMode(int handle, int mode);
+
+/**
+ * @brief To set the Dolby volume leveller
+ *
+ * This function will set the Volume leveller value used in a given audio port
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [in] level  Volume Leveller value
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsSetVolumeLeveller(int handle, int level);
+
+
+/**
+ * @brief To set the audio Bass
+ *
+ * This function will set the Bass used in a given audio port
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [in] enabled   Bass Enhancer enable/disable
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsSetBassEnhancer(int handle, bool enabled);
+
+
+/**
+ * @brief To set the audio Surround Decoder
+ *
+ * This function will enable/disable surround decoder
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [in] enabled  Surround Decoder enable/disable
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsEnableSurroundDecoder(int handle, bool enabled);
+
+
+/**
+ * @brief To set the DRC Mode
+ *
+ * This function will set the Dynamic Range Control used in a given audio port
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [in] mode     line/RF mode
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsSetDRCMode(int handle, int mode);
+
+
+/**
+ * @brief To set the audio Surround Virtualizer level
+ *
+ * This function will set the Surround Virtualizer level used in a given audio port
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [in] boost    Surround virtualizer level
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsSetSurroundVirtualizer(int handle, int boost);
+
+
+/**
+ * @brief To set the audio Media intelligent Steering
+ *
+ * This function will set the Media Intelligent Steerinf
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [in] enabled      enable/disable MI Steering
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsSetMISteering(int handle, bool enabled);
 
 
 /**

@@ -78,6 +78,10 @@ IARM_Result_t _dsIsAudioMS12Decode(void *arg);
 IARM_Result_t _dsIsAudioPortEnabled(void *arg);
 IARM_Result_t _dsEnableAudioPort(void *arg);
 IARM_Result_t _dsSetAudioDuckingLevel(void *arg);
+IARM_Result_t _dsGetAudioLevel(void *arg);
+IARM_Result_t _dsSetAudioLevel(void *arg);
+IARM_Result_t _dsGetAudioGain(void *arg);
+IARM_Result_t _dsSetAudioGain(void *arg);
 IARM_Result_t _dsEnableLEConfig(void *arg);
 IARM_Result_t _dsGetLEConfig(void *arg);
 IARM_Result_t _dsSetAudioDelay(void *arg);
@@ -95,6 +99,19 @@ IARM_Result_t _dsSetDolbyVolumeMode(void *arg);
 IARM_Result_t _dsGetDolbyVolumeMode(void *arg);
 IARM_Result_t _dsSetIntelligentEqualizerMode(void *arg);
 IARM_Result_t _dsGetIntelligentEqualizerMode(void *arg);
+
+IARM_Result_t _dsGetVolumeLeveller(void *arg);
+IARM_Result_t _dsSetVolumeLeveller(void *arg);
+IARM_Result_t _dsGetBassEnhancer(void *arg);
+IARM_Result_t _dsSetBassEnhancer(void *arg);
+IARM_Result_t _dsIsSurroundDecoderEnabled(void *arg);
+IARM_Result_t _dsEnableSurroundDecoder(void *arg);
+IARM_Result_t _dsGetDRCMode(void *arg);
+IARM_Result_t _dsSetDRCMode(void *arg);
+IARM_Result_t _dsGetSurroundVirtualizer(void *arg);
+IARM_Result_t _dsSetSurroundVirtualizer(void *arg);
+IARM_Result_t _dsGetMISteering(void *arg);
+IARM_Result_t _dsSetMISteering(void *arg);
 
 
 static void _GetAudioModeFromPersistent(void *arg);
@@ -248,6 +265,10 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetStereoAuto,_dsGetStereoAuto);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioMute,_dsSetAudioMute);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioDuckingLevel,_dsSetAudioDuckingLevel);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioLevel,_dsSetAudioLevel);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioLevel,_dsGetAudioLevel);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioGain,_dsSetAudioGain);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioGain,_dsGetAudioGain);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetEncoding,_dsGetEncoding);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioMSDecode,_dsIsAudioMSDecode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioMS12Decode,_dsIsAudioMS12Decode);
@@ -273,6 +294,18 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetDolbyVolumeMode	, _dsGetDolbyVolumeMode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetIntelligentEqualizerMode, _dsSetIntelligentEqualizerMode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetIntelligentEqualizerMode, _dsGetIntelligentEqualizerMode);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetVolumeLeveller, _dsGetVolumeLeveller);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetVolumeLeveller, _dsSetVolumeLeveller);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetBassEnhancer, _dsGetBassEnhancer);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetBassEnhancer, _dsSetBassEnhancer);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsSurroundDecoderEnabled, _dsIsSurroundDecoderEnabled);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableSurroundDecoder, _dsEnableSurroundDecoder);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetDRCMode, _dsGetDRCMode);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetDRCMode, _dsSetDRCMode);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetSurroundVirtualizer, _dsGetSurroundVirtualizer);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetSurroundVirtualizer, _dsSetSurroundVirtualizer);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMISteering, _dsGetMISteering);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetMISteering, _dsSetMISteering);
 
         m_isInitialized = 1;
     }
@@ -525,6 +558,188 @@ IARM_Result_t _dsSetAudioDuckingLevel(void *arg)
     IARM_BUS_Unlock(lock);
 
     return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsGetAudioGain(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetAudioGain_t)(int handle, float *gain);
+    static dsGetAudioGain_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetAudioGain_t) dlsym(dllib, "dsGetAudioGain");
+            if (func) {
+                printf("dsGetAudioGain_t(int, float *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetAudioGain_t(int, float *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAudioGainParam_t *param = (dsAudioGainParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        float gain = 0;
+        param->gain = 0;
+        if (func(param->handle, &gain) == dsERR_NONE)
+        {
+           param->gain = gain;
+           result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+IARM_Result_t _dsGetAudioLevel(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetAudioLevel_t)(int handle, float *level);
+    static dsGetAudioLevel_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetAudioLevel_t) dlsym(dllib, "dsGetAudioLevel");
+            if (func) {
+                printf("dsGetAudioLevel_t(int, float *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetAudioLevel_t(int, float *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAudioSetLevelParam_t *param = (dsAudioSetLevelParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        float level = 0;
+        param->level = 0;
+        if (func(param->handle, &level) == dsERR_NONE)
+        {
+           param->level = level;
+           result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+IARM_Result_t _dsSetAudioGain(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetAudioGain_t)(int handle, float gain);
+    static dsSetAudioGain_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetAudioGain_t) dlsym(dllib, "dsSetAudioGain");
+            if (func) {
+                printf("dsSetAudioGain_t(int, float ) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetAudioGain_t(int, float ) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAudioGainParam_t *param = (dsAudioGainParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->gain) == dsERR_NONE)
+        {
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+
+}
+
+IARM_Result_t _dsSetAudioLevel(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetAudioLevel_t)(int handle, float level);
+    static dsSetAudioLevel_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetAudioLevel_t) dlsym(dllib, "dsSetAudioLevel");
+            if (func) {
+                printf("dsSetAudioLevel_t(int, float ) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetAudioLevel_t(int, float ) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAudioSetLevelParam_t *param = (dsAudioSetLevelParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->level) == dsERR_NONE)
+        {
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+
 }
 
 IARM_Result_t _dsSetAudioMute(void *arg)
@@ -1363,6 +1578,547 @@ IARM_Result_t _dsGetIntelligentEqualizerMode(void *arg)
         if (func(param->handle, &mode) == dsERR_NONE)
         {
             param->mode = mode;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsGetVolumeLeveller(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetVolumeLeveller_t)(int handle, int *level);
+    static dsGetVolumeLeveller_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetVolumeLeveller_t) dlsym(dllib, "dsGetVolumeLeveller");
+            if (func) {
+                printf("dsGetVolumeLeveller_t(int, int *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetVolumeLeveller_t(int, int *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsVolumeLevellerParam_t *param = (dsVolumeLevellerParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        int  level = 0;
+        param->level = 0;
+        if (func(param->handle, &level) == dsERR_NONE)
+        {
+            param->level = level;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsSetVolumeLeveller(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, int level);
+    static dsSetVolumeLeveller_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetVolumeLeveller_t) dlsym(dllib, "dsSetVolumeLeveller");
+            if (func) {
+                printf("dsSetVolumeLeveller_t(int, int) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetVolumeLeveller_t(int, int) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsVolumeLevellerParam_t *param = (dsVolumeLevellerParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->level) == dsERR_NONE)
+        {
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsGetBassEnhancer(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetBassEnhancer_t)(int handle, bool *enabled);
+    static dsGetBassEnhancer_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetBassEnhancer_t) dlsym(dllib, "dsGetBassEnhancer");
+            if (func) {
+                printf("dsGetBassEnhancer_t(int, bool *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetBassEnhancer_t(int, bool *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsBassEnhancerParam_t *param = (dsBassEnhancerParam_t *)arg;
+    bool enable = false;
+    param->enable = false;
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, &enable) == dsERR_NONE)
+        {
+            param->enable = enable;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsSetBassEnhancer(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetBassEnhancer_t)(int handle, bool enabled);
+    static dsSetBassEnhancer_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetBassEnhancer_t) dlsym(dllib, "dsSetBassEnhancer");
+            if (func) {
+                printf("dsSetBassEnhancer_t(int, bool) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetBassEnhancer_t(int, bool) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsBassEnhancerParam_t *param = (dsBassEnhancerParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->enable) == dsERR_NONE)
+        {
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsIsSurroundDecoderEnabled(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsIsSurroundDecoderEnabled_t)(int handle, bool *enabled);
+    static dsIsSurroundDecoderEnabled_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsIsSurroundDecoderEnabled_t) dlsym(dllib, "dsIsSurroundDecoderEnabled");
+            if (func) {
+                printf("dsIsSurroundDecoderEnabled_t(int, bool *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsIsSurroundDecoderEnabled_t(int, bool *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsSurroundDecoderParam_t *param = (dsSurroundDecoderParam_t *)arg;
+    bool enable = false;
+    param->enable = false;
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, &enable) == dsERR_NONE)
+        {
+            param->enable = enable;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+IARM_Result_t _dsEnableSurroundDecoder(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsEnableSurroundDecoder_t)(int handle, bool enabled);
+    static dsEnableSurroundDecoder_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsEnableSurroundDecoder_t) dlsym(dllib, "dsEnableSurroundDecoder");
+            if (func) {
+                printf("dsEnableSurroundDecoder_t(int, bool) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsEnableSurroundDecoder_t(int, bool) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsSurroundDecoderParam_t *param = (dsSurroundDecoderParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->enable) == dsERR_NONE)
+        {
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsGetDRCMode(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetDRCMode_t)(int handle, int *mode);
+    static dsGetDRCMode_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetDRCMode_t) dlsym(dllib, "dsGetDRCMode");
+            if (func) {
+                printf("dsGetDRCMode_t(int, int *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetDRCMode_t(int, int *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsDRCModeParam_t *param = (dsDRCModeParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        int mode = 0;
+        param->mode = 0;
+        if (func(param->handle, &mode) == dsERR_NONE)
+        {
+            param->mode = mode;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsSetDRCMode(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetDRCMode_t)(int handle, int mode);
+    static dsSetDRCMode_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetDRCMode_t) dlsym(dllib, "dsSetDRCMode");
+            if (func) {
+                printf("dsSetDRCMode_t(int, int) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetDRCMode_t(int, int) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsDRCModeParam_t *param = (dsDRCModeParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->mode) == dsERR_NONE)
+        {
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+IARM_Result_t _dsGetSurroundVirtualizer(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetSurroundVirtualizer_t)(int handle, int *boost);
+    static dsGetSurroundVirtualizer_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetSurroundVirtualizer_t) dlsym(dllib, "dsGetSurroundVirtualizer");
+            if (func) {
+                printf("dsGetSurroundVirtualizer_t(int, int *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetSurroundVirtualizer_t(int, int *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsSurroundVirtualizerParam_t *param = (dsSurroundVirtualizerParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        int boost = 0;
+        param->boost = 0;
+        if (func(param->handle, &boost) == dsERR_NONE)
+        {
+            param->boost = boost;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsSetSurroundVirtualizer(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, int boost);
+    static dsSetSurroundVirtualizer_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetSurroundVirtualizer_t) dlsym(dllib, "dsSetSurroundVirtualizer");
+            if (func) {
+                printf("dsSetSurroundVirtualizer_t(int, int) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetSurroundVirtualizer_t(int, int) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsSurroundVirtualizerParam_t *param = (dsSurroundVirtualizerParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->boost) == dsERR_NONE)
+        {
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsGetMISteering(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetMISteering_t)(int handle, bool *enabled);
+    static dsGetMISteering_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetMISteering_t) dlsym(dllib, "dsGetMISteering");
+            if (func) {
+                printf("dsGetMISteering_t(int, bool *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetMISteering_t(int, bool *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsMISteeringParam_t *param = (dsMISteeringParam_t *)arg;
+    bool enable = false;
+    param->enable = false;
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, &enable) == dsERR_NONE)
+        {
+            param->enable = enable;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsSetMISteering(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetMISteering_t)(int handle, bool enabled);
+    static dsSetMISteering_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetMISteering_t) dlsym(dllib, "dsSetMISteering");
+            if (func) {
+                printf("dsSetMISteering_t(int, bool) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetMISteering_t(int, bool) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsMISteeringParam_t *param = (dsMISteeringParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->enable) == dsERR_NONE)
+        {
             result = IARM_RESULT_SUCCESS;
         }
     }

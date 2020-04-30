@@ -111,6 +111,12 @@ public:
 	int getDialogEnhancement() const;
 	bool getDolbyVolumeMode() const;
 	int getIntelligentEqualizerMode() const;
+        int getVolumeLeveller() const;
+        bool getBassEnhancer() const;
+        bool isSurroundDecoderEnabled() const;
+        int getDRCMode() const;
+        int getSurroundVirtualizer() const;
+        bool getMISteering() const;
 	const AudioStereoMode &getStereoMode(bool usePersist = false);
 	
 	void enable();
@@ -139,6 +145,12 @@ public:
 	void setDialogEnhancement(const int level);
 	void setDolbyVolumeMode(const bool mode);
 	void setIntelligentEqualizerMode(const int mode);
+        void setVolumeLeveller(const int level);
+        void setBassEnhancer(const bool enable);
+        void enableSurroundDecoder(const bool enable);
+        void setDRCMode(const int mode);
+        void setSurroundVirtualizer(const int boost);
+        void setMISteering(const bool enable);
 
 	void setStereoMode(const int mode, const bool toPersist = true);
 	void setStereoAuto(const bool autoMode, const bool toPersist = true);
@@ -154,6 +166,7 @@ public:
         void setAudioAtmosOutputMode(bool enable);  
 
 	void setDB(const float db);
+        void setGain(const float newGain);
 	void setLevel(const float level);
 	void setLoopThru(const bool loopThru);
 	void setMuted(const bool mute);

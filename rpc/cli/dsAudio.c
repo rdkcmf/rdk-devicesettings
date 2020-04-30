@@ -167,9 +167,27 @@ dsError_t dsGetStereoAuto(int handle, int *autoMode)
 
 dsError_t dsGetAudioGain(int handle, float *gain)
 {
-	dsError_t ret = dsERR_NONE;
-    ret = dsERR_OPERATION_NOT_SUPPORTED;
-	return ret;
+    dsError_t ret = dsERR_GENERAL;
+    _DEBUG_ENTER();
+
+    dsAudioGainParam_t param;
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+    param.handle = handle;
+    param.gain = 0;
+
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsGetAudioGain,
+                        (void *)&param,
+                        sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+            *gain = param.gain;
+            ret = dsERR_NONE;
+    }
+
+    return ret;
 }
 
 dsError_t dsGetAudioDB(int handle, float *db)
@@ -181,9 +199,28 @@ dsError_t dsGetAudioDB(int handle, float *db)
 
 dsError_t dsGetAudioLevel(int handle, float *level)
 {
-	dsError_t ret = dsERR_NONE;
-    ret = dsERR_OPERATION_NOT_SUPPORTED;
-	return ret;
+    dsError_t ret = dsERR_GENERAL;
+    _DEBUG_ENTER();
+
+    dsAudioSetLevelParam_t param;
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+    param.handle = handle;
+    param.level = 0;
+
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsGetAudioLevel,
+                        (void *)&param,
+                        sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+            *level = param.level;
+            ret = dsERR_NONE;
+    }
+
+    return ret;
+
 }
 
 dsError_t dsGetAudioMaxDB(int handle, float *maxDb)
@@ -332,9 +369,26 @@ dsError_t dsSetStereoAuto(int handle, int autoMode, bool isPersist)
 
 dsError_t dsSetAudioGain(int handle, float gain)
 {
-	dsError_t ret = dsERR_NONE;
-	/* This is a empty operation in RNG150 */
-	return ret;
+    dsError_t ret = dsERR_GENERAL;
+    _DEBUG_ENTER();
+
+    dsAudioGainParam_t param;
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+    param.handle = handle;
+    param.gain = gain;
+
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsSetAudioGain,
+                        (void *)&param,
+                        sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+            ret = dsERR_NONE;
+    }
+
+    return ret;
 }
 
 
@@ -348,9 +402,26 @@ dsError_t dsSetAudioDB(int handle, float db)
 
 dsError_t dsSetAudioLevel(int handle, float level)
 {
-	dsError_t ret = dsERR_NONE;
-	/* This is a empty operation in RNG150 */
-	return ret;
+    dsError_t ret = dsERR_GENERAL;
+    _DEBUG_ENTER();
+
+    dsAudioSetLevelParam_t param;
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+    param.handle = handle;
+    param.level = level;
+
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsSetAudioLevel,
+                        (void *)&param,
+                        sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+            ret = dsERR_NONE;
+    }
+
+    return ret;
 }
 
 dsError_t dsSetAudioDuckingLevel(int handle, float level)
@@ -700,6 +771,252 @@ dsError_t dsGetIntelligentEqualizerMode(int handle, int *mode)
         }
 
         *mode = param.mode;
+        return dsERR_NONE;
+}
+
+dsError_t dsGetVolumeLeveller(int handle, int *level)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsVolumeLevellerParam_t param;
+
+        param.handle = handle;
+        param.level = 0;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetVolumeLeveller,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *level = param.level;
+        return dsERR_NONE;
+}
+
+dsError_t  dsSetVolumeLeveller(int handle, int level)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsVolumeLevellerParam_t param;
+        param.handle = handle;
+        param.level = level;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetVolumeLeveller,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsGetBassEnhancer(int handle, bool *enabled)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsBassEnhancerParam_t param;
+
+        param.handle = handle;
+        param.enable = false;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetBassEnhancer,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *enabled = param.enable;
+        return dsERR_NONE;
+}
+
+dsError_t  dsSetBassEnhancer(int handle, bool enabled)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsBassEnhancerParam_t param;
+        param.handle = handle;
+        param.enable = enabled;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetBassEnhancer,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsIsSurroundDecoderEnabled(int handle, bool *enabled)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsSurroundDecoderParam_t param;
+
+        param.handle = handle;
+        param.enable = false;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsIsSurroundDecoderEnabled,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *enabled = param.enable;
+        return dsERR_NONE;
+}
+
+dsError_t  dsEnableSurroundDecoder(int handle, bool enabled)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsSurroundDecoderParam_t param;
+        param.handle = handle;
+        param.enable = enabled;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsEnableSurroundDecoder,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsGetDRCMode(int handle, int *mode)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsDRCModeParam_t param;
+
+        param.handle = handle;
+        param.mode = 0;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetDRCMode,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *mode = param.mode;
+        return dsERR_NONE;
+}
+
+dsError_t  dsSetDRCMode(int handle, int mode)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsDRCModeParam_t param;
+        param.handle = handle;
+        param.mode = mode;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetDRCMode,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsGetSurroundVirtualizer(int handle, int *boost)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsSurroundVirtualizerParam_t param;
+
+        param.handle = handle;
+        param.boost = 0;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetSurroundVirtualizer,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *boost = param.boost;
+        return dsERR_NONE;
+}
+
+dsError_t  dsSetSurroundVirtualizer(int handle, int boost)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsSurroundVirtualizerParam_t param;
+        param.handle = handle;
+        param.boost = boost;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetSurroundVirtualizer,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsGetMISteering(int handle, bool *enabled)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsMISteeringParam_t param;
+
+        param.handle = handle;
+        param.enable = false;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetMISteering,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *enabled = param.enable;
+        return dsERR_NONE;
+}
+
+dsError_t  dsSetMISteering(int handle, bool enabled)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsMISteeringParam_t param;
+        param.handle = handle;
+        param.enable = enabled;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetMISteering,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
         return dsERR_NONE;
 }
 

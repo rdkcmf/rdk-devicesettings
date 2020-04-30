@@ -65,6 +65,7 @@ public:
 	static const int kIDLR;
 	static const int kHDMI;
 	static const int kSPDIF;
+        static const int kSPEAKER;
         
 
 	static AudioOutputPortType & getInstance(int id);
