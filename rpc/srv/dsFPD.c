@@ -534,6 +534,7 @@ IARM_Result_t _dsSetFPColor(void *arg)
     dsError_t dsStatus = dsSetFPColor(param->eIndicator, param->eColor);
     if(dsStatus == dsERR_NONE)
     {
+    param->eColor &= 0x00FFFFFF;
     srvFPDSettings[param->eIndicator].color = param->eColor;
     INFO("_dsSetFPColor Value  From  App is %d for Indicator %d \r\n",param->eColor,param->eIndicator);
     try{
