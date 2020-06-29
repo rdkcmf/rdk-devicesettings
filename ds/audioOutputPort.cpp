@@ -945,6 +945,32 @@ void AudioOutputPort::setLevel(const float newLevel)
 
 }
 
+/**
+ * @fn void AudioOutputPort::setAudioDuckingLevel(const float newLevel)
+ * @brief This API is used to set the audio level to be used in a given audio port. If output mode is Passthrough/Expert this mutes the audio
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] newLevel New Audio level for a given audio output port
+ *
+ * @return None
+ */
+void AudioOutputPort::setAudioDuckingLevel(const float newLevel)
+{
+    dsError_t ret = dsERR_NONE;
+
+    if (newLevel < 0) {
+        ret = dsERR_INVALID_PARAM;
+    }
+    else if ( (ret = dsSetAudioDuckingLevel(_handle, newLevel)) == dsERR_NONE)
+    {
+        _level = newLevel;
+    }
+
+    if (ret != dsERR_NONE) throw Exception(ret);
+}
+
 
 /**
  * @fn void AudioOutputPort::setLoopThru(const bool loopThru)

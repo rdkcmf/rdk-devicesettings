@@ -53,6 +53,7 @@ typedef enum _DSMgr_EventId_t {
 	IARM_BUS_DSMGR_EVENT_RX_SENSE,                     /*!< HDMI Rx Sense status */
 	IARM_BUS_DSMGR_EVENT_HDMI_IN_HOTPLUG,              /*!< HDMI IN HPD change event */
     IARM_BUS_DSMGR_EVENT_TIME_FORMAT_CHANGE,           /*!< Clock Time Format Change Event*/
+    IARM_BUS_DSMGR_EVENT_AUDIO_LEVEL_CHANGED,           /*!< Audio Level Change Event*/
 	IARM_BUS_DSMGR_EVENT_MAX,					       /*!< Max Event  */
 } IARM_Bus_DSMgr_EventId_t;
 
@@ -107,6 +108,11 @@ typedef struct _DSMgr_EventData_t {
         {
         	dsHdcpProtocolVersion_t  protocolVersion;
         }HDCPProtocolVersion;
+
+        struct _AUDIO_LEVEL_DATA
+        {
+            int level;
+        }AudioLevelInfo;
 
     } data;
 }IARM_Bus_DSMgr_EventData_t;

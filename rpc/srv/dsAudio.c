@@ -55,7 +55,7 @@ static int m_isPlatInitialized = 0;
 static bool m_MS12DAPV2Enabled = 0;
 static bool m_MS12DEEnabled = 0;
 static bool m_LEEnabled = 0;
-
+static int m_volumeDuckingLevel = 0;
 static pthread_mutex_t dsLock = PTHREAD_MUTEX_INITIALIZER;
 int _srv_AudioAuto  = 0;
 dsAudioStereoMode_t _srv_HDMI_Audiomode = dsAUDIO_STEREO_STEREO;
@@ -77,7 +77,7 @@ IARM_Result_t _dsIsAudioMSDecode(void *arg);
 IARM_Result_t _dsIsAudioMS12Decode(void *arg);
 IARM_Result_t _dsIsAudioPortEnabled(void *arg);
 IARM_Result_t _dsEnableAudioPort(void *arg);
-
+IARM_Result_t _dsSetAudioDuckingLevel(void *arg);
 IARM_Result_t _dsEnableLEConfig(void *arg);
 IARM_Result_t _dsGetLEConfig(void *arg);
 IARM_Result_t _dsSetAudioDelay(void *arg);
@@ -247,6 +247,7 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetStereoAuto,_dsSetStereoAuto);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetStereoAuto,_dsGetStereoAuto);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioMute,_dsSetAudioMute);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioDuckingLevel,_dsSetAudioDuckingLevel);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetEncoding,_dsGetEncoding);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioMSDecode,_dsIsAudioMSDecode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioMS12Decode,_dsIsAudioMS12Decode);
@@ -481,6 +482,48 @@ IARM_Result_t _dsSetStereoAuto(void *arg)
     _srv_AudioAuto = param->autoMode ? 1 : 0;
 
     IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsSetAudioDuckingLevel(void *arg)
+{
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+    int volume = 0;
+    dsAudioSetLevelParam_t *param = (dsAudioSetLevelParam_t *)arg;
+    IARM_Bus_DSMgr_EventData_t eventData;
+
+    volume = param->level * 100;
+    if(volume != m_volumeDuckingLevel)
+    {
+        m_volumeDuckingLevel = volume;
+
+        dsAudioPortType_t _APortType = _GetAudioPortType(param->handle);
+        dsAudioStereoMode_t mode = dsAUDIO_STEREO_STEREO;
+        if (_APortType == dsAUDIOPORT_TYPE_SPDIF)
+        {
+                mode = _srv_SPDIF_Audiomode;
+        }
+        else if (_APortType == dsAUDIOPORT_TYPE_HDMI) {
+                mode = _srv_HDMI_Audiomode;
+        }
+        printf("The Port type is :%d  Audio Settings Mode is %d \r\n",_APortType, mode);
+
+        if(mode == dsAUDIO_STEREO_PASSTHRU && volume != 100)
+        {
+            eventData.data.AudioLevelInfo.level = 0;
+            printf(" IARM_BUS_DSMGR_EVENT_AUDIO_LEVEL_CHANGED PASSTHRU mode volume:%d \n",eventData.data.AudioLevelInfo.level);
+        }
+        else
+        {
+            eventData.data.AudioLevelInfo.level = volume;
+            printf(" IARM_BUS_DSMGR_EVENT_AUDIO_LEVEL_CHANGED  volume:%d \n ",eventData.data.AudioLevelInfo.level);
+        }
+        IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,(IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_LEVEL_CHANGED,(void *)&eventData, sizeof(eventData));
+    }
+    IARM_BUS_Unlock(lock);
+
     return IARM_RESULT_SUCCESS;
 }
 

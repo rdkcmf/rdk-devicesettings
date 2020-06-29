@@ -353,6 +353,30 @@ dsError_t dsSetAudioLevel(int handle, float level)
 	return ret;
 }
 
+dsError_t dsSetAudioDuckingLevel(int handle, float level)
+{
+    dsError_t ret = dsERR_GENERAL;
+    _DEBUG_ENTER();
+
+    dsAudioSetLevelParam_t param;
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+    param.handle = handle;
+    param.level = level;
+
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsSetAudioDuckingLevel,
+                        (void *)&param,
+                        sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+            ret = dsERR_NONE;
+    }
+
+    return ret;
+}
+
 dsError_t dsEnableLoopThru(int handle, bool loopThru)
 {
 	dsError_t ret = dsERR_NONE;
