@@ -332,6 +332,7 @@ const VideoOutputPort::Display &VideoOutputPort::getDisplay()
 			_display._physicalAddressB = edid.physicalAddressB;
 			_display._physicalAddressC = edid.physicalAddressC;
 			_display._physicalAddressD = edid.physicalAddressD;
+			_display._isDeviceRepeater = edid.isRepeater;
 
 
 			}

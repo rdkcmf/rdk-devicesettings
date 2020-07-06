@@ -87,6 +87,7 @@ public:
     	 int _aspectRatio;
 		 bool _hdmiDeviceType;
 		 bool _isSurroundCapable;
+		 bool _isDeviceRepeater;
 		 uint8_t _physicalAddressA; //!<  Physical Address for HDMI node A
 		 uint8_t _physicalAddressB; //!< Physical Address for HDMI node B
 		 uint8_t _physicalAddressC; //!<  Physical Address for HDMI node C
@@ -101,7 +102,7 @@ public:
  *
  * @return None.
  */
-    	Display() :_handle(0), _productCode(0), _serialNumber(0), _manufacturerYear(0), _manufacturerWeek(0),_aspectRatio(0),_hdmiDeviceType(true), _isSurroundCapable(false),
+    	Display() :_handle(0), _productCode(0), _serialNumber(0), _manufacturerYear(0), _manufacturerWeek(0),_aspectRatio(0),_hdmiDeviceType(true), _isSurroundCapable(false), _isDeviceRepeater(false),
 		_physicalAddressA(1),_physicalAddressB(0),_physicalAddressC(0),_physicalAddressD(0){};
     	Display(VideoOutputPort &vPort);
     	virtual ~Display();
@@ -152,6 +153,7 @@ public:
  * @retval False If device type is DVI.
  */
         int getConnectedDeviceType() const {return _hdmiDeviceType;};
+        bool isConnectedDeviceRepeater() const {return _isDeviceRepeater;};
         void getEDIDBytes(std::vector<uint8_t> &edid) const;
 
 /**
