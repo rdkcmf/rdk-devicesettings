@@ -329,6 +329,7 @@ typedef struct _dsVideoPortGetResolutionParam_t {
 
 
 typedef struct _dsVideoPortSetResolutionParam_t {
+	dsError_t result;
 	int handle;
 	bool toPersist;
     bool forceCompatible;

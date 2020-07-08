@@ -753,6 +753,7 @@ IARM_Result_t _dsSetResolution(void *arg)
 			/*!< Persist Resolution Settings */
 			persistResolution(param);
 		}
+		param->result = ret;
 	}
 		
     IARM_BUS_Unlock(lock);

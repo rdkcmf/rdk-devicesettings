@@ -425,7 +425,7 @@ dsError_t  dsSetResolution(int handle, dsVideoPortResolution_t *resolution, bool
 							(void *)&param,
 							sizeof(param));
 
-	if (IARM_RESULT_SUCCESS == rpcRet)
+	if (IARM_RESULT_SUCCESS == rpcRet && (dsERR_NONE == param.result))
 	{
 		return dsERR_NONE;
 	}
