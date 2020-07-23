@@ -50,6 +50,7 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsGetStereoAuto		"dsGetStereoAuto"
 #define IARM_BUS_DSMGR_API_dsGetEncoding                "dsGetEncoding"
 #define  IARM_BUS_DSMGR_API_dsSetAudioMute		"dsSetAudioMute"
+#define  IARM_BUS_DSMGR_API_dsIsAudioMute              "dsIsAudioMute"
 #define  IARM_BUS_DSMGR_API_dsIsAudioMSDecode    "dsIsAudioMSDecode"
 #define  IARM_BUS_DSMGR_API_dsIsAudioMS12Decode    "dsIsAudioMS12Decode"
 

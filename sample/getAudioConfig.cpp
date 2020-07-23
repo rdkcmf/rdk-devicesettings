@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
         printf("\t MaxDB - [%f]\r\n",         aPort.getMaxDB());
         printf("\t MinDB- [%f]\r\n",          aPort.getMinDB());
         printf("\t Optimal Level- [%f]\r\n",  aPort.getOptimalLevel());
-        printf("\t Audio Level- [%d]\r\n",    aPort.getLevel());
+        printf("\t Audio Level- [%f]\r\n",    aPort.getLevel());
         printf("\t Audio delay - [%lu] ms\r\n", audioDelayMs);
         printf("\t Supported Compressions - [%d]\r\n", aPort.getSupportedCompressions().size());
         for (size_t i = 0; i < aPort.getSupportedCompressions().size(); i++) {

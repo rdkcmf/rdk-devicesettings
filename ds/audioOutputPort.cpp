@@ -372,7 +372,16 @@ bool AudioOutputPort::getAudioDelayOffset(uint32_t& audioDelayOffsetMs) const
  * @return Current Audio Level for the given audio output port
  */
 float AudioOutputPort::getLevel() const{
-	return _level;
+        dsError_t ret = dsERR_NONE;
+        float level = 0;
+        if ((ret = dsGetAudioLevel(_handle, &level)) == dsERR_NONE)
+        {
+            return level;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
 }
 
 
@@ -399,7 +408,12 @@ bool AudioOutputPort::isLoopThru() const {
  */
 bool AudioOutputPort::isMuted() const
 {
-	return _muted;
+        bool muted = false;
+        dsError_t ret = dsIsAudioMute(_handle, &muted);
+        if (ret != dsERR_NONE) {
+                throw Exception(ret);
+        }
+        return muted;
 }
 
 

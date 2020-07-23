@@ -254,9 +254,21 @@ dsError_t  dsIsAudioLoopThru(int handle, bool *loopThru)
 
 dsError_t dsIsAudioMute(int handle, bool *muted)
 {
-	dsError_t ret = dsERR_NONE;
-    ret = dsERR_OPERATION_NOT_SUPPORTED;
-	return ret;
+        dsAudioSetMutedParam_t param;
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+        param.handle = handle;
+        param.mute = false;
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *)IARM_BUS_DSMGR_API_dsIsAudioMute,
+                            (void *)&param,
+                            sizeof(param));
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                *muted = param.mute;
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
 }
 
 dsError_t dsIsAudioPortEnabled(int handle, bool *enabled)

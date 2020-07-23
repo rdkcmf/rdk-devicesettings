@@ -70,6 +70,7 @@ IARM_Result_t _dsSetStereoMode(void *arg);
 IARM_Result_t _dsSetStereoAuto(void *arg);
 IARM_Result_t _dsGetStereoAuto(void *arg);
 IARM_Result_t _dsSetAudioMute(void *arg);
+IARM_Result_t _dsIsAudioMute(void *arg);
 IARM_Result_t _dsAudioPortTerm(void *arg);
 IARM_Result_t _dsGetStereoMode(void *arg);
 IARM_Result_t _dsGetEncoding(void *arg);
@@ -264,6 +265,7 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetStereoAuto,_dsSetStereoAuto);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetStereoAuto,_dsGetStereoAuto);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioMute,_dsSetAudioMute);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioMute,_dsIsAudioMute);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioDuckingLevel,_dsSetAudioDuckingLevel);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioLevel,_dsSetAudioLevel);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioLevel,_dsGetAudioLevel);
