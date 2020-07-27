@@ -758,7 +758,10 @@ void VideoOutputPort::getTVHDRCapabilities(int *capabilities) const
  */
 void VideoOutputPort::getSupportedTvResolutions(int *resolutions) const
 {
-    dsSupportedTvResolutions(_handle,resolutions);
+    dsError_t ret = dsSupportedTvResolutions(_handle,resolutions);
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
 }
 
 int VideoOutputPort::forceDisable4KSupport(bool disable)
