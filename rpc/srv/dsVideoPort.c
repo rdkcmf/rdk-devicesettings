@@ -717,6 +717,8 @@ IARM_Result_t _dsSetResolution(void *arg)
 			{
 				//Trying to set 4K resolution when it's disabled. This cannot be allowed.
 				printf("Error! Cannot set 4K resolution. Support for 4K is disabled.\n");
+                                ret = dsERR_OPERATION_NOT_SUPPORTED;
+                                param->result = ret;
 				IARM_BUS_Unlock(lock);
 				return IARM_RESULT_SUCCESS;
 			}
@@ -735,6 +737,7 @@ IARM_Result_t _dsSetResolution(void *arg)
 			
 			printf("Same Resolution ..Ignoring Resolution Request------\r\n");
                         _dsHDMIResolution = platresolution.name;
+                        param->result = ret;
 			IARM_BUS_Unlock(lock);
 			return IARM_RESULT_SUCCESS;
 		}
