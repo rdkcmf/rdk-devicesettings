@@ -76,7 +76,6 @@ public:
 	unsigned int getSupportedVideoCodingFormats() const;
 	dsVideoCodecInfo_t getVideoCodecInfo(dsVideoCodingFormat_t format) const;
 	int forceDisableHDRSupport(bool disable);
-	int enableHDRDVSupport(bool enable);
 };
 
 }

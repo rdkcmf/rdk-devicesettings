@@ -144,15 +144,6 @@ dsError_t dsGetVideoCodecInfo(int handle, dsVideoCodingFormat_t codec, dsVideoCo
 
 dsError_t dsForceDisableHDRSupport(int handle, bool disable);
 
-/**
- * @brief This API is used to set the HDR DV support settings.
- *
- * @param [in]   handle  Handle for the video device (video decoder)
- * @param [in]   enable  1-enable 0-disable.
- *
- * @return dsError_t Error code.
- */
-dsError_t dsEnableHDRDVSupport(int handle, bool enable);
 /* End of DSHAL_VIDEODEVICE_API doxygen group */
 /**
  * @}

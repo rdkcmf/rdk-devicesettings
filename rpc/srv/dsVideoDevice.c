@@ -69,7 +69,7 @@ IARM_Result_t _dsGetHDRCapabilities(void *arg);
 IARM_Result_t _dsGetSupportedVideoCodingFormats(void *arg);
 IARM_Result_t _dsGetVideoCodecInfo(void *arg);
 IARM_Result_t _dsForceDisableHDR(void *arg);
-IARM_Result_t _dsEnableHDRDVSupport(void *arg);
+static bool get_HDR_DV_RFC_config();
 
 IARM_Result_t dsVideoDeviceMgr_init()
 {
@@ -112,26 +112,8 @@ IARM_Result_t dsVideoDeviceMgr_init()
 		printf("Exception in getting force-disable-HDR setting at start up.\r\n");
 	}
 
-        try
-        {
-                std::string _hdr_dv_setting("false");
-                _hdr_dv_setting = device::HostPersistence::getInstance().getProperty("HDR.DV", _hdr_dv_setting);
-                if (_hdr_dv_setting.compare("false") == 0)
-                {
-                        enableHDRDVStatus = false;
-                        printf("HDR DV support is disabled.\n");
-                }
-                else
-                {
-                        enableHDRDVStatus = true;
-                        printf("HDR DV support is enabled.\n");
-                }
-
-        }
-        catch(...)
-        {
-                printf("Exception in getting HDR DV setting at start up.\r\n");
-        }
+	enableHDRDVStatus = get_HDR_DV_RFC_config();
+	printf("HDR DV support status is: %s.\n", (true == enableHDRDVStatus? "enabled" : "disabled"));
 
 
     if (!m_isPlatInitialized) {
@@ -162,7 +144,6 @@ IARM_Result_t _dsVideoDeviceInit(void *arg)
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetSupportedVideoCodingFormats, _dsGetSupportedVideoCodingFormats); 
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetVideoCodecInfo, _dsGetVideoCodecInfo); 
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetForceDisableHDR, _dsForceDisableHDR); 
-		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableHDRDVSupport, _dsEnableHDRDVSupport);
         m_isInitialized = 1;
     }
 
@@ -432,30 +413,33 @@ IARM_Result_t _dsForceDisableHDR(void *arg)
     return IARM_RESULT_SUCCESS;
 }
 
-
-IARM_Result_t _dsEnableHDRDVSupport(void *arg)
+#define RFC_BUFFER_SIZE 100
+static bool get_HDR_DV_RFC_config()
 {
-    _DEBUG_ENTER();
-
-    IARM_BUS_Lock(lock);
-
-    dsEnableHDRDVSupportParam_t *param = (dsEnableHDRDVSupportParam_t *)arg;
-        param->result = dsERR_NONE;
-
-        enableHDRDVStatus = param->enable;
-        if(enableHDRDVStatus)
+    bool is_enabled = false;
+    const char * cmd = "tr181Set -g Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DolbyVision.Enable 2>&1 1>/dev/null";
+    /*Note: the above redirection is necessary because tr181 prints the value of parameter to stderr instead of stdout. */
+    printf("%s: getting RFC config using command \"%s\"\n", __FUNCTION__, cmd);
+    FILE * pipe = popen(cmd, "r");
+    if(pipe)
+    {
+        char buffer[RFC_BUFFER_SIZE];
+        if(NULL == fgets(buffer, RFC_BUFFER_SIZE, pipe))
         {
-                printf("enableHDRDVStatus persist true\n");
-                device::HostPersistence::getInstance().persistHostProperty("HDR.DV","true");
+            printf("%s: could not parse output of command <%s>.\n", __FUNCTION__, cmd);
         }
         else
         {
-                printf("enableHDRDVStatus persist false \n");
-                device::HostPersistence::getInstance().persistHostProperty("HDR.DV","false");
+            printf("%s: read output \"%s\"\n", __FUNCTION__, buffer);
+            if(0 == strncasecmp(buffer, "true", 4))
+            {
+                is_enabled = true;
+            }
         }
-
-    IARM_BUS_Unlock(lock);
-    return IARM_RESULT_SUCCESS;
+    }
+    printf("%s: the feature is %s.\n", __FUNCTION__, (true == is_enabled? "enabled" : "disabled"));
+    pclose(pipe);
+    return is_enabled;
 }
 
 /** @} */

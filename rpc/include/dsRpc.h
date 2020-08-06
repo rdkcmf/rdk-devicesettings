@@ -129,7 +129,6 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsResetOutputToSDR "dsResetOutputToSDR"
 #define IARM_BUS_DSMGR_API_dsSetHdmiPreference "dsSetHdmiPreference"
 #define IARM_BUS_DSMGR_API_dsGetHdmiPreference "dsGetHdmiPreference"
-#define IARM_BUS_DSMGR_API_dsEnableHDRDVSupport "dsEnableHDRDVSupport"
 #define IARM_BUS_DSMGR_API_dsSetScartParameter     "dsSetScartParameter"
 #define IARM_BUS_DSMGR_API_dsGetVideoEOTF           "dsGetVideoEOTF"
 #define IARM_BUS_DSMGR_API_dsGetMatrixCoefficients  "dsGetMatrixCoefficients"
@@ -558,13 +557,6 @@ typedef struct
 	bool disable;
 } dsForceDisable4KParam_t;
   
-typedef struct
-{
-        dsError_t result;
-        int handle;
-        bool enable;
-} dsEnableHDRDVSupportParam_t;  
-
 typedef struct _dsIsOutputHDRParam_t {
     dsError_t result;
     int handle;

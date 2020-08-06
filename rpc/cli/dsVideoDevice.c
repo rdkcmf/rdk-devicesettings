@@ -242,27 +242,5 @@ dsError_t dsForceDisableHDRSupport(int handle, bool disable)
 
 	return dsERR_GENERAL ;
 }
-dsError_t dsEnableHDRDVSupport(int handle, bool  enable)
-{
-        _DEBUG_ENTER();
-
-        dsEnableHDRDVSupportParam_t param;
-        memset(&param, 0, sizeof(param));
-        param.handle = handle;
-        param.enable= enable;
-
-        IARM_Result_t rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
-                        (char *) IARM_BUS_DSMGR_API_dsEnableHDRDVSupport,
-                        (void *) &param,
-                        sizeof(param));
-
-        if (IARM_RESULT_SUCCESS == rpcRet)
-        {
-                return param.result;
-        }
-
-        return dsERR_GENERAL ;
-
-}
 /** @} */
 /** @} */

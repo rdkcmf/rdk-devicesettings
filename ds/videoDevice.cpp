@@ -292,12 +292,6 @@ int VideoDevice::forceDisableHDRSupport(bool disable)
 	dsForceDisableHDRSupport(_handle, disable);
 	return 0;
 }
-
-int VideoDevice::enableHDRDVSupport(bool enable)
-{
-        dsEnableHDRDVSupport(_handle, enable);
-        return 0;
-}
 }
 
 /** @} */
