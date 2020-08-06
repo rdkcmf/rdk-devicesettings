@@ -89,10 +89,10 @@ BOOST_AUTO_TEST_CASE(test_AudioOutputPort_set_Methods)
 		if (true) { /* These are dummy values */
 			/* You can set the following 3 values using integer constants or use string names*/
 			aPort.setEncoding(device::AudioEncoding::kAC3);
-			aPort.setCompression(device::AudioCompression::kMedium);
+//			aPort.setCompression(device::AudioCompression::kMedium);
 			aPort.setStereoMode(device::AudioStereoMode::kSurround);
 			aPort.setEncoding(std::string("AC3"));
-			aPort.setCompression(std::string("MEDIUM"));
+//			aPort.setCompression(std::string("MEDIUM"));
 			aPort.setStereoMode(std::string("SURROUND"));
 
 			aPort.setDB(1.0);
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(SetAudioConfig_InvalidNames)
 		device::VideoOutputPort vPort =
 				device::Host::getInstance().getVideoOutputPort(std::string("HDMI0"));
 		device::AudioOutputPort aPort = vPort.getAudioOutputPort();
-		aPort.setCompression(device::AudioCompression::getInstance("BadName").getId());
+//		aPort.setCompression(device::AudioCompression::getInstance("BadName").getId());
 		BOOST_CHECK(0);
 	}
 	catch(...) {

@@ -61,17 +61,13 @@ int main(int argc, char *argv[])
         aPort.getAudioDelay(audioDelayMs);
         printf("AudioPort Name- [%s] =======================\r\n",    aPort.getName().c_str());
 
-        printf("\t Compression- [%d]\r\n",    aPort.getCompression());
-        printf("\t MS12 MultiStreamDecode Status - [%s]\r\n",aPort.isAudioMS12Decode()? "On" : "Off");
-        printf("\t DialogEnhancement- [%d]\r\n",    aPort.getDialogEnhancement());
-        printf("\t DolbyVolumeMode- [%d]\r\n",    aPort.getDolbyVolumeMode());
-        printf("\t IntelligentEqualizerMode- [%d]\r\n",    aPort.getIntelligentEqualizerMode());
         printf("\t Volume Leveller - [%d]\r\n",    aPort.getVolumeLeveller());
         printf("\t Bass Enhancer Status - [%s]\r\n",aPort.getBassEnhancer()? "On" : "Off");
         printf("\t Surround Decoder Status - [%s]\r\n",aPort.isSurroundDecoderEnabled()? "Enabled" : "Disabled");
         printf("\t Dynamic Range Control Mode - [%s]\r\n",aPort.getDRCMode()? "RF" : "Line");
         printf("\t Surround Virtualizer boost - [%d]\r\n",    aPort.getSurroundVirtualizer());
         printf("\t Media Intelligent Steering - [%s]\r\n",aPort.getMISteering()? "On" : "Off");
+        printf("\t Compression- [%s]\r\n",    aPort.getCompression().getName().c_str());
         printf("\t Encoding- [%s]\r\n",       aPort.getEncoding().getName().c_str());
         printf("\t Stereo Mode- [%s]\r\n",    aPort.getStereoMode().getName().c_str());
         printf("\t Gain - [%f]\r\n",          aPort.getGain());
