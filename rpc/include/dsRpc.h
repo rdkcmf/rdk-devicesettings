@@ -271,7 +271,7 @@ typedef struct _dsVolumeLevellerParam_t {
 
 typedef struct _dsBassEnhancerParam_t {
        int handle;
-       bool enable;
+       int boost;
 } dsBassEnhancerParam_t;
 
 typedef struct _dsSurroundDecoderParam_t {

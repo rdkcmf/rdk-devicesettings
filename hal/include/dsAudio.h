@@ -125,11 +125,11 @@ dsError_t  dsGetVolumeLeveller(int handle, int* level);
  * This function will get the Bass used in a given audio port
  *
  * @param [in] handle       Handle for the Output Audio port
- * @param [out] *enabled   Bass Enhancer enable/disable
+ * @param [out] *boost   Bass Enhancer boost value
  * @return dsError_t Error code.
  */
 
-dsError_t  dsGetBassEnhancer(int handle, bool *enabled);
+dsError_t  dsGetBassEnhancer(int handle, int *boost);
 
 
 /**
@@ -463,11 +463,11 @@ dsError_t  dsSetVolumeLeveller(int handle, int level);
  * This function will set the Bass used in a given audio port
  *
  * @param [in] handle       Handle for the Output Audio port
- * @param [in] enabled   Bass Enhancer enable/disable
+ * @param [in] boost   Bass Enhancer boost value
  * @return dsError_t Error code.
  */
 
-dsError_t  dsSetBassEnhancer(int handle, bool enabled);
+dsError_t  dsSetBassEnhancer(int handle, int boost);
 
 
 /**

@@ -110,7 +110,7 @@ public:
 	const AudioEncoding &getEncoding() const;
 	const AudioCompression &getCompression() const;
         int getVolumeLeveller() const;
-        bool getBassEnhancer() const;
+        int getBassEnhancer() const;
         bool isSurroundDecoderEnabled() const;
         int getDRCMode() const;
         int getSurroundVirtualizer() const;
@@ -140,7 +140,7 @@ public:
 	void setEncoding(const int encoding);
         void setCompression(const int compression);
         void setVolumeLeveller(const int level);
-        void setBassEnhancer(const bool enable);
+        void setBassEnhancer(const int boost);
         void enableSurroundDecoder(const bool enable);
         void setDRCMode(const int mode);
         void setSurroundVirtualizer(const int boost);

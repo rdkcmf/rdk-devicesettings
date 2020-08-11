@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
         printf("AudioPort Name- [%s] =======================\r\n",    aPort.getName().c_str());
 
         printf("\t Volume Leveller - [%d]\r\n",    aPort.getVolumeLeveller());
-        printf("\t Bass Enhancer Status - [%s]\r\n",aPort.getBassEnhancer()? "On" : "Off");
+        printf("\t Bass Enhancer Boost value - [%d]\r\n",aPort.getBassEnhancer());
         printf("\t Surround Decoder Status - [%s]\r\n",aPort.isSurroundDecoderEnabled()? "Enabled" : "Disabled");
         printf("\t Dynamic Range Control Mode - [%s]\r\n",aPort.getDRCMode()? "RF" : "Line");
         printf("\t Surround Virtualizer boost - [%d]\r\n",    aPort.getSurroundVirtualizer());

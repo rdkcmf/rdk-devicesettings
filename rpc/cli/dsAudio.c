@@ -652,13 +652,13 @@ dsError_t  dsSetVolumeLeveller(int handle, int level)
         return dsERR_NONE;
 }
 
-dsError_t dsGetBassEnhancer(int handle, bool *enabled)
+dsError_t dsGetBassEnhancer(int handle, int *boost)
 {
         IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
         dsBassEnhancerParam_t param;
 
         param.handle = handle;
-        param.enable = false;
+        param.boost = 0;
 
         rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                                                 (char *)IARM_BUS_DSMGR_API_dsGetBassEnhancer,
@@ -671,16 +671,16 @@ dsError_t dsGetBassEnhancer(int handle, bool *enabled)
                 return dsERR_GENERAL;
         }
 
-        *enabled = param.enable;
+        *boost = param.boost;
         return dsERR_NONE;
 }
 
-dsError_t  dsSetBassEnhancer(int handle, bool enabled)
+dsError_t  dsSetBassEnhancer(int handle, int boost)
 {
         IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
         dsBassEnhancerParam_t param;
         param.handle = handle;
-        param.enable = enabled;
+        param.boost = boost;
 
         rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                                                         (char *)IARM_BUS_DSMGR_API_dsSetBassEnhancer,

@@ -569,21 +569,21 @@ void AudioOutputPort::setVolumeLeveller(const int level)
 }
 
 /**
- * @fn AudioOutputPort::setBassEnhancer(const bool enable)
- * @brief This API is used to enable/disable the Bass in a given audio port.
+ * @fn AudioOutputPort::setBassEnhancer(const int boost)
+ * @brief This API is used to adjust the Bass in a given audio port.
  *
  * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
  * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
  *
- * @param[in] enable/disable bass for the given audio Output port.
+ * @param[in]  bass boost value for the given audio Output port.
  *
  * @return None
  */
-void AudioOutputPort::setBassEnhancer(const bool enable)
+void AudioOutputPort::setBassEnhancer(const int boost)
 {
         dsError_t ret = dsERR_NONE;
 
-        if ( (ret = dsSetBassEnhancer(_handle, enable)) == dsERR_NONE) {
+        if ( (ret = dsSetBassEnhancer(_handle, boost)) == dsERR_NONE) {
         }
         else
         {
@@ -705,18 +705,18 @@ int AudioOutputPort::getVolumeLeveller() const
 
 
 /**
- * @fn  bool AudioOutputPort::getBassEnhancer()
- * @brief This API is used to get the current auto mode Bass value
+ * @fn  int AudioOutputPort::getBassEnhancer()
+ * @brief This API is used to get the Bass Enhancer boost value
  *
  * @return Current audio bass value
  */
-bool AudioOutputPort::getBassEnhancer() const
+int AudioOutputPort::getBassEnhancer() const
 {
         dsError_t ret = dsERR_NONE;
-        bool _enable = 0;
-        if ( (ret = dsGetBassEnhancer(_handle, &_enable)) == dsERR_NONE)
+        int _boost = 0;
+        if ( (ret = dsGetBassEnhancer(_handle, &_boost)) == dsERR_NONE)
         {
-            return _enable;
+            return _boost;
         }
         else
         {

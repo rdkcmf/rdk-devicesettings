@@ -56,18 +56,18 @@ int main(int argc, char *argv[])
 
 
     if (argc != 4) {
-        printf("%s : <Port Type - HDMI, SPEAKER> <Port Number-0, 1, 2...> <Enable-1 or Disable-0>\r\n", argv[0]);
+        printf("%s : <Port Type - HDMI, SPEAKER> <Port Number-0, 1, 2...> <boost 0-100>\r\n", argv[0]);
         return 0;
     }
 
     char *portType = argv[1];
     char *portId = argv[2];
-    bool enable = (bool) atoi((const char *)argv[3]);
+    int boost = atoi((const char *)argv[3]);
 
     try {
 		printf("Sample Application: set Bass Enhancer\r\n");
 		device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(std::string(portType).append(portId));
-		aPort.setBassEnhancer(enable);
+		aPort.setBassEnhancer(boost);
 		printf("Sample Application: set Bass Enhancer is completed\r\n");
     }
     catch (...) {

@@ -1448,17 +1448,17 @@ IARM_Result_t _dsGetBassEnhancer(void *arg)
     IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     IARM_BUS_Lock(lock);
 
-    typedef dsError_t (*dsGetBassEnhancer_t)(int handle, bool *enabled);
+    typedef dsError_t (*dsGetBassEnhancer_t)(int handle, int *boost);
     static dsGetBassEnhancer_t func = 0;
     if (func == 0) {
         void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
         if (dllib) {
             func = (dsGetBassEnhancer_t) dlsym(dllib, "dsGetBassEnhancer");
             if (func) {
-                printf("dsGetBassEnhancer_t(int, bool *) is defined and loaded\r\n");
+                printf("dsGetBassEnhancer_t(int, int *) is defined and loaded\r\n");
             }
             else {
-                printf("dsGetBassEnhancer_t(int, bool *) is not defined\r\n");
+                printf("dsGetBassEnhancer_t(int, int *) is not defined\r\n");
             }
             dlclose(dllib);
         }
@@ -1468,13 +1468,13 @@ IARM_Result_t _dsGetBassEnhancer(void *arg)
     }
 
     dsBassEnhancerParam_t *param = (dsBassEnhancerParam_t *)arg;
-    bool enable = false;
-    param->enable = false;
+    int boost = 0;
+    param->boost = 0;
     if (func != 0 && param != NULL)
     {
-        if (func(param->handle, &enable) == dsERR_NONE)
+        if (func(param->handle, &boost) == dsERR_NONE)
         {
-            param->enable = enable;
+            param->boost = boost;
             result = IARM_RESULT_SUCCESS;
         }
     }
@@ -1494,17 +1494,17 @@ IARM_Result_t _dsSetBassEnhancer(void *arg)
     IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     IARM_BUS_Lock(lock);
 
-    typedef dsError_t (*dsSetBassEnhancer_t)(int handle, bool enabled);
+    typedef dsError_t (*dsSetBassEnhancer_t)(int handle, int boost);
     static dsSetBassEnhancer_t func = 0;
     if (func == 0) {
         void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
         if (dllib) {
             func = (dsSetBassEnhancer_t) dlsym(dllib, "dsSetBassEnhancer");
             if (func) {
-                printf("dsSetBassEnhancer_t(int, bool) is defined and loaded\r\n");
+                printf("dsSetBassEnhancer_t(int, int) is defined and loaded\r\n");
             }
             else {
-                printf("dsSetBassEnhancer_t(int, bool) is not defined\r\n");
+                printf("dsSetBassEnhancer_t(int, int) is not defined\r\n");
             }
             dlclose(dllib);
         }
@@ -1517,7 +1517,7 @@ IARM_Result_t _dsSetBassEnhancer(void *arg)
 
     if (func != 0 && param != NULL)
     {
-        if (func(param->handle, param->enable) == dsERR_NONE)
+        if (func(param->handle, param->boost) == dsERR_NONE)
         {
             result = IARM_RESULT_SUCCESS;
         }
