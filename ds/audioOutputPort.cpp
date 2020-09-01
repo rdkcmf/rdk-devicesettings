@@ -111,7 +111,7 @@ AudioOutputPort & AudioOutputPort::getInstance(const std::string &name)
 AudioOutputPort::AudioOutputPort(const int type, const int index, const int id) :
 								 _type(type), _index(index), _id(id),
 								 _handle(-1), _encoding(AudioEncoding::kNone),
-								  _stereoMode(AudioStereoMode::kStereo), _stereoAuto(false),
+								 _compression(AudioCompression::kNone), _stereoMode(AudioStereoMode::kStereo), _stereoAuto(false),
 								 _gain(0.0), _db(0.0), _maxDb(0.0), _minDb(0.0), _optimalLevel(0.0),
 								 _level(0.0), _loopThru(false), _muted(false), _audioDelayMs(0), _audioDelayOffsetMs(0)
 {
@@ -123,7 +123,7 @@ AudioOutputPort::AudioOutputPort(const int type, const int index, const int id) 
 		_name = out.str();
 	}
 
-	//dsGetAudioCompression	(_handle, (dsAudioCompression_t *)&_compression);
+	dsGetAudioCompression	(_handle, (dsAudioCompression_t *)&_compression);
 	dsGetAudioEncoding		(_handle, (dsAudioEncoding_t *)&_encoding);
 	dsGetStereoMode			(_handle, (dsAudioStereoMode_t *)&_stereoMode, false);
 	dsGetAudioGain			(_handle, &_gain);
@@ -209,6 +209,18 @@ const AudioEncoding & AudioOutputPort::getEncoding() const
 {
 	dsGetAudioEncoding(_handle, (dsAudioEncoding_t *)&_encoding);
 	return AudioEncoding::getInstance(_encoding);
+}
+
+
+/**
+ * @fn const AudioCompression & AudioOutputPort::getCompression() const
+ * @brief This API is used to get the current compression of the output port.
+ *
+ * @return Current audio compression
+ */
+const AudioCompression & AudioOutputPort::getCompression() const
+{
+	return AudioCompression::getInstance(_compression);
 }
 
 
@@ -513,79 +525,24 @@ void AudioOutputPort::setCompression(const int newCompression)
 {
 	dsError_t ret = dsERR_NONE;
 
-	if ( (ret = dsSetAudioCompression(_handle, newCompression)) == dsERR_NONE) {
+	if ( (ret = dsSetAudioCompression(_handle, (dsAudioCompression_t)newCompression)) == dsERR_NONE) {
+		_compression = (int)newCompression;
 	}
 
 	if (ret != dsERR_NONE) throw Exception(ret);
 }
 
 /**
- * @fn AudioOutputPort::setDialogEnhancement(const int level)
+ * @fn AudioOutputPort::setCompression(const std::string &newCompression)
  * @brief This API is used to set the compression mode in a given audio port.
- *
- * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
- * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
  *
  * @param[in] newCompression Type of Compression mode for the given audio Output port.
  *
  * @return None
  */
-void AudioOutputPort::setDialogEnhancement(const int level)
+void AudioOutputPort::setCompression(const std::string &newCompression)
 {
-	dsError_t ret = dsERR_NONE;
-
-	if ( (ret = dsSetDialogEnhancement(_handle, level)) == dsERR_NONE) {
-	}
-	else
-	{
-	    throw Exception(ret);
-	}
-}
-
-/**
- * @fn AudioOutputPort::setDolbyVolumeMode(const bool mode)
- * @brief This API is used to set the compression mode in a given audio port.
- *
- * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
- * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
- *
- * @param[in] newCompression Type of Compression mode for the given audio Output port.
- *
- * @return None
- */
-void AudioOutputPort::setDolbyVolumeMode(const bool mode)
-{
-	dsError_t ret = dsERR_NONE;
-
-	if ( (ret = dsSetDolbyVolumeMode(_handle, mode)) == dsERR_NONE) {
-	}
-	else
-	{
-	    throw Exception(ret);
-	}
-}
-
-/**
- * @fn AudioOutputPort::setIntelligentEqualizerMode(const int level)
- * @brief This API is used to set the compression mode in a given audio port.
- *
- * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
- * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
- *
- * @param[in] newCompression Type of Compression mode for the given audio Output port.
- *
- * @return None
- */
-void AudioOutputPort::setIntelligentEqualizerMode(const int mode)
-{
-	dsError_t ret = dsERR_NONE;
-
-	if ( (ret = dsSetIntelligentEqualizerMode(_handle, mode)) == dsERR_NONE) {
-	}
-	else
-	{
-	    throw Exception(ret);
-	}
+	setCompression(AudioCompression::getInstance(newCompression).getId());
 }
 
 /**
@@ -725,87 +682,6 @@ void AudioOutputPort::setMISteering(const bool enable)
             throw Exception(ret);
         }
 }
-
-/**
- * @fn const AudioCompression & AudioOutputPort::getCompression() const
- * @brief This API is used to get the current compression of the output port.
- *
- * @return Current audio compression
- */
-int  AudioOutputPort::getCompression() const
-{
-	dsError_t ret = dsERR_NONE;
-	int _compression = 0;
-	if ( (ret = dsGetAudioCompression(_handle, &_compression)) == dsERR_NONE)
-	{
-            return _compression;
-	}
-	else
-	{
-	    throw Exception(ret);
-	}
-}
-
-/**
- * @fn const int AudioOutputPort::getDialogEnhancement()
- * @brief This API is used to get the current auto mode.
- *
- * @return Current audio stereo mode
- */
-int  AudioOutputPort::getDialogEnhancement() const
-{
-	dsError_t ret = dsERR_NONE;
-	int _enhancerLevel = 0;
-	if ((ret = dsGetDialogEnhancement(_handle, &_enhancerLevel)) == dsERR_NONE)
-	{
-            return _enhancerLevel;
-	}
-	else
-	{
-	    throw Exception(ret);
-	}
-}
-
-/**
- * @fn  bool AudioOutputPort::getDolbyVolumeMode() 
- * @brief This API is used to get the current auto mode.
- *
- * @return Current audio stereo mode
- */
-bool AudioOutputPort::getDolbyVolumeMode() const
-{
-	dsError_t ret = dsERR_NONE;
-	bool _mode = 0;
-	if ( (ret = dsGetDolbyVolumeMode(_handle, &_mode)) == dsERR_NONE)
-	{
-            return _mode;
-	}
-	else
-	{
-	    throw Exception(ret);
-	}
-}
-
-/**
- * @fn const int AudioOutputPort::getDialogEnhancement()
- * @brief This API is used to get the current auto mode.
- *
- * @return Current audio stereo mode
- */
-int AudioOutputPort::getIntelligentEqualizerMode() const
-{
-	dsError_t ret = dsERR_NONE;
-	int _mode = 0;
-	if ((ret = dsGetIntelligentEqualizerMode(_handle, &_mode)) == dsERR_NONE)
-	{
-        return _mode;
-	}
-	else
-	{
-	    throw Exception(ret);
-	}
-}
-
 
 /**
  * @fn const int AudioOutputPort::getVolumeLeveller()
@@ -1327,25 +1203,6 @@ bool AudioOutputPort::isAudioMSDecode() const
 	return HasMS11Decode;
 }
 
-/**
- * @fn bool AudioOutputPort::isAudioMSi12Decode() const
- * @brief This API is used to check whether the audio port supports Dolby MS12 Multistream Decode
- *
- * @return True or False
- * @retval True when Audio ports could be configured to support Mix PCM Audio with Surround
- * @retval Fals when Audio ports could not be configured to support Mix PCM Audio with Surround
- */
-
-bool AudioOutputPort::isAudioMS12Decode() const
-{
-        bool HasMS12Decode = false;
-
-        dsError_t ret = dsIsAudioMS12Decode(_handle,&HasMS12Decode);
-        if (ret != dsERR_NONE) {
-                throw Exception(ret);
-        }
-        return HasMS12Decode;
-}
 
 }
 

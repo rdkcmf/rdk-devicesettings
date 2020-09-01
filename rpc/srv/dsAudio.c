@@ -75,7 +75,6 @@ IARM_Result_t _dsAudioPortTerm(void *arg);
 IARM_Result_t _dsGetStereoMode(void *arg);
 IARM_Result_t _dsGetEncoding(void *arg);
 IARM_Result_t _dsIsAudioMSDecode(void *arg);
-IARM_Result_t _dsIsAudioMS12Decode(void *arg);
 IARM_Result_t _dsIsAudioPortEnabled(void *arg);
 IARM_Result_t _dsEnableAudioPort(void *arg);
 IARM_Result_t _dsSetAudioDuckingLevel(void *arg);
@@ -83,6 +82,7 @@ IARM_Result_t _dsGetAudioLevel(void *arg);
 IARM_Result_t _dsSetAudioLevel(void *arg);
 IARM_Result_t _dsGetAudioGain(void *arg);
 IARM_Result_t _dsSetAudioGain(void *arg);
+IARM_Result_t _dsEnableMS12Config(void *arg);
 IARM_Result_t _dsEnableLEConfig(void *arg);
 IARM_Result_t _dsGetLEConfig(void *arg);
 IARM_Result_t _dsSetAudioDelay(void *arg);
@@ -91,15 +91,6 @@ IARM_Result_t _dsSetAudioDelayOffset(void *arg);
 IARM_Result_t _dsGetAudioDelayOffset(void *arg);
 IARM_Result_t _dsGetSinkDeviceAtmosCapability(void *arg);
 IARM_Result_t _dsSetAudioAtmosOutputMode(void *arg);
-
-IARM_Result_t _dsSetAudioCompression(void *arg);
-IARM_Result_t _dsGetAudioCompression(void *arg);
-IARM_Result_t _dsSetDialogEnhancement(void *arg);
-IARM_Result_t _dsGetDialogEnhancement(void *arg);
-IARM_Result_t _dsSetDolbyVolumeMode(void *arg);
-IARM_Result_t _dsGetDolbyVolumeMode(void *arg);
-IARM_Result_t _dsSetIntelligentEqualizerMode(void *arg);
-IARM_Result_t _dsGetIntelligentEqualizerMode(void *arg);
 
 IARM_Result_t _dsGetVolumeLeveller(void *arg);
 IARM_Result_t _dsSetVolumeLeveller(void *arg);
@@ -117,6 +108,112 @@ IARM_Result_t _dsSetMISteering(void *arg);
 
 static void _GetAudioModeFromPersistent(void *arg);
 static dsAudioPortType_t _GetAudioPortType(int handle);
+static bool Is_Audio_MS12_Decode()
+{
+#ifndef RDK_DSHAL_NAME
+    #warning   "RDK_DSHAL_NAME is not defined"
+    #define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    bool isMS12Decode = false;
+    typedef dsError_t  (*dsIsAudioMS12DecodeConfig_t)(bool *enable);
+    static dsIsAudioMS12DecodeConfig_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsIsAudioMS12DecodeConfig_t) dlsym(dllib, "dsIsAudioMS12Decode");
+            if (func) {
+                __TIMESTAMP();printf("dsIsAudioMS12Decode(bool *) is defined and loaded\r\n");
+            }
+            else {
+                __TIMESTAMP();printf("dsIsAudioMS12Decode(bool *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            __TIMESTAMP();printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    if (func != NULL)
+    {
+        dsError_t ret = func(&isMS12Decode);
+    }
+
+    __TIMESTAMP();printf("Is_Audio_MS12_Decode status:%d",isMS12Decode);
+    return isMS12Decode;
+}
+
+void ms12ConfigInit()
+{
+    typedef dsError_t  (*dsEnableMS12Config_t)(int handle, dsMS12FEATURE_t feature,const bool enable);
+    int handle = 0;
+    if(Is_Audio_MS12_Decode() == false)
+    {
+    	return;
+    }
+    dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle);
+    static dsEnableMS12Config_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsEnableMS12Config_t) dlsym(dllib, "dsEnableMS12Config");
+            if (func) {
+                __TIMESTAMP();printf("dsEnableMS12Config(int, enum, bool) is defined and loaded\r\n");
+            	std::string _MS12DAPV2Enable("FALSE");
+            	try
+            	{
+            	    _MS12DAPV2Enable = device::HostPersistence::getInstance().getProperty("MS12.DAPV2Enable");
+            	}
+            	catch(...)
+            	{
+             		__TIMESTAMP();printf("MS12 : Persisting defaultMS12.DAPV2Enable  status: %s \r\n",_MS12DAPV2Enable.c_str());
+            		device::HostPersistence::getInstance().persistHostProperty("MS12.DAPV2Enable",_MS12DAPV2Enable);
+            	}
+            	__TIMESTAMP();printf("MS12 : Persistence DAPV2 status: %s \r\n",_MS12DAPV2Enable.c_str());
+            	if(_MS12DAPV2Enable == "TRUE")
+            	{
+            		m_MS12DAPV2Enabled = 1;
+            	}
+            	else
+            	{
+            		m_MS12DAPV2Enabled = 0;
+            	}
+            	func(handle,dsMS12FEATURE_DAPV2,m_MS12DAPV2Enabled);
+
+            	std::string _MS12DEEnable("FALSE");
+            	try
+            	{
+            	    _MS12DEEnable = device::HostPersistence::getInstance().getProperty("MS12.DEEnable");
+            	}
+            	catch(...)
+            	{
+             		__TIMESTAMP();printf("MS12 : Persisting default MS12.DEEnable  status: %s \r\n",_MS12DEEnable.c_str());
+            		device::HostPersistence::getInstance().persistHostProperty("MS12.DEEnable",_MS12DEEnable);
+            	}
+            	__TIMESTAMP();printf("MS12 : Persistence DE status: %s \r\n",_MS12DEEnable.c_str());
+
+            	if(_MS12DEEnable == "TRUE")
+            	{
+            		m_MS12DEEnabled = 1;
+            	}
+            	else
+            	{
+            		m_MS12DEEnabled = 0;
+            	}
+            	func(handle,dsMS12FEATURE_DE,m_MS12DEEnabled);
+            }
+            else {
+                __TIMESTAMP();printf("dsEnableMS12Config(int, enum, bool) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            __TIMESTAMP();printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+}
 
 void LEConfigInit()
 {
@@ -237,6 +334,7 @@ IARM_Result_t dsAudioMgr_init()
 	}
     	if (!m_isPlatInitialized) {
     		dsAudioPortInit();
+    		ms12ConfigInit();
                 LEConfigInit();
 	   	}
         /*coverity[missing_lock]  CID-19380 using Coverity Annotation to ignore error*/
@@ -273,12 +371,12 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioGain,_dsGetAudioGain);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetEncoding,_dsGetEncoding);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioMSDecode,_dsIsAudioMSDecode);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioMS12Decode,_dsIsAudioMS12Decode);
 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioPortEnabled,_dsIsAudioPortEnabled);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableAudioPort,_dsEnableAudioPort);
 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioPortTerm,_dsAudioPortTerm);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableMS12Config,_dsEnableMS12Config);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableLEConfig,_dsEnableLEConfig);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetLEConfig,_dsGetLEConfig);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioDelay, _dsSetAudioDelay);
@@ -287,15 +385,6 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioDelayOffset, _dsGetAudioDelayOffset);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetSinkDeviceAtmosCapability, _dsGetSinkDeviceAtmosCapability);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioAtmosOutputMode, _dsSetAudioAtmosOutputMode);      
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioAtmosOutputMode, _dsSetAudioAtmosOutputMode);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioCompression, _dsSetAudioCompression);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioCompression, _dsGetAudioCompression);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetDialogEnhancement, _dsSetDialogEnhancement);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetDialogEnhancement, _dsGetDialogEnhancement);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetDolbyVolumeMode, _dsSetDolbyVolumeMode);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetDolbyVolumeMode	, _dsGetDolbyVolumeMode);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetIntelligentEqualizerMode, _dsSetIntelligentEqualizerMode);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetIntelligentEqualizerMode, _dsGetIntelligentEqualizerMode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetVolumeLeveller, _dsGetVolumeLeveller);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetVolumeLeveller, _dsSetVolumeLeveller);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetBassEnhancer, _dsGetBassEnhancer);
@@ -315,6 +404,7 @@ IARM_Result_t _dsAudioPortInit(void *arg)
     if (!m_isPlatInitialized) {
         /* Nexus init, if any here */
         dsAudioPortInit();
+        ms12ConfigInit();
         LEConfigInit();
    }
    m_isPlatInitialized++;
@@ -925,52 +1015,76 @@ IARM_Result_t _dsIsAudioMSDecode(void *arg)
     return IARM_RESULT_SUCCESS;
 }
 
-IARM_Result_t _dsIsAudioMS12Decode(void *arg)
+IARM_Result_t _dsEnableMS12Config(void *arg)
 {
-
-    IARM_BUS_Unlock(lock);
 
 #ifndef RDK_DSHAL_NAME
     #warning   "RDK_DSHAL_NAME is not defined"
     #define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
 #endif
     _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
 
     IARM_BUS_Lock(lock);
-    
-    typedef dsError_t  (*dsIsAudioMS12Decode_t)(int handle, bool *HasMS12Decode);
-    static dsIsAudioMS12Decode_t func = NULL;
+
+    typedef dsError_t  (*dsEnableMS12Config_t)(int handle, dsMS12FEATURE_t feature,const bool enable);
+    static dsEnableMS12Config_t func = NULL;
     if (func == NULL) {
         void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
         if (dllib) {
-            func = (dsIsAudioMS12Decode_t) dlsym(dllib, "dsIsAudioMS12Decode");
+            func = (dsEnableMS12Config_t) dlsym(dllib, "dsEnableMS12Config");
             if (func) {
-                __TIMESTAMP();printf("dsIsAudioMS12Decode(int, bool*) is defined and loaded\r\n");
-            }   
+                __TIMESTAMP();printf("dsEnableMS12Config(int, enum, bool) is defined and loaded\r\n");
+            }
             else {
-                __TIMESTAMP();printf("dsIsAudioMS12Decode(int, bool*) is not defined\r\n");
-            }   
+                __TIMESTAMP();printf("dsEnableMS12Config(int, enum, bool) is not defined\r\n");
+            }
             dlclose(dllib);
-        }   
+        }
         else {
             __TIMESTAMP();printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }   
-    }   
-
-    dsAudioGetMS12Param_t *param = (dsAudioGetMS12Param_t *)arg;
-    if (func != NULL) {
-        bool HasMS12Decode = false;
-        dsError_t ret = func(param->handle, &HasMS12Decode);
-        if (ret == dsERR_NONE) {
-            param->ms12Enabled = HasMS12Decode;
         }
+    }
+
+    _dsMS12ConfigParam_t *param = (_dsMS12ConfigParam_t *)arg;
+    if ((func != NULL) && (Is_Audio_MS12_Decode() == true)) {
+    	__TIMESTAMP();printf("MS12: %s feature :%s enable status:%d \r\n",__FUNCTION__,((param->feature==dsMS12FEATURE_DAPV2)?"DAPV2":"DE"),param->enable);
+
+        if((param->feature == dsMS12FEATURE_DAPV2)  && (param->enable != m_MS12DAPV2Enabled) )
+        {
+            m_MS12DAPV2Enabled = param->enable;
+            //Persist DAPV2 setting
+            if(m_MS12DAPV2Enabled)
+                device::HostPersistence::getInstance().persistHostProperty("MS12.DAPV2Enable","TRUE");
+            else
+                device::HostPersistence::getInstance().persistHostProperty("MS12.DAPV2Enable","FALSE");
+
+            dsError_t ret = func(param->handle, param->feature, param->enable);
+            if (ret == dsERR_NONE) {
+            	result = IARM_RESULT_SUCCESS;
+            }
+        }
+        if((param->feature == dsMS12FEATURE_DE)  && (param->enable != m_MS12DEEnabled) )
+        {
+            m_MS12DEEnabled = param->enable;
+            //Persist DE setting
+            if(m_MS12DEEnabled)
+                device::HostPersistence::getInstance().persistHostProperty("MS12.DEEnable","TRUE");
+            else
+                device::HostPersistence::getInstance().persistHostProperty("MS12.DEEnable","FALSE");
+
+            dsError_t ret = func(param->handle, param->feature, param->enable);
+            if (ret == dsERR_NONE) {
+            	result = IARM_RESULT_SUCCESS;
+            }
+        }
+
     }else {
-        param->ms12Enabled = false;
     }
 
     IARM_BUS_Unlock(lock);
 
-    return IARM_RESULT_SUCCESS;
+    return result;
 }
 
 IARM_Result_t _dsSetAudioDelay(void *arg)
@@ -1231,362 +1345,6 @@ IARM_Result_t _dsGetSinkDeviceAtmosCapability(void *arg)
     return IARM_RESULT_SUCCESS;
 }
 
-IARM_Result_t _dsSetAudioCompression(void *arg)
-{
-#ifndef RDK_DSHAL_NAME
-#warning   "RDK_DSHAL_NAME is not defined"
-#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
-#endif
-    _DEBUG_ENTER();
-    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
-    IARM_BUS_Lock(lock);
-
-    typedef dsError_t (*dsSetAudioCompression_t)(int handle, int compressionLevel);
-    static dsSetAudioCompression_t func = 0;
-    if (func == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            func = (dsSetAudioCompression_t) dlsym(dllib, "dsSetAudioCompression");
-            if (func) {
-                printf("dsSetAudioCompression_t(int, int ) is defined and loaded\r\n");
-            }
-            else {
-                printf("dsSetAudioCompression_t(int, int) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-    dsAudioCompressionParam_t *param = (dsAudioCompressionParam_t *)arg;
-
-    if (func != 0 && param != NULL)
-    {
-        if (func(param->handle, param->compression) == dsERR_NONE)
-        {
-            result = IARM_RESULT_SUCCESS;
-        }
-    }
-
-    IARM_BUS_Unlock(lock);
-    return result;
-}
-
-IARM_Result_t _dsGetAudioCompression(void *arg)
-{
-#ifndef RDK_DSHAL_NAME
-#warning   "RDK_DSHAL_NAME is not defined"
-#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
-#endif
-    _DEBUG_ENTER();
-    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
-    IARM_BUS_Lock(lock);
-
-    typedef dsError_t (*dsGetAudioCompression_t)(int handle, int *compressionLevel);
-    static dsGetAudioCompression_t func = 0;
-    if (func == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            func = (dsGetAudioCompression_t) dlsym(dllib, "dsGetAudioCompression");
-            if (func) {
-                printf("dsGetAudioCompression_t(int, int *) is defined and loaded\r\n");
-            }
-            else {
-                printf("dsGetAudioCompression_t(int, int *) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-    dsAudioCompressionParam_t *param = (dsAudioCompressionParam_t *)arg;
-
-    if (func != 0 && param != NULL)
-    {
-        int compression = 0;
-        param->compression= 0;
-        if (func(param->handle, &compression) == dsERR_NONE)
-        {
-           param->compression = compression;
-           result = IARM_RESULT_SUCCESS;
-        }
-    }
-
-    IARM_BUS_Unlock(lock);
-    return result;
-}
-
-IARM_Result_t _dsSetDialogEnhancement(void *arg)
-{
-#ifndef RDK_DSHAL_NAME
-#warning   "RDK_DSHAL_NAME is not defined"
-#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
-#endif
-    _DEBUG_ENTER();
-    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
-    IARM_BUS_Lock(lock);
-
-    typedef dsError_t (*dsSetDialogEnhancement_t)(int handle, int enhancerLevel);
-    static dsSetDialogEnhancement_t func = 0;
-    if (func == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            func = (dsSetDialogEnhancement_t) dlsym(dllib, "dsSetDialogEnhancement");
-            if (func) {
-                printf("dsSetDialogEnhancement_t(int, int) is defined and loaded\r\n");
-            }
-            else {
-                printf("dsSetDialogEnhancement_t(int, int ) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-    dsDialogEnhancementParam_t *param = (dsDialogEnhancementParam_t *)arg;
-
-    if (func != 0 && param != NULL)
-    {
-        if (func(param->handle, param->enhancerLevel) == dsERR_NONE)
-        {
-            result = IARM_RESULT_SUCCESS;
-        }
-    }
-
-    IARM_BUS_Unlock(lock);
-    return result;
-}
-
-IARM_Result_t _dsGetDialogEnhancement(void *arg)
-{
-#ifndef RDK_DSHAL_NAME
-#warning   "RDK_DSHAL_NAME is not defined"
-#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
-#endif
-    _DEBUG_ENTER();
-    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
-    IARM_BUS_Lock(lock);
-
-    typedef dsError_t (*dsGetDialogEnhancement_t)(int handle, int *enhancerLevel);
-    static dsGetDialogEnhancement_t func = 0;
-    if (func == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            func = (dsGetDialogEnhancement_t) dlsym(dllib, "dsGetDialogEnhancement");
-            if (func) {
-                printf("dsGetDialogEnhancement_t(int, int *) is defined and loaded\r\n");
-            }
-            else {
-                printf("dsGetDialogEnhancement_t(int, int *) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-    dsDialogEnhancementParam_t *param = (dsDialogEnhancementParam_t *)arg;
-
-    if (func != 0 && param != NULL)
-    {
-        int enhancerLevel = 0;
-        param->enhancerLevel = 0;
-        if (func(param->handle, &enhancerLevel) == dsERR_NONE)
-        {
-           param->enhancerLevel = enhancerLevel;
-           result = IARM_RESULT_SUCCESS;
-        }
-    }
-
-    IARM_BUS_Unlock(lock);
-    return result;
-}
-
-
-IARM_Result_t _dsSetDolbyVolumeMode(void *arg)
-{
-#ifndef RDK_DSHAL_NAME
-#warning   "RDK_DSHAL_NAME is not defined"
-#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
-#endif
-    _DEBUG_ENTER();
-    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
-    IARM_BUS_Lock(lock);
-
-    typedef dsError_t (*dsSetDolbyVolumeMode_t)(int handle, bool enable);
-    static dsSetDolbyVolumeMode_t func = 0;
-    if (func == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            func = (dsSetDolbyVolumeMode_t) dlsym(dllib, "dsSetDolbyVolumeMode");
-            if (func) {
-                printf("dsSetDolbyVolumeMode_t(int, bool) is defined and loaded\r\n");
-            }
-            else {
-                printf("dsSetDolbyVolumeMode_t(int, bool) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-    dsSetDolbyVolumeParam_t *param = (dsSetDolbyVolumeParam_t *)arg;
-
-    if (func != 0 && param != NULL)
-    {
-        if (func(param->handle, param->enable) == dsERR_NONE)
-        {
-            result = IARM_RESULT_SUCCESS;
-        }
-    }
-
-    IARM_BUS_Unlock(lock);
-    return result;
-}
-
-IARM_Result_t _dsGetDolbyVolumeMode(void *arg)
-{
-#ifndef RDK_DSHAL_NAME
-#warning   "RDK_DSHAL_NAME is not defined"
-#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
-#endif
-    _DEBUG_ENTER();
-    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
-    IARM_BUS_Lock(lock);
-
-    typedef dsError_t (*dsGetDolbyVolumeMode_t)(int handle, bool *enable);
-    static dsGetDolbyVolumeMode_t func = 0;
-    if (func == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            func = (dsGetDolbyVolumeMode_t) dlsym(dllib, "dsGetDolbyVolumeMode");
-            if (func) {
-                printf("dsGetDolbyVolumeMode_t(int, bool *) is defined and loaded\r\n");
-            }
-            else {
-                printf("dsGetDolbyVolumeMode_t(int, bool *) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-    dsSetDolbyVolumeParam_t *param = (dsSetDolbyVolumeParam_t *)arg;
-    bool enable = false;
-    param->enable = false;
-    if (func != 0 && param != NULL)
-    {
-        if (func(param->handle, &enable) == dsERR_NONE)
-        {
-            param->enable = enable;
-            result = IARM_RESULT_SUCCESS;
-        }
-    }
-
-    IARM_BUS_Unlock(lock);
-    return result;
-}
-
-IARM_Result_t _dsSetIntelligentEqualizerMode(void *arg)
-{
-#ifndef RDK_DSHAL_NAME
-#warning   "RDK_DSHAL_NAME is not defined"
-#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
-#endif
-    _DEBUG_ENTER();
-    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
-    IARM_BUS_Lock(lock);
-
-    typedef dsError_t (*dsSetIntelligentEqualizerMode_t)(int handle, int mode);
-    static dsSetIntelligentEqualizerMode_t func = 0;
-    if (func == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            func = (dsSetIntelligentEqualizerMode_t) dlsym(dllib, "dsSetIntelligentEqualizerMode");
-            if (func) {
-                printf("dsSetIntelligentEqualizerMode_t(int, int) is defined and loaded\r\n");
-            }
-            else {
-                printf("dsSetIntelligentEqualizerMode_t(int, int) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-    dsIntelligentEqualizerModeParam_t *param = (dsIntelligentEqualizerModeParam_t *)arg;
-
-    if (func != 0 && param != NULL)
-    {
-        if (func(param->handle, param->mode) == dsERR_NONE)
-        {
-            result = IARM_RESULT_SUCCESS;
-        }
-    }
-
-    IARM_BUS_Unlock(lock);
-    return result;
-}
-
-
-IARM_Result_t _dsGetIntelligentEqualizerMode(void *arg)
-{
-#ifndef RDK_DSHAL_NAME
-#warning   "RDK_DSHAL_NAME is not defined"
-#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
-#endif
-    _DEBUG_ENTER();
-    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
-    IARM_BUS_Lock(lock);
-
-    typedef dsError_t (*dsGetIntelligentEqualizerMode_t)(int handle, int *mode);
-    static dsGetIntelligentEqualizerMode_t func = 0;
-    if (func == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            func = (dsGetIntelligentEqualizerMode_t) dlsym(dllib, "dsGetIntelligentEqualizerMode");
-            if (func) {
-                printf("dsGetIntelligentEqualizerMode_t(int, int *) is defined and loaded\r\n");
-            }
-            else {
-                printf("dsGetIntelligentEqualizerMode_t(int, int *) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-    dsIntelligentEqualizerModeParam_t *param = (dsIntelligentEqualizerModeParam_t *)arg;
-
-    if (func != 0 && param != NULL)
-    {
-        int  mode = 0;
-        param->mode = 0;
-        if (func(param->handle, &mode) == dsERR_NONE)
-        {
-            param->mode = mode;
-            result = IARM_RESULT_SUCCESS;
-        }
-    }
-
-    IARM_BUS_Unlock(lock);
-    return result;
-}
 
 
 IARM_Result_t _dsGetVolumeLeveller(void *arg)

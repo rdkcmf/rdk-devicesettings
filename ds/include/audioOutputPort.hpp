@@ -64,6 +64,7 @@ class AudioOutputPort  : public Enumerable {
 	std::string _name;
 
 	int _encoding; //!< Audio Encoding Types.
+	int _compression; //!< Audio Compression Types.
 	int _stereoMode; //!< Audio stereo mode Types.
 	uint32_t _audioDelayMs; //!< Audio delays
 	uint32_t _audioDelayOffsetMs; //!< Audio delay offset
@@ -107,10 +108,7 @@ public:
 
 
 	const AudioEncoding &getEncoding() const;
-	int getCompression() const;
-	int getDialogEnhancement() const;
-	bool getDolbyVolumeMode() const;
-	int getIntelligentEqualizerMode() const;
+	const AudioCompression &getCompression() const;
         int getVolumeLeveller() const;
         bool getBassEnhancer() const;
         bool isSurroundDecoderEnabled() const;
@@ -138,13 +136,9 @@ public:
 	bool isEnabled() const;
 
 	bool isAudioMSDecode() const;
-	bool isAudioMS12Decode() const;
 	
 	void setEncoding(const int encoding);
-	void setCompression(const int compression);
-	void setDialogEnhancement(const int level);
-	void setDolbyVolumeMode(const bool mode);
-	void setIntelligentEqualizerMode(const int mode);
+        void setCompression(const int compression);
         void setVolumeLeveller(const int level);
         void setBassEnhancer(const bool enable);
         void enableSurroundDecoder(const bool enable);
@@ -156,6 +150,7 @@ public:
 	void setStereoAuto(const bool autoMode, const bool toPersist = true);
 
 	void setEncoding(const std::string & encoding);
+	void setCompression(const std::string & compression);
 	void setStereoMode(const std::string & mode,const bool toPersist = true);
 	void enableMS12Config(const dsMS12FEATURE_t feature,const bool enable);
 	void enableLEConfig(const bool enable);

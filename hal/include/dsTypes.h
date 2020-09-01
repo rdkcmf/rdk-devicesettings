@@ -202,21 +202,6 @@ typedef enum _dsAudioCompression_t{
     dsAUDIO_CMP_HEAVY,       /**< Heavy audio level compression.             */
     dsAUDIO_CMP_MAX          /**< Maximum index for audio compression types. */
 } dsAudioCompression_t;
-/**
- * This defines the type of audio compression that can be used.
- */
-typedef int dsAudioCompressionValue_t;
-
-/**
- * This defines the type of dialog enhancer level  that can be used.
- */
-typedef int dsDialogEnhancer_t;
-
-/**
- * This defines the type of dialog enhancer level  that can be used.
- */
-typedef int dsIntelligentEqualizerMode_t;
-
 
 /**
  * Audio compression type validation check.
