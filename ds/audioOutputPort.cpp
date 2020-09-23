@@ -281,7 +281,17 @@ bool AudioOutputPort::getStereoAuto()
  */
 float AudioOutputPort::getGain() const
 {
-	return _gain;
+        dsError_t ret = dsERR_NONE;
+        float gain = 0;
+        ret = dsGetAudioGain(_handle, &gain);
+        if (ret == dsERR_NONE)
+        {
+            return gain;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
 }
 
 
@@ -340,12 +350,14 @@ float AudioOutputPort::getOptimalLevel() const
  */
 bool AudioOutputPort::getAudioDelay(uint32_t& audioDelayMs) const
 {
-	if (dsGetAudioDelay(_handle, &audioDelayMs) != dsERR_NONE)
-	{
-		return false;
-	}
+        dsError_t ret = dsERR_NONE;
+        ret = dsGetAudioDelay(_handle, &audioDelayMs);
+        if (ret != dsERR_NONE)
+        {
+                throw Exception(ret);
+        }
 
-	return true;
+        return true;
 }
 
 /**
@@ -356,12 +368,14 @@ bool AudioOutputPort::getAudioDelay(uint32_t& audioDelayMs) const
  */
 bool AudioOutputPort::getAudioDelayOffset(uint32_t& audioDelayOffsetMs) const
 {
-	if (dsGetAudioDelayOffset(_handle, &audioDelayOffsetMs) != dsERR_NONE)
-	{
-		return false;
-	}
+        dsError_t ret = dsERR_NONE;
+        ret = dsGetAudioDelayOffset(_handle, &audioDelayOffsetMs);
+        if (ret != dsERR_NONE)
+        {
+                throw Exception(ret);
+        }
 
-	return true;
+        return true;
 }
 
 
