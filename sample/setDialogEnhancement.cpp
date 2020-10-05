@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     try {
 		printf("Sample Application: set Dialog Enhancement \r\n");
 		device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(std::string(portType).append(portId));
-	//	aPort.setDialogEnhancement(level);
+		aPort.setDialogEnhancement(level);
 		printf("Sample Application: set Dialog Enhancement complete\r\n");
     }
     catch (...) {
