@@ -1094,6 +1094,7 @@ IARM_Result_t _dsGetStereoMode(void *arg)
 
     if (param != NULL && param->toPersist) {
         _GetAudioModeFromPersistent(arg);
+        result = IARM_RESULT_SUCCESS;
     }
     else if (param != NULL)
     {
