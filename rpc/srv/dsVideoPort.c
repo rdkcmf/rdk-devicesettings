@@ -58,12 +58,15 @@
 #else
   #define DEFAULT_RESOLUTION "720p"
 #endif
+#define DEFAULT_SD_RESOLUTION "480i"
 
 static int m_isInitialized = 0;
 static int m_isPlatInitialized = 0;
 static pthread_mutex_t dsLock = PTHREAD_MUTEX_INITIALIZER;
 static std::string _dsHDMIResolution(DEFAULT_RESOLUTION);
 static std::string _dsCompResolution(DEFAULT_RESOLUTION);
+static std::string _dsBBResolution(DEFAULT_SD_RESOLUTION);
+static std::string _dsRFResolution(DEFAULT_SD_RESOLUTION);
 static dsHdcpStatus_t _hdcpStatus = dsHDCP_STATUS_UNAUTHENTICATED;
 static bool force_disable_4K = false;
 extern bool enableHDRDVStatus;
@@ -140,6 +143,10 @@ IARM_Result_t dsVideoPortMgr_init()
 			_dsCompResolution = device::HostPersistence::getInstance().getProperty("COMPONENT0.resolution",_Resolution);
 		#endif
 		__TIMESTAMP();printf("The Persistent Component/Composite resolution read is %s \r\n",_dsCompResolution.c_str());
+                 _dsRFResolution = device::HostPersistence::getInstance().getProperty("RF0.resolution",_Resolution);
+                __TIMESTAMP();printf("The Persistent RF resolution read is %s \r\n",_dsRFResolution.c_str());
+                _dsBBResolution = device::HostPersistence::getInstance().getProperty("Baseband0.resolution",_Resolution);
+                __TIMESTAMP();printf("The Persistent BB resolution read is %s \r\n",_dsBBResolution.c_str());
 					
 		if (!m_isPlatInitialized) 
 		{
@@ -685,9 +692,29 @@ IARM_Result_t _dsGetResolution(void *arg)
 			_Resolution = _dsCompResolution; 
 		}
 	}
+        else if (_VPortType == dsVIDEOPORT_TYPE_BB )
+        {
+                if(param->toPersist){
+                        _Resolution = device::HostPersistence::getInstance().getProperty("Baseband0.resolution",_Resolution);
+                        __TIMESTAMP();printf("Reading BB persistent resolution %s\r\n",_Resolution.c_str());
+                }
+                else{
+                        _Resolution = _dsBBResolution;
+                }
+        }
+        else if (_VPortType == dsVIDEOPORT_TYPE_RF )
+        {
+                if(param->toPersist){
+                        _Resolution = device::HostPersistence::getInstance().getProperty("RF0.resolution",_Resolution);
+                        __TIMESTAMP();printf("Reading RF persistent resolution %s\r\n",_Resolution.c_str());
+                }
+                else{
+                        _Resolution = _dsRFResolution;
+                }
+        }
 	
 	strcpy(resolution->name,_Resolution.c_str());
-
+        printf("%s _VPortType:%d  resolution::%s \n",__FUNCTION__,_VPortType,resolution->name);
 	IARM_BUS_Unlock(lock);
 	
 	return IARM_RESULT_SUCCESS;
@@ -703,12 +730,23 @@ IARM_Result_t _dsSetResolution(void *arg)
 	
 
 	dsVideoPortSetResolutionParam_t *param = (dsVideoPortSetResolutionParam_t *)arg;
+        dsVideoPortType_t _VPortType = _GetVideoPortType(param->handle);
+        bool isConnected = 0;
+        dsIsDisplayConnected(param->handle,&isConnected);
+        if(!isConnected)
+        {
+            printf("Port _VPortType:%d  not connected..Ignoring Resolution Request------\r\n",_VPortType);
+            param->result = ret;
+            IARM_BUS_Unlock(lock);
+            return IARM_RESULT_SUCCESS;
+        }
 	
 	if (param != NULL)
 	{
 	
 		dsVideoPortResolution_t resolution = param->resolution;
 		std::string resolutionName(resolution.name);
+                __TIMESTAMP();printf("Resolution Requested ..%s \r\n",resolution.name);
 
 		if(force_disable_4K)
 		{
@@ -737,6 +775,8 @@ IARM_Result_t _dsSetResolution(void *arg)
 			
 			printf("Same Resolution ..Ignoring Resolution Request------\r\n");
                         _dsHDMIResolution = platresolution.name;
+                        /*!< Persist Resolution Settings */
+			persistResolution(param);
                         param->result = ret;
 			IARM_BUS_Unlock(lock);
 			return IARM_RESULT_SUCCESS;
@@ -1250,6 +1290,54 @@ static void persistResolution(dsVideoPortSetResolutionParam_t *param)
 				__TIMESTAMP();printf("HDMI and Analog Ports Resolutions are  Compatible \r\n");
 			}
 		}
+                else if (_VPortType == dsVIDEOPORT_TYPE_BB)
+                {
+
+                        if(param->toPersist){
+                               device::HostPersistence::getInstance().persistHostProperty("Baseband0.resolution",resolutionName);
+                        }
+
+                        __TIMESTAMP();printf("Set Resolution on Composite Ports!!!!!!..\r\n");
+                        _dsBBResolution = resolutionName;
+                        if (false == IsCompatibleResolution(resolution.pixelResolution,getPixelResolution(_dsHDMIResolution)))
+                        {
+                                __TIMESTAMP();printf("HDMI Resolution is not Compatible with Analog ports..\r\n");
+
+                                _dsHDMIResolution = getCompatibleResolution(&resolution);
+                                if (_dsHDMIResolution.compare("480i") == 0)
+                                        _dsHDMIResolution = "480p";
+
+                                __TIMESTAMP();printf("New Compatible resolution is %s  \r\n",_dsHDMIResolution.c_str());
+                        }
+                        else
+                        {
+                                __TIMESTAMP();printf("HDMI and Analog Ports Resolutions are  Compatible \r\n");
+                        }
+                }
+                else if (_VPortType == dsVIDEOPORT_TYPE_RF)
+                {
+
+                        if(param->toPersist){
+                               device::HostPersistence::getInstance().persistHostProperty("RF0.resolution",resolutionName);
+                        }
+
+                        __TIMESTAMP();printf("Set Resolution on RF Ports!!!!!!..\r\n");
+                        _dsRFResolution = resolutionName;
+                        if (false == IsCompatibleResolution(resolution.pixelResolution,getPixelResolution(_dsHDMIResolution)))
+                        {
+                                __TIMESTAMP();printf("HDMI Resolution is not Compatible with Analog ports..\r\n");
+
+                                _dsHDMIResolution = getCompatibleResolution(&resolution);
+                                if (_dsHDMIResolution.compare("480i") == 0)
+                                        _dsHDMIResolution = "480p";
+
+                                __TIMESTAMP();printf("New Compatible resolution is %s  \r\n",_dsHDMIResolution.c_str());
+                        }
+                        else
+                        {
+                                __TIMESTAMP();printf("HDMI and Analog Ports Resolutions are  Compatible \r\n");
+                        }
+                }
 	}
 	catch(...) 
 	{
