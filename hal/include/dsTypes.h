@@ -219,6 +219,52 @@ typedef int dsIntelligentEqualizerMode_t;
 
 
 /**
+ * Enumeration defines all of the supported Audio types.
+ * Each bit of uint32_t represent a standard. 
+ * If a device supports multiple standards, the capability is the bitwise OR
+* of the standards.
+ */
+typedef enum _dsAudioCapabilities_t {
+    dsAUDIOSUPPORT_NONE = 0x0,
+    dsAUDIOSUPPORT_ATMOS = 0x01,
+    dsAUDIOSUPPORT_DD = 0x02,
+    dsAUDIOSUPPORT_DDPLUS = 0x04,
+    dsAUDIOSUPPORT_DAD = 0x08,
+    dsAUDIOSUPPORT_DAPv2 = 0x10,
+    dsAUDIOSUPPORT_MS12 = 0x20,
+    dsAUDIOSUPPORT_Invalid = 0x80,
+} dsAudioCapabilities_t;
+
+/**
+ * Enumeration defines all of the supported MS12 types.
+ * Each bit of uint32_t represent a standard. 
+ * If a device supports multiple standards, the capability is the bitwise OR
+* of the standards.
+ */
+typedef enum _dsMS12Capabilities_t {
+    dsMS12SUPPORT_NONE = 0x0,
+    dsMS12SUPPORT_DolbyVolume = 0x01,
+    dsMS12SUPPORT_InteligentEqualizer = 0x02,
+    dsMS12SUPPORT_DialogueEnhancer = 0x04,
+    dsMS12SUPPORT_Invalid = 0x80,
+} dsMS12Capabilities_t;
+/**
+ * This defines the type of audio compression that can be used.
+ */
+typedef int dsAudioCompressionValue_t;
+
+/**
+ * This defines the type of dialog enhancer level  that can be used.
+ */
+typedef int dsDialogEnhancer_t;
+
+/**
+ * This defines the type of dialog enhancer level  that can be used.
+ */
+typedef int dsIntelligentEqualizerMode_t;
+
+
+/**
  * Audio compression type validation check.
  */
 #define dsAudioCompression_isValid(t)  (((t) >= dsAUDIO_CMP_NONE ) && ((t) < dsAUDIO_CMP_MAX))
@@ -458,6 +504,7 @@ typedef struct _dsVideoConfig_t {
     const dsVideoZoom_t *supportedDFCs;    /**< List of zoom modes supported.   */
     dsVideoZoom_t defaultDFC;              /**< The default zoom mode.          */
 } dsVideoConfig_t;
+
 /* End of DSHAL_VIDEODEVICE_TYPES doxygen group. */
 /**
  * @}
@@ -540,6 +587,7 @@ typedef enum _dsHDRStandard_t {
     dsHDRSTANDARD_TechnicolorPrime = 0x08,
     dsHDRSTANDARD_Invalid = 0x80,
 } dsHDRStandard_t;
+
 
 /**
  * Enumeration defines surround mode.

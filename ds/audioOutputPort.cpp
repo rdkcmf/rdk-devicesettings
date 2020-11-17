@@ -1361,6 +1361,36 @@ bool AudioOutputPort::isAudioMS12Decode() const
         return HasMS12Decode;
 }
 
+/**
+ * @fn void AudioOutputPort::getAudioCapabilities(int *capabilities) 
+ * @brief This API is used to query the Audio capabilities of the device
+ *
+ * @return void
+ */
+
+void AudioOutputPort::getAudioCapabilities(int *capabilities)
+{
+        dsError_t ret = dsGetAudioCapabilities(_handle, capabilities);
+        if (ret != dsERR_NONE) {
+                throw Exception(ret);
+        }
+}
+
+/**
+ * @fn void AudioOutputPort::getMS12Capabilities(int *capabilities) 
+ * @brief This API is used to query the MS12 capabilities of the device
+ *
+ * @return void
+ */
+
+void AudioOutputPort::getMS12Capabilities(int *capabilities)
+{
+        dsError_t ret = dsGetMS12Capabilities(_handle, capabilities);
+        if (ret != dsERR_NONE) {
+                throw Exception(ret);
+        }
+}
+
 }
 
 /** @} */

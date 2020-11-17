@@ -94,6 +94,12 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsSetMISteering  "dsSetMISteering"
 
 /*
+ * Declare RPC dsAudio Device API names 
+ */
+#define IARM_BUS_DSMGR_API_dsGetAudioCapabilities     "dsGetAudioCapabilities"
+#define IARM_BUS_DSMGR_API_dsGetMS12Capabilities     "dsGetMS12Capabilities"
+
+/*
  * Declare RPC dsDisplay API names 
  */
 #define IARM_BUS_DSMGR_API_dsDisplayInit				"dsDisplayInit"
@@ -567,6 +573,20 @@ typedef struct _dsGetHDRCapabilitiesParam_t
     int                     handle;
     int                     capabilities;
 } dsGetHDRCapabilitiesParam_t;
+
+typedef struct _dsGetAudioCapabilitiesParam_t
+{
+    dsError_t               result;
+    int                     handle;
+    int                     capabilities;
+} dsGetAudioCapabilitiesParam_t;
+
+typedef struct _dsGetMS12CapabilitiesParam_t
+{
+    dsError_t               result;
+    int                     handle;
+    int                     capabilities;
+} dsGetMS12CapabilitiesParam_t;
 
 typedef struct _dsMS12ConfigParam_t
 {

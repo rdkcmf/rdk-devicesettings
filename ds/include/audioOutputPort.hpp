@@ -171,6 +171,8 @@ public:
 	void setLoopThru(const bool loopThru);
 	void setMuted(const bool mute);
 	void setAudioDuckingLevel(const float level);
+        void getAudioCapabilities(int *capabilities);
+        void getMS12Capabilities(int *capabilities);
 
 };
 

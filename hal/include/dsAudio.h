@@ -753,6 +753,27 @@ dsError_t dsSetAudioDelayOffset(int handle, const uint32_t audioDelayOffsetMs);
 dsError_t  dsAudioPortTerm();
 
 /**
+ * @brief To find the HDR capabilities of SoC
+ * 
+ * This function is used to check which HDR capabilities the SoC supports
+ *
+ * @param [in] handle   Handle for the audio device (audio decoder)
+ * @param [out] *capabilities OR-ed value of supported HDR standards.
+ * @return dsError_t Error code.
+ */
+dsError_t dsGetAudioCapabilities(int handle, int *capabilities);
+
+/**
+ * @brief To find the HDR capabilities of SoC
+ * 
+ * This function is used to check which HDR capabilities the SoC supports
+ *
+ * @param [in] handle   Handle for the audio device (audio decoder)
+ * @param [out] *capabilities OR-ed value of supported HDR standards.
+ * @return dsError_t Error code.
+ */
+dsError_t dsGetMS12Capabilities(int handle, int *capabilities);
+/**
  * @}
  */
 

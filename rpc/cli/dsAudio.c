@@ -1168,5 +1168,46 @@ dsError_t dsGetLEConfig(int handle, bool *enable)
         return dsERR_NONE;
 }
 
+dsError_t dsGetAudioCapabilities(int handle, int *capabilities)
+{
+	_DEBUG_ENTER();
+
+	dsGetHDRCapabilitiesParam_t param;
+	param.handle = handle;
+
+	IARM_Result_t rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+			(char *) IARM_BUS_DSMGR_API_dsGetAudioCapabilities,
+			(void *) &param,
+			sizeof(param));
+	
+	if (IARM_RESULT_SUCCESS == rpcRet)
+	{
+		*capabilities = param.capabilities;
+		return param.result;
+	}
+
+	return dsERR_GENERAL ;
+}
+
+dsError_t dsGetMS12Capabilities(int handle, int *capabilities)
+{
+	_DEBUG_ENTER();
+
+	dsGetMS12CapabilitiesParam_t param;
+	param.handle = handle;
+
+	IARM_Result_t rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+			(char *) IARM_BUS_DSMGR_API_dsGetMS12Capabilities,
+			(void *) &param,
+			sizeof(param));
+	
+	if (IARM_RESULT_SUCCESS == rpcRet)
+	{
+		*capabilities = param.capabilities;
+		return param.result;
+	}
+
+	return dsERR_GENERAL ;
+}
 /** @} */
 /** @} */

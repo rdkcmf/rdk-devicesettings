@@ -114,6 +114,8 @@ IARM_Result_t _dsSetSurroundVirtualizer(void *arg);
 IARM_Result_t _dsGetMISteering(void *arg);
 IARM_Result_t _dsSetMISteering(void *arg);
 
+IARM_Result_t _dsGetAudioCapabilities(void *arg);
+IARM_Result_t _dsGetMS12Capabilities(void *arg);
 
 static void _GetAudioModeFromPersistent(void *arg);
 static dsAudioPortType_t _GetAudioPortType(int handle);
@@ -1032,6 +1034,9 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetSurroundVirtualizer, _dsSetSurroundVirtualizer);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMISteering, _dsGetMISteering);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetMISteering, _dsSetMISteering);
+
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioCapabilities,_dsGetAudioCapabilities); 
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMS12Capabilities,_dsGetMS12Capabilities); 
 
         m_isInitialized = 1;
     }
@@ -3190,6 +3195,79 @@ static void _GetAudioModeFromPersistent(void *arg)
             param->mode = dsAUDIO_STEREO_STEREO;
         } 
     }
+}
+
+IARM_Result_t _dsGetAudioCapabilities(void *arg)
+{
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+    
+    typedef dsError_t (*dsGetAudioCapabilitiesFunc_t)(int handle, int *capabilities);
+    static dsGetAudioCapabilitiesFunc_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetAudioCapabilitiesFunc_t)dlsym(dllib, "dsGetAudioCapabilities");
+            if (func) {
+                printf("dsGetAudioCapabilities() is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetAudioCapabilities() is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+    dsGetAudioCapabilitiesParam_t *param = (dsGetAudioCapabilitiesParam_t *)arg;
+    if(0 != func) {
+        param->result = func(param->handle, &param->capabilities);
+    }
+    else {
+        param->capabilities = dsAUDIOSUPPORT_NONE;
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+
+IARM_Result_t _dsGetMS12Capabilities(void *arg)
+{
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+    
+    typedef dsError_t (*dsGetMS12CapabilitiesFunc_t)(int handle, int *capabilities);
+    static dsGetMS12CapabilitiesFunc_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetMS12CapabilitiesFunc_t)dlsym(dllib, "dsGetMS12Capabilities");
+            if (func) {
+                printf("dsGetMS12Capabilities() is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetMS12Capabilities() is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+    dsGetMS12CapabilitiesParam_t *param = (dsGetMS12CapabilitiesParam_t *)arg;
+    if(0 != func) {
+        param->result = func(param->handle, &param->capabilities);
+    }
+    else {
+        param->capabilities = dsMS12SUPPORT_NONE;
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
 }
 
 
