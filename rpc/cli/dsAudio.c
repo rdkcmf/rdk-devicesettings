@@ -1032,6 +1032,49 @@ dsError_t  dsSetMISteering(int handle, bool enabled)
         return dsERR_NONE;
 }
 
+dsError_t dsGetSupportedARCTypes(int handle, int *types)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsGetSupportedARCTypesParam_t param;
+
+        param.handle = handle;
+        param.types = dsAUDIOARCSUPPORT_NONE;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetSupportedARCTypes,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *types = param.types;
+        return dsERR_NONE;
+}
+
+dsError_t  dsAudioEnableARC(int handle, dsAudioARCStatus_t arcStatus)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsAudioEnableARCParam_t param;
+        param.handle = handle;
+        param.arcStatus.type = arcStatus.type;
+        param.arcStatus.status = arcStatus.status;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsAudioEnableARC,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+		printf("%s: (SET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
 dsError_t dsGetAudioDelay(int handle, uint32_t *audioDelayMs)
 {
 	IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;

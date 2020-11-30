@@ -1084,6 +1084,45 @@ void AudioOutputPort::getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCa
 }
 
 /**
+ * @fn void AudioOutputPort::getSupportedARCTypes(int *types)
+ * @brief This API is used to query the supported ARC types of the connected device
+ *
+ * @return void
+ */
+void AudioOutputPort::getSupportedARCTypes(int *types)
+{
+        dsError_t ret = dsGetSupportedARCTypes(_handle, types);
+        if (ret != dsERR_NONE) {
+                throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::enableARC(dsAudioARCTypes_t type, bool enable)
+ * @brief This function enables/disables ARC/EARC and routes audio to connected device
+ *
+ * @param[in] type  ARC/eARC
+ * @param[in] enable  true/false to control feature
+ *
+ * @return None
+ */
+void AudioOutputPort::enableARC(dsAudioARCTypes_t type, bool enable)
+{
+        dsError_t ret = dsERR_NONE;
+        dsAudioARCStatus_t arcStatus;
+
+	arcStatus.type = type;
+	arcStatus.status = enable;
+
+        ret = dsAudioEnableARC(_handle, arcStatus);
+
+        if (ret != dsERR_NONE)
+        {
+                throw Exception(ret);
+        }
+}
+
+/**
  * @fn AudioOutputPort::enableLEConfig(const bool enable)
  * @brief This API is used to enable Loudness Equivalence *
  * @param[in] enable true/false to control feature.

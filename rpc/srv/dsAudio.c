@@ -66,6 +66,8 @@ dsAudioStereoMode_t _srv_SPDIF_Audiomode = dsAUDIO_STEREO_STEREO;
 
 IARM_Result_t _dsAudioPortInit(void *arg);
 IARM_Result_t _dsGetAudioPort(void *arg);
+IARM_Result_t _dsGetSupportedARCTypes(void *arg);
+IARM_Result_t _dsAudioEnableARC(void *arg);
 IARM_Result_t _dsSetStereoMode(void *arg);
 IARM_Result_t _dsSetStereoAuto(void *arg);
 IARM_Result_t _dsGetStereoAuto(void *arg);
@@ -986,6 +988,8 @@ IARM_Result_t _dsAudioPortInit(void *arg)
     if (!m_isInitialized) {
 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioPort,_dsGetAudioPort);
+	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetSupportedARCTypes,_dsGetSupportedARCTypes);
+	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioEnableARC,_dsAudioEnableARC);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetStereoMode,_dsSetStereoMode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetStereoMode,_dsGetStereoMode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetStereoAuto,_dsSetStereoAuto);
@@ -3047,6 +3051,95 @@ IARM_Result_t _dsSetMISteering(void *arg)
             printf("%s: persist MISteering value: %s\n", __func__, param->enable ? "Enabled":"Disabled");
             device::HostPersistence::getInstance().persistHostProperty("audio.MISteering",param->enable ? "Enabled":"Disabled");
 #endif
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+IARM_Result_t _dsGetSupportedARCTypes(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetSupportedARCTypes_t)(int handle, int *types);
+    static dsGetSupportedARCTypes_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetSupportedARCTypes_t) dlsym(dllib, "dsGetSupportedARCTypes");
+            if (func) {
+                printf("dsGetSupportedARCTypes_t(int, int*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetSupportedARCTypes_t(int, int*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsGetSupportedARCTypesParam_t *param = (dsGetSupportedARCTypesParam_t *)arg;
+    int types = dsAUDIOARCSUPPORT_NONE;
+    param->types = dsAUDIOARCSUPPORT_NONE;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, &types) == dsERR_NONE)
+        {
+            param->types = types;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+IARM_Result_t _dsAudioEnableARC(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsAudioEnableARC_t)(int handle, dsAudioARCStatus_t arcStatus);
+    static dsAudioEnableARC_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsAudioEnableARC_t) dlsym(dllib, "dsAudioEnableARC");
+            if (func) {
+                printf("dsAudioEnableARC_t(int, dsAudioARCStatus_t) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsAudioEnableARC_t(int, dsAudioARCStatus_t) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAudioEnableARCParam_t *param = (dsAudioEnableARCParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->arcStatus) == dsERR_NONE)
+        {
             result = IARM_RESULT_SUCCESS;
         }
     }

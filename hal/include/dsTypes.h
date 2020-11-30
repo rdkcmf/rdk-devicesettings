@@ -167,6 +167,7 @@ typedef enum _dsAudioPortType_t{
     dsAUDIOPORT_TYPE_HDMI,    /**< HDMI audio output.                 */
     dsAUDIOPORT_TYPE_SPDIF,   /**< S/PDIF audio output.               */
     dsAUDIOPORT_TYPE_SPEAKER,  /**< SPEAKER audio output.             */
+    dsAUDIOPORT_TYPE_HDMI_ARC,  /** < HDMI ARC/EARC audio output.     */
     dsAUDIOPORT_TYPE_MAX      /**< Maximum index for audio port type. */
 } dsAudioPortType_t;
 
@@ -234,6 +235,26 @@ typedef enum _dsAudioCapabilities_t {
     dsAUDIOSUPPORT_MS12 = 0x20,
     dsAUDIOSUPPORT_Invalid = 0x80,
 } dsAudioCapabilities_t;
+
+/**
+ * Enumeration defines all of the supported Arc types.
+ * Each bit of uint32_t represent an ARC support type.
+ * If a device multiple ARC types support, it's represented as bitwise OR
+* of the types.
+ */
+typedef enum _dsAudioARCTypes_t {
+    dsAUDIOARCSUPPORT_NONE = 0x0,
+    dsAUDIOARCSUPPORT_ARC = 0x01,
+    dsAUDIOARCSUPPORT_eARC = 0x02,
+} dsAudioARCTypes_t;
+
+/**
+ * @brief Structure that defines ARC status for the HDMI ARC/EARC port.
+ */
+typedef struct _dsAudioARCStatus_t {
+   dsAudioARCTypes_t type;
+   bool status;
+} dsAudioARCStatus_t;
 
 /**
  * Enumeration defines all of the supported MS12 types.

@@ -53,6 +53,8 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsIsAudioMute              "dsIsAudioMute"
 #define  IARM_BUS_DSMGR_API_dsIsAudioMSDecode    "dsIsAudioMSDecode"
 #define  IARM_BUS_DSMGR_API_dsIsAudioMS12Decode    "dsIsAudioMS12Decode"
+#define  IARM_BUS_DSMGR_API_dsGetSupportedARCTypes    "dsGetSupportedARCTypes"
+#define  IARM_BUS_DSMGR_API_dsAudioEnableARC    "dsAudioEnableARC"
 
 #define  IARM_BUS_DSMGR_API_dsIsAudioPortEnabled  "dsIsAudioPortEnabled"
 #define  IARM_BUS_DSMGR_API_dsEnableAudioPort      "dsEnableAudioPort"
@@ -226,6 +228,16 @@ typedef struct _dsAudioGetHandleParam_t {
 	int index;
 	int handle;
 } dsAudioGetHandleParam_t;
+
+typedef struct _dsGetSupportedARCTypesParam_t {
+        int handle;
+        int types;
+} dsGetSupportedARCTypesParam_t;
+
+typedef struct _dsAudioEnableARCParam_t {
+        int handle;
+        dsAudioARCStatus_t arcStatus;
+} dsAudioEnableARCParam_t;
 
 typedef struct _dsAudioSetStereoModeParam_t {
 	int handle;

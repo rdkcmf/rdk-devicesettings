@@ -222,6 +222,33 @@ dsError_t  dsGetSurroundVirtualizer(int handle, int* boost);
 
 dsError_t  dsGetMISteering(int handle, bool *enabled);
 
+/**
+ * @brief Get the supported ARC types of the connected ARC/eARC device
+ *
+ * This function gets the supported ARC types of the connected device on ARC/eARC port.
+ *
+ * @param[in] handle Handle for the HDMI ARC/eARC port.
+ * @param[out] *types OR-ed value of supported ARC types
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE Indicates dsGetSupportedARCTypes was successfully called using iarmbus.
+ */
+
+dsError_t dsGetSupportedARCTypes(int handle, int *types);
+
+/**
+ * @brief enable/disable ARC/EARC and route audio to connected device
+ *
+ * This function enables/disables ARC/EARC and routes audio to connected device.
+ *
+ * @param[in] handle Handle for the HDMI ARC/eARC port.
+ * @param[in] arcStatus to enable/disable ARC/eARC feature
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE Indicates dsAudioEnableARC was successfully called using iarmbus.
+ */
+
+dsError_t dsAudioEnableARC(int handle, dsAudioARCStatus_t arcStatus);
 
 /**
  * @brief Get the stereo mode of an audio port.
