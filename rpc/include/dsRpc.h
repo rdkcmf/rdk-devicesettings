@@ -198,7 +198,17 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsHdmiInGetCurrentVideoMode  "dsHdmiInGetCurrentVideoMode"
 
 /*
- * Declare RPC Host Interface  API names 
+ * Declare RPC COMPOSITE INPUT API names
+ */
+#define IARM_BUS_DSMGR_API_dsCompositeInInit                 "dsCompositeInInit"
+#define IARM_BUS_DSMGR_API_dsCompositeInTerm                 "dsCompositeInTerm"
+#define IARM_BUS_DSMGR_API_dsCompositeInGetNumberOfInputs    "dsCompositeInGetNumberOfInputs"
+#define IARM_BUS_DSMGR_API_dsCompositeInGetStatus            "dsCompositeInGetStatus"
+#define IARM_BUS_DSMGR_API_dsCompositeInSelectPort           "dsCompositeInSelectPort"
+#define IARM_BUS_DSMGR_API_dsCompositeInScaleVideo           "dsCompositeInScaleVideo"
+
+/*
+ * Declare RPC Host Interface  API names
  */
 
 #define IARM_BUS_DSMGR_API_dsHostInit				"dsHostInit"
@@ -566,6 +576,32 @@ typedef struct _dsHdmiInGetResolutionParam_t
 	dsError_t               result;
 	dsVideoPortResolution_t resolution;
 } dsHdmiInGetResolutionParam_t;
+
+
+typedef struct _dsCompositeInGetNumberOfInputsParam_t
+{
+    dsError_t   result;
+    uint8_t     numCompositeInputs;
+} dsCompositeInGetNumberOfInputsParam_t;
+
+typedef struct _dsCompositeInGetStatusParam_t
+{
+    dsError_t           result;
+    dsCompositeInStatus_t    status;
+} dsCompositeInGetStatusParam_t;
+
+typedef struct _dsCompositeInSelectPortParam_t
+{
+    dsError_t       result;
+    dsCompositeInPort_t  port;
+} dsCompositeInSelectPortParam_t;
+
+typedef struct _dsCompositeInScaleVideoParam_t
+{
+    dsError_t       result;
+    dsVideoRect_t   videoRect;
+} dsCompositeInScaleVideoParam_t;
+
 
 typedef struct _dsGetHDRCapabilitiesParam_t
 {

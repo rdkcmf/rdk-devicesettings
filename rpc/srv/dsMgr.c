@@ -54,6 +54,8 @@ extern IARM_Result_t dsDisplayMgr_term();
 extern IARM_Result_t dsHostMgr_term();
 extern IARM_Result_t dsHdmiInMgr_init();
 extern IARM_Result_t dsHdmiInMgr_term();
+extern IARM_Result_t dsCompositeInMgr_init();
+extern IARM_Result_t dsCompositeInMgr_term();
 
 IARM_Result_t dsMgr_init()
 {
@@ -68,6 +70,7 @@ IARM_Result_t dsMgr_init()
 	dsFPDMgr_init();
 	dsHostMgr_init();
 	dsHdmiInMgr_init();
+	dsCompositeInMgr_init();
 	return ret;
 }
 
@@ -81,7 +84,8 @@ IARM_Result_t dsMgr_term()
 	dsFPDMgr_term();
 	dsDisplayMgr_term();
 	dsHostMgr_term();
-    dsHdmiInMgr_term();
+	dsHdmiInMgr_term();
+	dsCompositeInMgr_term();
 	return ret;
 }
 

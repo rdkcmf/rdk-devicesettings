@@ -883,6 +883,33 @@ typedef struct _dsHdmiInStatus_t
  * @}
  */
 
+
+
+ /** @addtogroup DSHAL_HDMI_IN_TYPES Device Settings HAL COMPOSITE IN Type Definitions
+ *  @ingroup DSHAL_COMPOSITE_IN
+ *  @{
+ */
+typedef enum _dsCompositeInPort_t
+{
+    dsCOMPOSITE_IN_PORT_NONE = -1,
+    dsCOMPOSITE_IN_PORT_0,
+	dsCOMPOSITE_IN_PORT_1,
+    dsCOMPOSITE_IN_PORT_MAX
+} dsCompositeInPort_t;
+
+typedef struct _dsCompositeInStatus_t
+{
+    bool             isPresented;                          /**< Boolean flag indicating Composite Input is enabled for presentation by client */
+    bool             isPortConnected[dsCOMPOSITE_IN_PORT_MAX];  /**< Boolean flag indicating Composite source connected to this Composite Input port */
+    dsCompositeInPort_t   activePort;                      /**< Composite Input Port selected as the currently active port (to the set-top)
+                                                           - note that only one COMPOSITE Input port can be active at a time */
+} dsCompositeInStatus_t;
+
+/* End of DSHAL_COMPOSITE_IN doxygen group */
+/**
+ * @}
+ */
+
 /* List of video compression formats that may be supported by the decoder. */
 typedef enum
 {
