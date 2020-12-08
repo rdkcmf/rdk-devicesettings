@@ -40,6 +40,7 @@
 #include "libIBus.h"
 #include "dsTypes.h"
 #include "dsclientlogger.h"
+#include <string.h> 
 
 dsError_t dsAudioPortInit()
 {
@@ -293,18 +294,71 @@ dsError_t dsIsAudioPortEnabled(int handle, bool *enabled)
 	return dsERR_NONE;
 }
 
-dsError_t  dsEnableAudioPort(int handle, bool enabled)
+dsError_t  dsEnableAudioPort(int handle, bool enabled, const char* portName)
 {
     _DEBUG_ENTER();
 
 	dsAudioPortEnabledParam_t param;
     param.handle = handle;
     param.enabled = enabled;
+    memset(param.portName, '\0', sizeof(param.portName));
+    strcpy (param.portName, portName);
 
     IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
 
 	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
 							(char *)IARM_BUS_DSMGR_API_dsEnableAudioPort,
+							(void *)&param,
+							sizeof(param));
+  
+	if (IARM_RESULT_SUCCESS == rpcRet)
+	{
+		return dsERR_NONE;
+	}
+
+	return dsERR_GENERAL ;
+}
+
+dsError_t dsGetPortEnablePersistVal(int handle, const char* portName, bool *enabled)
+{
+	dsAudioPortEnabledParam_t param;
+	IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+	param.handle = handle;
+    /*By default all port values are true*/
+	param.enabled = true;
+    memset(param.portName, '\0', sizeof(param.portName));
+    strcpy (param.portName, portName);
+
+	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *)IARM_BUS_DSMGR_API_dsGetPortEnablePersistVal,
+                            (void *)&param,
+                            sizeof(param));
+	if (IARM_RESULT_SUCCESS == rpcRet)
+	{
+		*enabled = param.enabled;
+		return dsERR_NONE;
+	}
+    printf ("dsGetPortEnablePersistVal cli portName:%s rpcRet:%d param.enabled:%d enabled:%d\n", 
+            portName, rpcRet, param.enabled, *enabled);	
+
+	return dsERR_NONE;
+}
+
+dsError_t dsSetPortEnablePersistVal(int handle, const char* portName, bool enabled)
+{
+    _DEBUG_ENTER();
+
+	dsAudioPortEnabledParam_t param;
+    param.handle = handle;
+    param.enabled = enabled;
+    memset(param.portName, '\0', sizeof(param.portName));
+    strcpy (param.portName, portName);
+
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+							(char *)IARM_BUS_DSMGR_API_dsSetPortEnablePersistVal,
 							(void *)&param,
 							sizeof(param));
 
@@ -315,8 +369,6 @@ dsError_t  dsEnableAudioPort(int handle, bool enabled)
 
 	return dsERR_GENERAL ;
 }
-
-
 
 dsError_t dsSetAudioEncoding(int handle, dsAudioEncoding_t encoding)
 {

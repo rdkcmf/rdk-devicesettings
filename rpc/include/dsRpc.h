@@ -58,6 +58,10 @@ extern "C" {
 
 #define  IARM_BUS_DSMGR_API_dsIsAudioPortEnabled  "dsIsAudioPortEnabled"
 #define  IARM_BUS_DSMGR_API_dsEnableAudioPort      "dsEnableAudioPort"
+
+#define IARM_BUS_DSMGR_API_dsGetPortEnablePersistVal "getPortEnablePersistVal"
+#define IARM_BUS_DSMGR_API_dsSetPortEnablePersistVal "setPortEnablePersistVal" 
+
 #define  IARM_BUS_DSMGR_API_dsAudioPortTerm		"dsAudioPortTerm"
 #define  IARM_BUS_DSMGR_API_dsEnableMS12Config	"dsEnableMS12Config"
 #define  IARM_BUS_DSMGR_API_dsEnableLEConfig            "dsEnableLEConfig"
@@ -367,6 +371,7 @@ typedef struct _dsVideoPortGetHandleParam_t {
 typedef struct _dsVideoPortEnabledParam_t {
 	int handle;
 	bool enabled;
+	char portName [32];
 } dsVideoPortIsEnabledParam_t, dsVideoPortSetEnabledParam_t, dsVideoPortIsHDCPEnabledParam_t,dsAudioPortEnabledParam_t;
 
 

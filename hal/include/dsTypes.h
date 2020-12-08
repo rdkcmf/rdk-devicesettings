@@ -168,6 +168,7 @@ typedef enum _dsAudioPortType_t{
     dsAUDIOPORT_TYPE_SPDIF,   /**< S/PDIF audio output.               */
     dsAUDIOPORT_TYPE_SPEAKER,  /**< SPEAKER audio output.             */
     dsAUDIOPORT_TYPE_HDMI_ARC,  /** < HDMI ARC/EARC audio output.     */
+    dsAUDIOPORT_TYPE_HEADPHONE,  /**< 3.5mm headphone jack.           */
     dsAUDIOPORT_TYPE_MAX      /**< Maximum index for audio port type. */
 } dsAudioPortType_t;
 
@@ -874,6 +875,7 @@ typedef enum _dsHdmiInPort_t
     dsHDMI_IN_PORT_NONE = -1,
     dsHDMI_IN_PORT_0,
     dsHDMI_IN_PORT_1,
+    dsHDMI_IN_PORT_2,
     dsHDMI_IN_PORT_MAX
 } dsHdmiInPort_t;
 
@@ -898,6 +900,12 @@ typedef struct _dsHdmiInStatus_t
     dsHdmiInPort_t   activePort;                           /**< Hdmi Input Port selected as the currently active port (to the set-top)
                                                               - note that only one HDMI Input port can be active at a time */
 } dsHdmiInStatus_t;
+
+typedef struct _dsHdmiInCap_t
+{
+    bool             isPortArcCapable[dsHDMI_IN_PORT_MAX]; /**< Boolean flag indicating Hdmi source is ARC capable */
+} dsHdmiInCap_t;
+
 
 /* End of DSHAL_HDMI_IN_TYPES doxygen group */
 /**

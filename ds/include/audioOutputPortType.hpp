@@ -67,7 +67,7 @@ public:
 	static const int kSPDIF;
         static const int kSPEAKER;
 	static const int kARC;
-        
+	static const int kHEADPHONE;    
 
 	static AudioOutputPortType & getInstance(int id);
 	static AudioOutputPortType & getInstance(const std::string &name);

@@ -285,6 +285,8 @@ dsError_t dsHdmiInRegisterSignalChangeCB (dsHdmiInSignalChangeCB_t CBFunc);
  */
 dsError_t dsHdmiInRegisterStatusChangeCB (dsHdmiInStatusChangeCB_t CBFunc);
 
+bool dsIsHdmiARCPort (int iPort);
+
 /* End of DSHAL_HdmiIn_API doxygen group */
 /**
  * @}

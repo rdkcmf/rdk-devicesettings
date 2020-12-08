@@ -57,6 +57,7 @@ typedef enum _DSMgr_EventId_t {
 	IARM_BUS_DSMGR_EVENT_COMPOSITE_IN_HOTPLUG,         /*!< COMPOSITE IN HPD change event */
     IARM_BUS_DSMGR_EVENT_TIME_FORMAT_CHANGE,           /*!< Clock Time Format Change Event*/
     IARM_BUS_DSMGR_EVENT_AUDIO_LEVEL_CHANGED,           /*!< Audio Level Change Event*/
+    IARM_BUS_DSMGR_EVENT_AUDIO_OUT_HOTPLUG,            /*!< AUDIO OUT HPD change event */
 	IARM_BUS_DSMGR_EVENT_MAX,					       /*!< Max Event  */
 } IARM_Bus_DSMgr_EventId_t;
 
@@ -133,6 +134,12 @@ typedef struct _DSMgr_EventData_t {
         {
             int level;
         }AudioLevelInfo;
+
+        struct _AUDIO_OUT_CONNECT_DATA
+        {
+            dsAudioPortType_t portType;
+            bool           isPortConnected;
+        }audio_out_connect;
 
     } data;
 }IARM_Bus_DSMgr_EventData_t;

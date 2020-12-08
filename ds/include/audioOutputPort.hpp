@@ -36,6 +36,8 @@
 #include "enumerable.hpp"
 #include "dsTypes.h"
 
+#include "dsError.h"
+
 #include <string>
 #include <stdint.h>
 
@@ -118,9 +120,13 @@ public:
         int getSurroundVirtualizer() const;
         bool getMISteering() const;
 	const AudioStereoMode &getStereoMode(bool usePersist = false);
-	
+
+    dsError_t setEnablePort(bool enabled);	
 	void enable();
 	void disable();
+
+    bool getPortEnablePersistVal () const;
+    void setPortEnablePersistVal (bool isEnabled);
 
 	bool getStereoAuto();
 

@@ -79,6 +79,11 @@ IARM_Result_t _dsGetEncoding(void *arg);
 IARM_Result_t _dsIsAudioMSDecode(void *arg);
 IARM_Result_t _dsIsAudioMS12Decode(void *arg);
 IARM_Result_t _dsIsAudioPortEnabled(void *arg);
+
+
+IARM_Result_t _dsGetPortEnablePersistVal(void *arg);
+IARM_Result_t _dsSetPortEnablePersistVal(void *arg);
+
 IARM_Result_t _dsEnableAudioPort(void *arg);
 IARM_Result_t _dsSetAudioDuckingLevel(void *arg);
 IARM_Result_t _dsGetAudioLevel(void *arg);
@@ -127,9 +132,9 @@ void AudioConfigInit()
     typedef dsError_t  (*dsEnableLEConfig_t)(int handle, const bool enable);
     int handle = 0;
     void *dllib = NULL;
-    dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle);
     static dsEnableLEConfig_t func = NULL;
-    if (func == NULL) {
+    if (dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+      if (func == NULL) {
         dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
         if (dllib) {
             func = (dsEnableLEConfig_t) dlsym(dllib, "dsEnableLEConfig");
@@ -167,6 +172,10 @@ void AudioConfigInit()
         else {
             __TIMESTAMP();printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
         }
+      }
+    }
+    else {
+        __TIMESTAMP();printf("dsEnableLEConfig(int,  bool) is failed. since dsAUDIOPORT_TYPE_HDMI 0 port not available\r\n");
     }
 
 #ifdef DS_AUDIO_SETTINGS_PERSISTENCE
@@ -876,9 +885,13 @@ void AudioConfigInit()
                 }
 //HDMI init
                 handle = 0;
-                dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle);
-                if (dsSetMISteeringFunc(handle, m_MISteering) == dsERR_NONE) {
-                    printf("Port %s: Initialized MI Steering : %d\n","HDMI0", m_MISteering);
+                if (dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                    if (dsSetMISteeringFunc(handle, m_MISteering) == dsERR_NONE) {
+                        printf("Port %s: Initialized MI Steering : %d\n","HDMI0", m_MISteering);
+                    }
+                }
+                else {
+                    printf("Port %s: Initialization MI Steering : %d failed. Port not available\n","HDMI0", m_MISteering);
                 }
             }
             else {
@@ -890,7 +903,6 @@ void AudioConfigInit()
             printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
         }
     }
-
 #endif //DS_AUDIO_SETTINGS_PERSISTENCE
 }
 
@@ -1007,6 +1019,9 @@ IARM_Result_t _dsAudioPortInit(void *arg)
 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioPortEnabled,_dsIsAudioPortEnabled);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableAudioPort,_dsEnableAudioPort);
+
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetPortEnablePersistVal, _dsGetPortEnablePersistVal);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetPortEnablePersistVal, _dsSetPortEnablePersistVal);
 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioPortTerm,_dsAudioPortTerm);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableLEConfig,_dsEnableLEConfig);
@@ -1594,6 +1609,7 @@ IARM_Result_t _dsIsAudioPortEnabled(void *arg)
         param->enabled = enabled;
         result = IARM_RESULT_SUCCESS;
     }
+    printf("%s : returned ret: %04x enabled: %s\n", __FUNCTION__, ret, param->enabled? "TRUE":"FALSE");
 
     IARM_BUS_Unlock(lock);
 
@@ -1614,12 +1630,104 @@ IARM_Result_t _dsEnableAudioPort(void *arg)
     if(ret == dsERR_NONE) {
         result = IARM_RESULT_SUCCESS;
     }
-   
+
+    std::string isEnabledAudioPortKey("audio.");
+    isEnabledAudioPortKey.append (param->portName);
+    isEnabledAudioPortKey.append (".isEnabled");
+
+
+    /*Ensure settings is enabled properly in HAL*/
+    bool bAudioPortEnableVerify = false;
+    ret = dsIsAudioPortEnabled (param->handle, &bAudioPortEnableVerify);
+    if(dsERR_NONE == ret) {
+        if (bAudioPortEnableVerify != param->enabled) {
+            printf("%s : %s Audio port status verification failed. param->enabled: %d bAudioPortEnableVerify:%d\n", 
+                    __FUNCTION__, isEnabledAudioPortKey.c_str(), param->enabled, bAudioPortEnableVerify);
+        }
+        else {
+            printf("%s : %s Audio port status verification passed. status %d\n", __FUNCTION__, isEnabledAudioPortKey.c_str(), param->enabled); 
+        }
+    }
+    else {
+        printf("%s : %s Audio port status:%s verification step: dsIsAudioPortEnabled call failed\n", 
+               __FUNCTION__, isEnabledAudioPortKey.c_str(), param->enabled? "TRUE":"FALSE");
+    }
+ 
     IARM_BUS_Unlock(lock);
     
     return result;
 }
 
+IARM_Result_t _dsGetPortEnablePersistVal(void *arg)
+{
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+
+    dsAudioPortEnabledParam_t *param = (dsAudioPortEnabledParam_t *)arg;
+    //By default all the ports are enabled.
+    bool enabled = true;
+
+    std::string isEnabledAudioPortKey("audio.");
+    isEnabledAudioPortKey.append (param->portName);
+    isEnabledAudioPortKey.append (".isEnabled");
+    std::string _AudioPortEnable("TRUE");
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+    try {
+        _AudioPortEnable = device::HostPersistence::getInstance().getProperty(isEnabledAudioPortKey);
+    }
+    catch(...) {
+        printf("Init: %s : Exception in Getting the %s port enable settings from persistence storage..... \r\n", __FUNCTION__, isEnabledAudioPortKey.c_str());
+        /*By default enable all the ports*/
+        _AudioPortEnable = "TRUE";
+    }
+    if ("FALSE" == _AudioPortEnable) { 
+        printf("%s: persist dsEnableAudioPort value: _AudioPortEnable:%s:\n", __FUNCTION__, _AudioPortEnable.c_str());  
+        enabled = false;
+    }
+    else {
+        printf("%s: persist dsEnableAudioPort value: _AudioPortEnable:%s:\n", __FUNCTION__, _AudioPortEnable.c_str());  
+        enabled = true;
+    }
+
+#endif //DS_AUDIO_SETTINGS_PERSISTENCE end
+    
+    param->enabled = enabled;
+    result = IARM_RESULT_SUCCESS;
+    printf("%s: persist dsEnableAudioPort value: %s for the port %s AudioPortEnable: %s result:%d \n", 
+           __FUNCTION__, param->enabled? "TRUE":"FALSE", isEnabledAudioPortKey.c_str(), _AudioPortEnable.c_str(), result);
+
+    IARM_BUS_Unlock(lock);
+
+    return result;
+}
+
+
+IARM_Result_t _dsSetPortEnablePersistVal(void *arg)
+{
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    dsError_t ret = dsERR_NONE;
+
+    dsAudioPortEnabledParam_t *param = (dsAudioPortEnabledParam_t *)arg;
+    result = IARM_RESULT_SUCCESS;
+
+    std::string isEnabledAudioPortKey("audio.");
+    isEnabledAudioPortKey.append (param->portName);
+    isEnabledAudioPortKey.append (".isEnabled");
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+    printf("%s: persist dsEnableAudioPort value: %s for the port %s\n", __FUNCTION__, param->enabled? "TRUE":"FALSE", isEnabledAudioPortKey.c_str());
+    device::HostPersistence::getInstance().persistHostProperty(isEnabledAudioPortKey.c_str(), param->enabled? ("TRUE"):("FALSE"));
+#endif //DS_AUDIO_SETTINGS_PERSISTENCE end
+ 
+    IARM_BUS_Unlock(lock);
+    
+    return result;
+}
 
 
 IARM_Result_t _dsAudioPortTerm(void *arg)
@@ -3115,6 +3223,13 @@ IARM_Result_t _dsAudioEnableARC(void *arg)
     IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     IARM_BUS_Lock(lock);
 
+    dsError_t ret = dsERR_GENERAL;
+    std::string _isEnabledAudoARCPortKey("audio.hdmiArc0.isEnabled");
+    std::string _audoARCPortTypeKey("audio.hdmiArc0.type");
+    //Default is eARC
+    std::string _audoARCPortiCapVal("eARC");
+
+
     typedef dsError_t (*dsAudioEnableARC_t)(int handle, dsAudioARCStatus_t arcStatus);
     static dsAudioEnableARC_t func = 0;
     if (func == 0) {
@@ -3142,6 +3257,28 @@ IARM_Result_t _dsAudioEnableARC(void *arg)
         {
             result = IARM_RESULT_SUCCESS;
         }
+
+
+
+        /*Ensure settings is enabled properly in HAL*/
+        ret = dsERR_NONE;
+        bool bAudioPortEnableVerify = false;
+        ret = (dsError_t) dsIsAudioPortEnabled (param->handle, &bAudioPortEnableVerify);
+        if(dsERR_NONE == ret) {
+            if (bAudioPortEnableVerify != param->arcStatus.status) {
+                printf("Init: %s : %s Audio port status:%s verification failed. bAudioPortEnable: %d bAudioPortEnableVerify:%d\n",
+                        __FUNCTION__, _audoARCPortTypeKey.c_str(), _isEnabledAudoARCPortKey.c_str(), param->arcStatus.status, bAudioPortEnableVerify);
+            }
+            else {
+                printf("%s : %s Audio port status verification passed. status %d\n", 
+                       __FUNCTION__, _isEnabledAudoARCPortKey.c_str(), param->arcStatus.status); 
+            }
+        }
+        else {
+            printf("Init: %s : %s Audio port status:%s verification step: dsIsAudioPortEnabled call failed\n", 
+                    __FUNCTION__, _audoARCPortTypeKey.c_str(), _isEnabledAudoARCPortKey.c_str());
+        }
+
     }
 
     IARM_BUS_Unlock(lock);

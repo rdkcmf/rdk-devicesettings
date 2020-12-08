@@ -51,6 +51,7 @@ namespace {
 			"SPDIF",
                         "SPEAKER",
 			"HDMI_ARC",
+			"HEADPHONE",
 	};
 
 	inline const bool isValid(int id) {
@@ -67,6 +68,7 @@ const int AudioOutputPortType::kHDMI 			= dsAUDIOPORT_TYPE_HDMI;
 const int AudioOutputPortType::kSPDIF 			= dsAUDIOPORT_TYPE_SPDIF;
 const int AudioOutputPortType::kSPEAKER                   = dsAUDIOPORT_TYPE_SPEAKER;
 const int AudioOutputPortType::kARC                     = dsAUDIOPORT_TYPE_HDMI_ARC;
+const int AudioOutputPortType::kHEADPHONE 		= dsAUDIOPORT_TYPE_HEADPHONE;
 
 
 
