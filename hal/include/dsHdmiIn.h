@@ -226,6 +226,33 @@ dsError_t dsHdmiInGetCurrentVideoMode (dsVideoPortResolution_t *resolution);
 typedef void (*dsHdmiInConnectCB_t)(dsHdmiInPort_t Port, bool isPortConnected);
 
 /**
+ * @brief Callback function used to notify applications of HDMI In signal change status
+ *
+ * HAL Implementation should call this method to deliver HDMI In signal change status
+ * to the application (e.g. NoSignal/UnstableSignal/NotSupportedSignal/StableSignal for HDMI In ports).
+ *
+ * @param port                HDMI Input port.
+ * @param sigStatus           signal Status of HDMI In Port.
+ *
+ *
+ * @return None.
+ */
+typedef void (*dsHdmiInSignalChangeCB_t)(dsHdmiInPort_t port, dsHdmiInSignalStatus_t sigStatus);
+
+/**
+ * @brief Callback function used to notify applications of HDMI Input status
+ *
+ * HAL Implementation should call this method to deliver HDMI Input status
+ * to the application (e.g. port, isPresented(true/false) etc. for HDMI In ports).
+ *
+ * @param inputStatus         HDMI Input status of a specific Port.
+ *
+ *
+ * @return None.
+ */
+typedef void (*dsHdmiInStatusChangeCB_t)(dsHdmiInStatus_t inputStatus);
+
+/**
  * @brief Register for the HDMI Input hot plug event.
  * 
  * This function is used to register for the HDMI Input hot plug event.
@@ -235,6 +262,28 @@ typedef void (*dsHdmiInConnectCB_t)(dsHdmiInPort_t Port, bool isPortConnected);
  * @retval    ::dsError_t
  */
 dsError_t dsHdmiInRegisterConnectCB (dsHdmiInConnectCB_t CBFunc);
+
+/**
+ * @brief Register for the HDMI Input Signal Change event.
+ *
+ * This function is used to register for the HDMI Input Signal Change event.
+ *
+ * @param[in] CBFunc HDMI Input Signal change callback function.
+ * @return Device Settings error code
+ * @retval    ::dsError_t
+ */
+dsError_t dsHdmiInRegisterSignalChangeCB (dsHdmiInSignalChangeCB_t CBFunc);
+
+/**
+ * @brief Register for the HDMI Input Status Change event.
+ *
+ * This function is used to register for the HDMI Input Status Change event.
+ *
+ * @param[in] CBFunc HDMI Input Status change callback function.
+ * @return Device Settings error code
+ * @retval    ::dsError_t
+ */
+dsError_t dsHdmiInRegisterStatusChangeCB (dsHdmiInStatusChangeCB_t CBFunc);
 
 /* End of DSHAL_HdmiIn_API doxygen group */
 /**

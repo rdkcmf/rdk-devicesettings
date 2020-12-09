@@ -52,6 +52,8 @@ typedef enum _DSMgr_EventId_t {
 	IARM_BUS_DSMGR_EVENT_HDCP_STATUS,                  /*!< HDMI HDCP status */
 	IARM_BUS_DSMGR_EVENT_RX_SENSE,                     /*!< HDMI Rx Sense status */
 	IARM_BUS_DSMGR_EVENT_HDMI_IN_HOTPLUG,              /*!< HDMI IN HPD change event */
+	IARM_BUS_DSMGR_EVENT_HDMI_IN_SIGNAL_STATUS,    /*!< HDMI IN signal status change event */
+	IARM_BUS_DSMGR_EVENT_HDMI_IN_STATUS,          /*!< HDMI IN status change event */
     IARM_BUS_DSMGR_EVENT_TIME_FORMAT_CHANGE,           /*!< Clock Time Format Change Event*/
     IARM_BUS_DSMGR_EVENT_AUDIO_LEVEL_CHANGED,           /*!< Audio Level Change Event*/
 	IARM_BUS_DSMGR_EVENT_MAX,					       /*!< Max Event  */
@@ -82,7 +84,7 @@ typedef struct _DSMgr_EventData_t {
         	/* Declare HDMI HPD Data */
             int event;
         }hdmi_hpd; /*HDMI Hot Plug detect*/
-		
+
 		struct _HDMI_HDCP_DATA{
         	/* Declare HDMI DCP Data */
             int hdcpStatus;
@@ -98,6 +100,18 @@ typedef struct _DSMgr_EventData_t {
             dsHdmiInPort_t port;
             bool           isPortConnected;
         }hdmi_in_connect;
+
+        struct _HDMI_IN_STATUS_DATA{
+         /* Declare HDMI Input status*/
+            dsHdmiInPort_t port;
+	    bool           isPresented;
+        }hdmi_in_status; /*HDMI in status change detect*/
+
+        struct _HDMI_IN_SIG_STATUS_DATA{
+         /* Declare HDMI In signal status*/
+            dsHdmiInPort_t port;
+            dsHdmiInSignalStatus_t status;
+        }hdmi_in_sig_status; /*HDMI in signal change detect*/
         
         struct _FPD_TIME_FORMAT
         {

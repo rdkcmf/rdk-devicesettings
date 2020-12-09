@@ -856,6 +856,20 @@ typedef enum _dsHdmiInPort_t
     dsHDMI_IN_PORT_MAX
 } dsHdmiInPort_t;
 
+/** @addtogroup DSHAL_HDMI_IN_TYPES Device Settings HAL HDMI IN Signal Status Definitions
+ *  @ingroup DSHAL_HDMI_IN
+ *  @{
+ */
+typedef enum _dsHdmiInSignalStatus_t
+{
+    dsHDMI_IN_SIGNAL_STATUS_NONE = -1,
+    dsHDMI_IN_SIGNAL_STATUS_NOSIGNAL,
+    dsHDMI_IN_SIGNAL_STATUS_UNSTABLE,
+    dsHDMI_IN_SIGNAL_STATUS_NOTSUPPORTED,
+    dsHDMI_IN_SIGNAL_STATUS_STABLE,
+    dsHDMI_IN_SIGNAL_STATUS_MAX
+} dsHdmiInSignalStatus_t;
+
 typedef struct _dsHdmiInStatus_t
 {
     bool             isPresented;                          /**< Boolean flag indicating Hdmi Input is enabled for presentation by client */

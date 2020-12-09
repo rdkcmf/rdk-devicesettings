@@ -61,6 +61,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pthread.h>
+#include <dlfcn.h>
 #include "dsHdmiIn.h"
 #include "dsRpc.h"
 #include "dsTypes.h"
@@ -98,6 +99,8 @@ IARM_Result_t _dsHdmiInResumeAudio(void *arg);
 IARM_Result_t _dsHdmiInGetCurrentVideoMode(void *arg);
 
 void _dsHdmiInConnectCB(dsHdmiInPort_t port, bool isPortConnected);
+void _dsHdmiInSignalChangeCB(dsHdmiInPort_t port, dsHdmiInSignalStatus_t sigStatus);
+void _dsHdmiInStatusChangeCB(dsHdmiInStatus_t inputStatus);
 
 #include <iostream>
 #include "hostPersistence.hpp"
@@ -164,6 +167,49 @@ IARM_Result_t _dsHdmiInInit(void *arg)
 #ifdef HAS_HDMI_IN_SUPPORT
         HDMI_IN_TRACE(("%s - invoking dsHdmiInRegisterConnectCB()\n", __PRETTY_FUNCTION__));
         dsHdmiInRegisterConnectCB(_dsHdmiInConnectCB);
+
+        typedef dsError_t (*dsHdmiInRegisterSignalChangeCB_t)(dsHdmiInSignalChangeCB_t CBFunc);
+        static dsHdmiInRegisterSignalChangeCB_t signalChangeCBFunc = 0;
+        if (signalChangeCBFunc == 0) {
+            void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+            if (dllib) {
+                signalChangeCBFunc = (dsHdmiInRegisterSignalChangeCB_t) dlsym(dllib, "dsHdmiInRegisterSignalChangeCB");
+                if(signalChangeCBFunc == 0) {
+                    printf("dsHdmiInRegisterSignalChangeCB(dsHdmiInSignalChangeCB_t) is not defined\r\n");
+                }
+                dlclose(dllib);
+            }
+            else {
+                printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+            }
+        }
+
+        if(signalChangeCBFunc) {
+             HDMI_IN_TRACE(("%s - invoking dsHdmiInRegisterSignalChangeCB()\n", __PRETTY_FUNCTION__));
+             signalChangeCBFunc(_dsHdmiInSignalChangeCB);
+        }
+
+        typedef dsError_t (*dsHdmiInRegisterStatusChangeCB_t)(dsHdmiInStatusChangeCB_t CBFunc);
+        static dsHdmiInRegisterStatusChangeCB_t statusChangeCBFunc = 0;
+        if (statusChangeCBFunc == 0) {
+            void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+            if (dllib) {
+                statusChangeCBFunc = (dsHdmiInRegisterStatusChangeCB_t) dlsym(dllib, "dsHdmiInRegisterStatusChangeCB");
+                if(statusChangeCBFunc == 0) {
+                    printf("dsHdmiInRegisterStatusChangeCB(dsHdmiInStatusChangeCB_t) is not defined\r\n");
+                }
+                dlclose(dllib);
+            }
+            else {
+                printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+            }
+        }
+
+        if(statusChangeCBFunc) {
+             HDMI_IN_TRACE(("%s - invoking dsHdmiInRegisterStatusChangeCB()\n", __PRETTY_FUNCTION__));
+             statusChangeCBFunc(_dsHdmiInStatusChangeCB);
+        }
+
 #endif
         HDMI_IN_TRACE(("%s - invoking IARM_Bus_RegisterCall()\n", __PRETTY_FUNCTION__));
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInTerm,                  _dsHdmiInTerm);
@@ -389,6 +435,40 @@ void _dsHdmiInConnectCB(dsHdmiInPort_t port, bool isPortConnected)
 	                        (void *)&hdmi_in_hpd_eventData, 
 	                        sizeof(hdmi_in_hpd_eventData));
 	                        
+    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
+}
+
+void _dsHdmiInSignalChangeCB(dsHdmiInPort_t port, dsHdmiInSignalStatus_t sigStatus)
+{
+    IARM_Bus_DSMgr_EventData_t hdmi_in_sigStatus_eventData;
+    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
+    __TIMESTAMP();
+    HDMI_IN_TRACE(("HDMI In signal status change update!!!!!! Port: %d, Signal Status: %d\r\n", port, sigStatus));
+    hdmi_in_sigStatus_eventData.data.hdmi_in_sig_status.port = port;
+    hdmi_in_sigStatus_eventData.data.hdmi_in_sig_status.status = sigStatus;
+
+    IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+			        (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_HDMI_IN_SIGNAL_STATUS,
+			        (void *)&hdmi_in_sigStatus_eventData,
+			        sizeof(hdmi_in_sigStatus_eventData));
+
+    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
+}
+
+void _dsHdmiInStatusChangeCB(dsHdmiInStatus_t inputStatus)
+{
+    IARM_Bus_DSMgr_EventData_t hdmi_in_status_eventData;
+    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
+    __TIMESTAMP();
+    HDMI_IN_TRACE(("HDMI In status change update!!!!!! Port: %d, isPresented: %d\r\n", inputStatus.activeport, inputStatus.isPresented));
+    hdmi_in_status_eventData.data.hdmi_in_status.port = inputStatus.activePort;
+    hdmi_in_status_eventData.data.hdmi_in_status.isPresented = inputStatus.isPresented;
+
+    IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                                (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_HDMI_IN_STATUS,
+                                (void *)&hdmi_in_status_eventData,
+                                sizeof(hdmi_in_status_eventData));
+
     HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
 }
 
