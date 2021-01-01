@@ -175,6 +175,7 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsGetMatrixCoefficients  "dsGetMatrixCoefficients"
 #define IARM_BUS_DSMGR_API_dsGetColorDepth          "dsGetColorDepths"
 #define IARM_BUS_DSMGR_API_dsGetColorSpace          "dsGetColorSpace"
+#define IARM_BUS_DSMGR_API_dsGetQuantizationRange "dsGetQuantizationRange"
 #define IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings "dsGetCurrentOutputSettings"
 #define IARM_BUS_DSMGR_API_dsSetBackgroundColor "dsSetBackgroundColor"
 /*
@@ -791,6 +792,12 @@ typedef struct _dsColorSpace_t {
     dsDisplayColorSpace_t color_space;
 } dsColorSpace_t;
 
+typedef struct _dsQuantizationRange_t {
+    dsError_t result;
+    int handle;
+    dsDisplayQuantizationRange_t quantization_range;
+} dsQuantizationRange_t;
+
 typedef struct _dsCurrentOutputSettings_t {
     dsError_t result;
     int handle;
@@ -798,6 +805,7 @@ typedef struct _dsCurrentOutputSettings_t {
     dsDisplayMatrixCoefficients_t matrix_coefficients;
     uint32_t color_depth;
     dsDisplayColorSpace_t color_space;
+    dsDisplayQuantizationRange_t quantization_range;
 } dsCurrentOutputSettings_t;
 
 typedef struct _dsAudioOutIsConnectedParam_t

@@ -211,13 +211,26 @@ int VideoOutputPort::getColorSpace() const
     return (int)colorSpace;
 }
 
-void VideoOutputPort::getCurrentOutputSettings(int &videoEOTF, int &matrixCoefficients, int &colorSpace, int &colorDepth) const
+int VideoOutputPort::getQuantizationRange() const
+{
+    dsDisplayQuantizationRange_t quantizationRange = dsDISPLAY_QUANTIZATIONRANGE_UNKNOWN;
+    dsError_t ret = dsGetQuantizationRange(_handle, &quantizationRange);
+
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+
+    return (int)quantizationRange;
+}
+
+void VideoOutputPort::getCurrentOutputSettings(int &videoEOTF, int &matrixCoefficients, int &colorSpace, int &colorDepth, int &quantizationRange) const
 {
     dsHDRStandard_t _videoEOTF = dsHDRSTANDARD_NONE;
     dsDisplayMatrixCoefficients_t _matrixCoefficients = dsDISPLAY_MATRIXCOEFFICIENT_UNKNOWN;
     dsDisplayColorSpace_t _colorSpace = dsDISPLAY_COLORSPACE_UNKNOWN;
     unsigned int _colorDepth = 0;
-    dsError_t ret = dsGetCurrentOutputSettings(_handle, &_videoEOTF, &_matrixCoefficients, &_colorSpace, &_colorDepth);
+    dsDisplayQuantizationRange_t _quantizationRange = dsDISPLAY_QUANTIZATIONRANGE_UNKNOWN;
+    dsError_t ret = dsGetCurrentOutputSettings(_handle, &_videoEOTF, &_matrixCoefficients, &_colorSpace, &_colorDepth, &_quantizationRange);
 
     if (ret != dsERR_NONE) {
         throw Exception(ret);
@@ -227,6 +240,7 @@ void VideoOutputPort::getCurrentOutputSettings(int &videoEOTF, int &matrixCoeffi
     matrixCoefficients = _matrixCoefficients;
     colorSpace = _colorSpace;
     colorDepth = _colorDepth;
+    quantizationRange = _quantizationRange;
 }
 
 /**

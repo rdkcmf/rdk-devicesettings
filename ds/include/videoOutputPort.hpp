@@ -274,7 +274,8 @@ public:
 	int getMatrixCoefficients() const;
 	int getColorSpace() const;
 	int getColorDepth() const;
-	void getCurrentOutputSettings(int &videoEOTF, int &matrixCoefficients, int &colorSpace, int &colorDepth) const;
+        int getQuantizationRange() const;
+        void getCurrentOutputSettings(int &videoEOTF, int &matrixCoefficients, int &colorSpace, int &colorDepth, int &quantizationRange) const;
 
 private:
 	Display _display;

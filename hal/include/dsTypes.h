@@ -892,6 +892,13 @@ typedef enum _dsDisplayColorSpace_t
     dsDISPLAY_COLORSPACE_AUTO = 5         /* Automatic color space */
 } dsDisplayColorSpace_t;
 
+typedef enum _dsDisplayQuantizationRange_t
+{
+    dsDISPLAY_QUANTIZATIONRANGE_UNKNOWN = 0,
+    dsDISPLAY_QUANTIZATIONRANGE_LIMITED = 1,
+    dsDISPLAY_QUANTIZATIONRANGE_FULL = 2
+} dsDisplayQuantizationRange_t;
+
 /**
  * Sleep mode validation check.
  */

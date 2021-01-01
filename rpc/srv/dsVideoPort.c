@@ -104,6 +104,7 @@ IARM_Result_t _dsGetVideoEOTF(void *arg);
 IARM_Result_t _dsGetMatrixCoefficients(void* arg);
 IARM_Result_t _dsGetColorDepth(void* arg);
 IARM_Result_t _dsGetColorSpace(void* arg);
+IARM_Result_t _dsGetQuantizationRange(void* arg);
 IARM_Result_t _dsGetCurrentOutputSettings(void* arg);
 IARM_Result_t _dsSetBackgroundColor(void *arg);
 
@@ -228,6 +229,7 @@ IARM_Result_t _dsVideoPortInit(void *arg)
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMatrixCoefficients,_dsGetMatrixCoefficients);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetColorDepth,_dsGetColorDepth);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetColorSpace,_dsGetColorSpace);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetQuantizationRange,_dsGetQuantizationRange);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings,_dsGetCurrentOutputSettings);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetBackgroundColor,_dsSetBackgroundColor);
 	
@@ -470,6 +472,48 @@ IARM_Result_t _dsGetColorSpace(void* arg)
     return IARM_RESULT_SUCCESS;
 }
 
+IARM_Result_t _dsGetQuantizationRange(void* arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetQuantizationRange_t)(int handle, dsDisplayQuantizationRange_t* quantization_range);
+    static dsGetQuantizationRange_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetQuantizationRange_t) dlsym(dllib, "dsGetQuantizationRange");
+            if (func) {
+                printf("dsGetQuantizationRange_t(int, dsDisplayQuantizationRange_t*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetQuantizationRange_t(int, dsDisplayQuantizationRange_t*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsQuantizationRange_t* param = (dsQuantizationRange_t*)arg;
+
+    if (func != 0) {
+        param->result = func(param->handle, &param->quantization_range);
+    }
+    else {
+        param->quantization_range = dsDISPLAY_QUANTIZATIONRANGE_UNKNOWN;
+    }
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+}
+
 IARM_Result_t _dsGetCurrentOutputSettings(void* arg)
 {
 #ifndef RDK_DSHAL_NAME
@@ -479,17 +523,17 @@ IARM_Result_t _dsGetCurrentOutputSettings(void* arg)
     _DEBUG_ENTER();
     IARM_BUS_Lock(lock);
 
-    typedef dsError_t (*dsGetCurrentOutputSettings_t)(int handle, dsHDRStandard_t* video_eotf, dsDisplayMatrixCoefficients_t* matrix_coefficients, dsDisplayColorSpace_t* color_space, unsigned int* color_depth);
+    typedef dsError_t (*dsGetCurrentOutputSettings_t)(int handle, dsHDRStandard_t* video_eotf, dsDisplayMatrixCoefficients_t* matrix_coefficients, dsDisplayColorSpace_t* color_space, unsigned int* color_depth, dsDisplayQuantizationRange_t* quantization_range);
     static dsGetCurrentOutputSettings_t func = 0;
     if (func == 0) {
         void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
         if (dllib) {
             func = (dsGetCurrentOutputSettings_t) dlsym(dllib, "dsGetCurrentOutputSettings");
             if (func) {
-                printf("dsGetCurrentOutputSettings_t(int, dsHDRStandard_t*, dsDisplayMatrixCoefficients_t*, dsDisplayColorSpace_t*, unsigned int*) is defined and loaded\r\n");
+                printf("dsGetCurrentOutputSettings_t(int, dsHDRStandard_t*, dsDisplayMatrixCoefficients_t*, dsDisplayColorSpace_t*, unsigned int*, dsDisplayQuantizationRange_t*) is defined and loaded\r\n");
             }
             else {
-                printf("dsGetCurrentOutputSettings_t(int, dsHDRStandard_t*, dsDisplayMatrixCoefficients_t*, dsDisplayColorSpace_t*, unsigned int*) is not defined\r\n");
+                printf("dsGetCurrentOutputSettings_t(int, dsHDRStandard_t*, dsDisplayMatrixCoefficients_t*, dsDisplayColorSpace_t*, unsigned int*, dsDisplayQuantizationRange_t*) is not defined\r\n");
             }
             dlclose(dllib);
         }
@@ -501,13 +545,14 @@ IARM_Result_t _dsGetCurrentOutputSettings(void* arg)
     dsCurrentOutputSettings_t* param = (dsCurrentOutputSettings_t*)arg;
 
     if (func != 0) {
-        param->result = func(param->handle, &param->video_eotf, &param->matrix_coefficients, &param->color_space, &param->color_depth);
+        param->result = func(param->handle, &param->video_eotf, &param->matrix_coefficients, &param->color_space, &param->color_depth, &param->quantization_range);
     }
     else {
         param->color_space = dsDISPLAY_COLORSPACE_UNKNOWN;
         param->color_depth = 0;
         param->matrix_coefficients = dsDISPLAY_MATRIXCOEFFICIENT_UNKNOWN;
         param->video_eotf = dsHDRSTANDARD_NONE;
+        param->quantization_range = dsDISPLAY_QUANTIZATIONRANGE_UNKNOWN;
     }
 
     IARM_BUS_Unlock(lock);

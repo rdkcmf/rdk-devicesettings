@@ -829,11 +829,40 @@ dsError_t dsGetColorSpace(int handle, dsDisplayColorSpace_t* color_space)
   return dsERR_GENERAL ;
 }
 
-dsError_t dsGetCurrentOutputSettings(int handle, dsHDRStandard_t* video_eotf, dsDisplayMatrixCoefficients_t* matrix_coefficients, dsDisplayColorSpace_t* color_space, unsigned int* color_depth)
+dsError_t dsGetQuantizationRange(int handle, dsDisplayQuantizationRange_t* quantization_range)
 {
   _DEBUG_ENTER();
 
-  if (video_eotf == NULL || matrix_coefficients == NULL || color_space == NULL || color_depth == NULL) {
+  if (quantization_range == NULL) {
+      return dsERR_INVALID_PARAM;
+  }
+
+  dsQuantizationRange_t param;
+
+  memset(&param, 0, sizeof(param));
+  param.handle = handle;
+  param.result = dsERR_NONE;
+
+  IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+  rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsGetQuantizationRange,
+                        (void *)&param,
+                        sizeof(param));
+
+  if( (IARM_RESULT_SUCCESS == rpcRet) && (dsERR_NONE == param.result))
+  {
+    *quantization_range = param.quantization_range;
+    return dsERR_NONE;
+  }
+
+  return dsERR_GENERAL ;
+}
+
+dsError_t dsGetCurrentOutputSettings(int handle, dsHDRStandard_t* video_eotf, dsDisplayMatrixCoefficients_t* matrix_coefficients, dsDisplayColorSpace_t* color_space, unsigned int* color_depth, dsDisplayQuantizationRange_t* quantization_range)
+{
+  _DEBUG_ENTER();
+
+  if (video_eotf == NULL || matrix_coefficients == NULL || color_space == NULL || color_depth == NULL || quantization_range == NULL) {
       return dsERR_INVALID_PARAM;
   }
 
@@ -855,6 +884,7 @@ dsError_t dsGetCurrentOutputSettings(int handle, dsHDRStandard_t* video_eotf, ds
     *matrix_coefficients = param.matrix_coefficients;
     *color_space = param.color_space;
     *color_depth = param.color_depth;
+    *quantization_range = param.quantization_range;
     return dsERR_NONE;
   }
 

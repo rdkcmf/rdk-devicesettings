@@ -457,20 +457,33 @@ dsError_t dsGetColorDepth(int handle, unsigned int* color_depth);
 dsError_t dsGetColorSpace(int handle, dsDisplayColorSpace_t* color_space);
 
 /**
- * @brief Get current color space setting, color depth, matrix coefficients and video Electro-Optical Transfer Function (EOT)
- *        in one call
+ * @brief Get quatization range.
+ *
+ * @param[in]  handle -  Handle of the display device.
+ * @param[out] quantization_range - pointer to quantization range value.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE on success
+ * @retval dsERR_GENERAL General failure.
+ */
+dsError_t dsGetQuantizationRange(int handle, dsDisplayQuantizationRange_t* quantization_range);
+
+/**
+ * @brief Get current color space setting, color depth, matrix coefficients, video Electro-Optical Transfer Function (EOT)
+ * and  quantization range in one call
  *
  * @param[in]  handle -  Handle of the display device.
  * @param[out] video_eotf - pointer to EOFF value
  * @param[out] matrix_coefficients - pointer to matrix coefficients value
  * @param[out] color_space - pointer to color space value.
  * @param[out] color_depth - pointer to color depths value.
+ * @param[out] quantization_range - pointer to quantization range value.
  *
  * @return Device Settings error code
  * @retval dsERR_NONE on success
  * @retval dsERR_GENERAL General failure.
  */
-dsError_t dsGetCurrentOutputSettings(int handle, dsHDRStandard_t* video_eotf, dsDisplayMatrixCoefficients_t* matrix_coefficients, dsDisplayColorSpace_t* color_space, unsigned int* color_depth);
+dsError_t dsGetCurrentOutputSettings(int handle, dsHDRStandard_t* video_eotf, dsDisplayMatrixCoefficients_t* matrix_coefficients, dsDisplayColorSpace_t* color_space, unsigned int* color_depth, dsDisplayQuantizationRange_t* quantization_range);
 
 /**
  * @brief Check Video Output is HDR or not.
