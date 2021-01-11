@@ -338,6 +338,7 @@ typedef enum _dsHdcpStatus_t {
     dsHDCP_STATUS_AUTHENTICATED,            /**< HDCP Authentication Process is initiated and Passed */
     dsHDCP_STATUS_AUTHENTICATIONFAILURE,    /**< HDCP Authentication Failure or Link Integroty Failure */
     dsHDCP_STATUS_INPROGRESS,               /**< HDCP Authentication in Progress */
+    dsHDCP_STATUS_PORTDISABLED,             /**< HDMI output port disabled */
     dsHDCP_STATUS_MAX                       /**< Maximum index for HDCP status. */
 } dsHdcpStatus_t;
 
