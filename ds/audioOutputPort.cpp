@@ -1367,14 +1367,18 @@ void AudioOutputPort::enableARC(dsAudioARCTypes_t type, bool enable)
  *
  * @return None
  */
-void AudioOutputPort::enableLEConfig(const bool enable)
+dsError_t AudioOutputPort::enableLEConfig(const bool enable)
 {
     dsError_t ret = dsERR_GENERAL;
 
     ret = dsEnableLEConfig(_handle, enable);
 
     if (ret != dsERR_NONE)
+    {
         printf("enableLEConfig failed with ret:%d \n",ret);
+    }
+
+    return ret;
 }
 
 /**

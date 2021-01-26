@@ -172,7 +172,7 @@ public:
 	void setSAD(std::vector<int> sad_list);
 	void enableARC(dsAudioARCTypes_t type, bool enable);
 	void enableMS12Config(const dsMS12FEATURE_t feature,const bool enable);
-	void enableLEConfig(const bool enable);
+	dsError_t enableLEConfig(const bool enable);
         bool GetLEConfig();
         void setAudioDelay(const uint32_t audioDelayMs);
         void setAudioDelayOffset(const uint32_t audioDelayOffsetMs);
