@@ -125,8 +125,8 @@ public:
 	void enable();
 	void disable();
 
-    bool getPortEnablePersistVal () const;
-    void setPortEnablePersistVal (bool isEnabled);
+    bool getEnablePersist () const;
+    void setEnablePersist (bool isEnabled);
 
 	bool getStereoAuto();
 

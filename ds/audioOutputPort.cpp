@@ -58,8 +58,8 @@ extern dsError_t dsSetStereoAuto(int handle, int autoMode, bool isPersist);
 extern dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode, bool isPersist);
 extern dsError_t dsEnableAudioPort(int handle, bool enabled, const char* portName);
 
-extern dsError_t dsGetPortEnablePersistVal(int handle, const char* portName, bool* enabled);
-extern dsError_t dsSetPortEnablePersistVal(int handle, const char* portName, bool enabled);
+extern dsError_t dsGetEnablePersist(int handle, const char* portName, bool* enabled);
+extern dsError_t dsSetEnablePersist(int handle, const char* portName, bool enabled);
 
 namespace device {
 
@@ -278,7 +278,7 @@ void AudioOutputPort::disable()
 }
 
 /**
- * @fn bool AudioOutputPort::getPortEnablePersistVal const
+ * @fn bool AudioOutputPort::getEnablePersist const
  * @brief This API is used to check the audio port enable
  * persist value
  *
@@ -286,12 +286,12 @@ void AudioOutputPort::disable()
  * @retval 1 when output is enabled
  * @retval 0 When output is disabled
  */
-bool AudioOutputPort::getPortEnablePersistVal () const
+bool AudioOutputPort::getEnablePersist () const
 {
     //By default all ports are enabled.
     bool isEnabled = true;
-    dsError_t ret = dsGetPortEnablePersistVal (_handle, _name.c_str(), &isEnabled);
-    printf ("AudioOutputPort::getPortEnablePersistVal portName: %s ret:%04x isEnabled: %d\n",
+    dsError_t ret = dsGetEnablePersist (_handle, _name.c_str(), &isEnabled);
+    printf ("AudioOutputPort::getEnablePersist portName: %s ret:%04x isEnabled: %d\n",
              _name.c_str(), ret, isEnabled);   
     if (ret != dsERR_NONE) {
         throw Exception(ret);
@@ -300,15 +300,15 @@ bool AudioOutputPort::getPortEnablePersistVal () const
 }
 
 /**
- * @fn bool AudioOutputPort::setPortEnablePersistVal const
+ * @fn bool AudioOutputPort::setEnablePersist const
  * @brief This API is used to set the audio port enable
  * persist value
  *
  * @return void
  */
-void AudioOutputPort::setPortEnablePersistVal (bool isEnabled)
+void AudioOutputPort::setEnablePersist (bool isEnabled)
 {
-    dsError_t ret = dsSetPortEnablePersistVal (_handle, _name.c_str(), isEnabled);
+    dsError_t ret = dsSetEnablePersist (_handle, _name.c_str(), isEnabled);
     if (ret != dsERR_NONE) {
         throw Exception(ret);
     }
@@ -527,6 +527,12 @@ bool AudioOutputPort::isConnected() const
     else if (dsAUDIOPORT_TYPE_HDMI_ARC == _type) {
         /*Considering 1 is ARC/eARC port*/
         return device::HdmiInput::getInstance().isPortConnected(1);
+    }
+    else if (dsAUDIOPORT_TYPE_HEADPHONE == _type) {
+        bool isConn = true;
+        dsAudioOutIsConnected(_handle, &isConn);
+        printf ("AudioOutputPort::isConnected dsAUDIOPORT_TYPE_HEADPHONE isConn:%d\n", isConn);
+        return isConn;
     }
     else {
         return true;

@@ -319,7 +319,7 @@ dsError_t  dsEnableAudioPort(int handle, bool enabled, const char* portName)
 	return dsERR_GENERAL ;
 }
 
-dsError_t dsGetPortEnablePersistVal(int handle, const char* portName, bool *enabled)
+dsError_t dsGetEnablePersist(int handle, const char* portName, bool *enabled)
 {
 	dsAudioPortEnabledParam_t param;
 	IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
@@ -331,7 +331,7 @@ dsError_t dsGetPortEnablePersistVal(int handle, const char* portName, bool *enab
     strcpy (param.portName, portName);
 
 	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
-                            (char *)IARM_BUS_DSMGR_API_dsGetPortEnablePersistVal,
+                            (char *)IARM_BUS_DSMGR_API_dsGetEnablePersist,
                             (void *)&param,
                             sizeof(param));
 	if (IARM_RESULT_SUCCESS == rpcRet)
@@ -339,13 +339,13 @@ dsError_t dsGetPortEnablePersistVal(int handle, const char* portName, bool *enab
 		*enabled = param.enabled;
 		return dsERR_NONE;
 	}
-    printf ("dsGetPortEnablePersistVal cli portName:%s rpcRet:%d param.enabled:%d enabled:%d\n", 
+    printf ("dsGetEnablePersist cli portName:%s rpcRet:%d param.enabled:%d enabled:%d\n", 
             portName, rpcRet, param.enabled, *enabled);	
 
 	return dsERR_NONE;
 }
 
-dsError_t dsSetPortEnablePersistVal(int handle, const char* portName, bool enabled)
+dsError_t dsSetEnablePersist(int handle, const char* portName, bool enabled)
 {
     _DEBUG_ENTER();
 
@@ -358,7 +358,7 @@ dsError_t dsSetPortEnablePersistVal(int handle, const char* portName, bool enabl
     IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
 
 	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
-							(char *)IARM_BUS_DSMGR_API_dsSetPortEnablePersistVal,
+							(char *)IARM_BUS_DSMGR_API_dsSetEnablePersist,
 							(void *)&param,
 							sizeof(param));
 
@@ -1304,5 +1304,25 @@ dsError_t dsGetMS12Capabilities(int handle, int *capabilities)
 
 	return dsERR_GENERAL ;
 }
+
+dsError_t dsAudioOutIsConnected(int handle, bool* pisCon)
+{
+        dsAudioOutIsConnectedParam_t param;
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+        param.handle = handle;
+        param.isCon = true;
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *) IARM_BUS_DSMGR_API_dsAudioOutIsConnected,
+                            (void *)&param,
+                            sizeof(param));
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                *pisCon = param.isCon;
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
+}
+
 /** @} */
 /** @} */

@@ -59,8 +59,8 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsIsAudioPortEnabled  "dsIsAudioPortEnabled"
 #define  IARM_BUS_DSMGR_API_dsEnableAudioPort      "dsEnableAudioPort"
 
-#define IARM_BUS_DSMGR_API_dsGetPortEnablePersistVal "getPortEnablePersistVal"
-#define IARM_BUS_DSMGR_API_dsSetPortEnablePersistVal "setPortEnablePersistVal" 
+#define IARM_BUS_DSMGR_API_dsGetEnablePersist "getPortEnablePersistVal"
+#define IARM_BUS_DSMGR_API_dsSetEnablePersist "setPortEnablePersistVal" 
 
 #define  IARM_BUS_DSMGR_API_dsAudioPortTerm		"dsAudioPortTerm"
 #define  IARM_BUS_DSMGR_API_dsEnableMS12Config	"dsEnableMS12Config"
@@ -98,6 +98,9 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsSetSurroundVirtualizer  "dsSetSurroundVirtualizer"
 #define  IARM_BUS_DSMGR_API_dsGetMISteering  "dsGetMISteering"
 #define  IARM_BUS_DSMGR_API_dsSetMISteering  "dsSetMISteering"
+
+
+#define IARM_BUS_DSMGR_API_dsAudioOutIsConnected     "dsAudioOutIsConnected"
 
 /*
  * Declare RPC dsAudio Device API names 
@@ -756,6 +759,14 @@ typedef struct _dsCurrentOutputSettings_t {
     uint32_t color_depth;
     dsDisplayColorSpace_t color_space;
 } dsCurrentOutputSettings_t;
+
+typedef struct _dsAudioOutIsConnectedParam_t
+{
+    dsError_t               result;
+    int                     handle;
+    bool                    isCon;
+} dsAudioOutIsConnectedParam_t;
+
 
 #ifdef __cplusplus
 }

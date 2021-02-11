@@ -479,18 +479,6 @@ void _dsHdmiInConnectCB(dsHdmiInPort_t port, bool isPortConnected)
 	                        (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_HDMI_IN_HOTPLUG,
 	                        (void *)&hdmi_in_hpd_eventData, 
 	                        sizeof(hdmi_in_hpd_eventData));
-
-    /*Checking HDMI eARC/ARC port from HAL*/
-    if (hdmiInCap_gs.isPortArcCapable[port]) {
-        printf("%s: HDMI_ARC port %d Hotplug happened\r\n", __FUNCTION__, port);
-        hdmi_in_hpd_eventData.data.audio_out_connect.portType = dsAUDIOPORT_TYPE_HDMI;
-        hdmi_in_hpd_eventData.data.audio_out_connect.isPortConnected = isPortConnected;
-			
-        IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
-	                           (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_OUT_HOTPLUG,
-	                           (void *)&hdmi_in_hpd_eventData, 
-	                           sizeof(hdmi_in_hpd_eventData));
-    }
            
     HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
 }

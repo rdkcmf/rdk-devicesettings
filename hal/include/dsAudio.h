@@ -42,6 +42,7 @@ extern "C" {
 #include "dsError.h"
 #include "dsTypes.h"
 
+typedef void (*dsAudioOutPortConnectCB_t)(dsAudioPortType_t portType, unsigned int uiPortNo, bool isPortCon);
 
 /** @addtogroup DSHAL_AUDIO_API Device Settings HAL Audio Public API
  *  @ingroup devicesettingshalapi
@@ -778,6 +779,11 @@ dsError_t dsSetAudioDelayOffset(int handle, const uint32_t audioDelayOffsetMs);
  * @retval dsERR_GENERAL Indicates error due to general failure.
  */
 dsError_t  dsAudioPortTerm();
+
+
+dsError_t dsAudioOutIsConnected(int handle, bool* pisCon);
+
+dsError_t dsAudioOutRegisterConnectCB(dsAudioOutPortConnectCB_t CBFunc);
 
 /**
  * @brief To find the HDR capabilities of SoC

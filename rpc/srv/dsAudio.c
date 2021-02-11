@@ -81,8 +81,8 @@ IARM_Result_t _dsIsAudioMS12Decode(void *arg);
 IARM_Result_t _dsIsAudioPortEnabled(void *arg);
 
 
-IARM_Result_t _dsGetPortEnablePersistVal(void *arg);
-IARM_Result_t _dsSetPortEnablePersistVal(void *arg);
+IARM_Result_t _dsGetEnablePersist(void *arg);
+IARM_Result_t _dsSetEnablePersist(void *arg);
 
 IARM_Result_t _dsEnableAudioPort(void *arg);
 IARM_Result_t _dsSetAudioDuckingLevel(void *arg);
@@ -123,9 +123,12 @@ IARM_Result_t _dsSetMISteering(void *arg);
 
 IARM_Result_t _dsGetAudioCapabilities(void *arg);
 IARM_Result_t _dsGetMS12Capabilities(void *arg);
+IARM_Result_t _dsAudioOutIsConnected(void *arg);
 
 static void _GetAudioModeFromPersistent(void *arg);
 static dsAudioPortType_t _GetAudioPortType(int handle);
+void _dsAudioOutPortConnectCB(dsAudioPortType_t portType, unsigned int uiPortNo, bool isPortConnected);
+static dsError_t _dsAudioOutRegisterConnectCB (dsAudioOutPortConnectCB_t cbFun);
 
 void AudioConfigInit()
 {
@@ -1020,8 +1023,8 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioPortEnabled,_dsIsAudioPortEnabled);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableAudioPort,_dsEnableAudioPort);
 
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetPortEnablePersistVal, _dsGetPortEnablePersistVal);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetPortEnablePersistVal, _dsSetPortEnablePersistVal);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetEnablePersist, _dsGetEnablePersist);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetEnablePersist, _dsSetEnablePersist);
 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioPortTerm,_dsAudioPortTerm);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsEnableLEConfig,_dsEnableLEConfig);
@@ -1056,6 +1059,12 @@ IARM_Result_t _dsAudioPortInit(void *arg)
 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioCapabilities,_dsGetAudioCapabilities); 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMS12Capabilities,_dsGetMS12Capabilities); 
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioOutIsConnected, _dsAudioOutIsConnected); 
+
+        dsError_t eRet = _dsAudioOutRegisterConnectCB (_dsAudioOutPortConnectCB);
+        if (dsERR_NONE != eRet) {
+            printf ("%s: _dsAudioOutRegisterConnectCB eRet:%04x", __FUNCTION__, eRet);
+        }
 
         m_isInitialized = 1;
     }
@@ -1658,7 +1667,7 @@ IARM_Result_t _dsEnableAudioPort(void *arg)
     return result;
 }
 
-IARM_Result_t _dsGetPortEnablePersistVal(void *arg)
+IARM_Result_t _dsGetEnablePersist(void *arg)
 {
     _DEBUG_ENTER();
 
@@ -1705,7 +1714,7 @@ IARM_Result_t _dsGetPortEnablePersistVal(void *arg)
 }
 
 
-IARM_Result_t _dsSetPortEnablePersistVal(void *arg)
+IARM_Result_t _dsSetEnablePersist(void *arg)
 {
     _DEBUG_ENTER();
     IARM_BUS_Lock(lock);
@@ -3501,6 +3510,113 @@ IARM_Result_t _dsGetMS12Capabilities(void *arg)
     return IARM_RESULT_SUCCESS;
 }
 
+void _dsAudioOutPortConnectCB(dsAudioPortType_t portType, unsigned int uiPortNo, bool isPortConnected)
+{
+    IARM_Bus_DSMgr_EventData_t audio_out_hpd_eventData;
+    printf("%s: AudioOutPort type:%d portNo:%d Hotplug happened\r\n", 
+            __FUNCTION__, portType, uiPortNo);
+    audio_out_hpd_eventData.data.audio_out_connect.portType = portType;
+    audio_out_hpd_eventData.data.audio_out_connect.uiPortNo = uiPortNo;
+    audio_out_hpd_eventData.data.audio_out_connect.isPortConnected = isPortConnected;
+        
+    IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                           (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_OUT_HOTPLUG,
+                           (void *)&audio_out_hpd_eventData, 
+                           sizeof(audio_out_hpd_eventData));
+    printf ("%s portType%d uiPortNo:%d isPortConnected:%d", 
+            __FUNCTION__, portType, uiPortNo, isPortConnected);           
+}
+
+static dsError_t _dsAudioOutRegisterConnectCB (dsAudioOutPortConnectCB_t cbFun) {
+    dsError_t eRet = dsERR_GENERAL; 
+    printf("%s: %d - Inside \n", __FUNCTION__, __LINE__);
+
+    typedef dsError_t (*dsAudioOutRegisterConnectCB_t)(dsAudioOutPortConnectCB_t cbFunArg);
+    static dsAudioOutRegisterConnectCB_t dsAudioOutRegisterConnectCBFun = 0;
+    if (dsAudioOutRegisterConnectCBFun == 0) {
+        printf("%s: %d - dlerror: %s\n", __FUNCTION__, __LINE__, dlerror());
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            dsAudioOutRegisterConnectCBFun = (dsAudioOutRegisterConnectCB_t) dlsym(dllib, "dsAudioOutRegisterConnectCB");
+            if(dsAudioOutRegisterConnectCBFun == 0) {
+                printf("%s: dsAudioOutRegisterConnectCB (int) is not defined %s\r\n", __FUNCTION__, dlerror());
+                eRet = dsERR_GENERAL;
+            }
+            else {
+                printf("%s: dsAudioOutRegisterConnectCB is loaded\r\n", __FUNCTION__);
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("%s: Opening RDK_DSHAL_NAME [%s] failed %s\r\n", 
+                   __FUNCTION__, RDK_DSHAL_NAME, dlerror());
+            eRet = dsERR_GENERAL;
+        }
+    }
+    if (0 != dsAudioOutRegisterConnectCBFun) { 
+        eRet = dsAudioOutRegisterConnectCBFun (cbFun);
+        printf("%s: dsAudioOutRegisterConnectCBFun registered\r\n", __FUNCTION__);
+    }
+    else {
+        printf("%s: dsAudioOutRegisterConnectCBFun NULL\r\n", __FUNCTION__);
+    }
+    return eRet;
+}
+
+IARM_Result_t _dsAudioOutIsConnected (void *arg) {
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    IARM_Result_t eIarmRet = IARM_RESULT_INVALID_PARAM;
+    dsAudioOutIsConnectedParam_t* param = (dsAudioOutIsConnectedParam_t*) arg; 
+    dsError_t eRet = dsERR_GENERAL; 
+    //By default all audio ports are connected
+    bool isConnected = true;
+    param->isCon = true;
+
+    printf("%s: %d - Inside \n", __FUNCTION__, __LINE__);
+
+    typedef dsError_t (*dsAudioOutIsConnected_t)(int handleArg, bool* pisConArg);
+    static dsAudioOutIsConnected_t dsAudioOutIsConFunc = 0;
+    if (dsAudioOutIsConFunc == 0) {
+        printf("%s: %d -  dlerror:%s\n", __FUNCTION__, __LINE__, dlerror());
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            dsAudioOutIsConFunc = (dsAudioOutIsConnected_t) dlsym(dllib, "dsAudioOutIsConnected");
+            if(dsAudioOutIsConFunc == 0) {
+                printf("%s: dsAudioOutIsConnected is not defined %s\r\n", __FUNCTION__, dlerror());
+                eRet = dsERR_GENERAL;
+            }
+            else {
+                printf("%s: dsAudioOutIsConnected is loaded\r\n", __FUNCTION__);
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("%s: Opening RDK_DSHAL_NAME [%s] failed %s\r\n", 
+                   __FUNCTION__, RDK_DSHAL_NAME, dlerror());
+            eRet = dsERR_GENERAL;
+        }
+    }
+    if (0 != dsAudioOutIsConFunc) { 
+        eRet = dsAudioOutIsConFunc (param->handle, &isConnected);
+        printf("%s: pisCon:%d eRet:%04x\r\n", 
+               __FUNCTION__, isConnected, eRet);
+    }
+    else {
+        printf("%s: dsAudioOutIsConFunc NULL\n", __FUNCTION__);
+    }
+    
+    param->result = eRet;
+    if (dsERR_NONE == eRet) {
+        param->isCon = isConnected;
+        eIarmRet = IARM_RESULT_SUCCESS;
+    }
+
+
+    IARM_BUS_Unlock(lock);
+    return eIarmRet;
+}
 
 /** @} */
 /** @} */

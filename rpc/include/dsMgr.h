@@ -138,6 +138,7 @@ typedef struct _DSMgr_EventData_t {
         struct _AUDIO_OUT_CONNECT_DATA
         {
             dsAudioPortType_t portType;
+            unsigned int      uiPortNo;
             bool           isPortConnected;
         }audio_out_connect;
 
