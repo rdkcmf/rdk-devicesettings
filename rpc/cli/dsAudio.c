@@ -1084,6 +1084,113 @@ dsError_t  dsSetMISteering(int handle, bool enabled)
         return dsERR_NONE;
 }
 
+dsError_t dsGetGraphicEqualizerMode(int handle, int *mode)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsGraphicEqualizerModeParam_t param;
+
+        param.handle = handle;
+        param.mode = 0;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetGraphicEqualizerMode,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: GraphicEqualizerMode (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *mode = param.mode;
+        return dsERR_NONE;
+}
+
+dsError_t dsSetGraphicEqualizerMode(int handle, int mode)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsGraphicEqualizerModeParam_t param;
+        param.handle = handle;
+        param.mode = mode;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetGraphicEqualizerMode,
+                                                        (void *)&param,
+                                                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsGetMS12AudioProfileList(int handle, dsMS12AudioProfileList_t* profiles)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsMS12AudioProfileListParam_t param;
+
+        param.handle = handle;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetMS12AudioProfileList,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        profiles->audioProfileCount = param.profileList.audioProfileCount;
+	strncpy(profiles->audioProfileList, param.profileList.audioProfileList, MAX_PROFILE_LIST_BUFFER_LEN);
+        return dsERR_NONE;
+}
+
+dsError_t dsGetMS12AudioProfile(int handle, char *profile)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsMS12AudioProfileParam_t param;
+
+        param.handle = handle;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetMS12AudioProfile,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+
+        strncpy(profile, param.profile, MAX_PROFILE_STRING_LEN);
+        return dsERR_NONE;
+}
+
+dsError_t  dsSetMS12AudioProfile(int handle, const char* profile)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsMS12AudioProfileParam_t param;
+        param.handle = handle;
+
+	memset( param.profile, 0, sizeof(param.profile) );
+	strcpy(param.profile, profile);
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetMS12AudioProfile,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
 dsError_t dsGetSupportedARCTypes(int handle, int *types)
 {
         IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;

@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
         printf("\t Dynamic Range Control Mode - [%s]\r\n",aPort.getDRCMode()? "RF" : "Line");
         printf("\t Surround Virtualizer boost - [%d]\r\n",    aPort.getSurroundVirtualizer());
         printf("\t Media Intelligent Steering - [%s]\r\n",aPort.getMISteering()? "On" : "Off");
+	printf("\t GraphicEqualizerMode- [%d]\r\n",    aPort.getGraphicEqualizerMode());
         printf("\t Encoding- [%s]\r\n",       aPort.getEncoding().getName().c_str());
         printf("\t Stereo Mode- [%s]\r\n",    aPort.getStereoMode().getName().c_str());
         printf("\t Gain - [%f]\r\n",          aPort.getGain());

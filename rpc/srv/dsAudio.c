@@ -108,6 +108,8 @@ IARM_Result_t _dsSetDolbyVolumeMode(void *arg);
 IARM_Result_t _dsGetDolbyVolumeMode(void *arg);
 IARM_Result_t _dsSetIntelligentEqualizerMode(void *arg);
 IARM_Result_t _dsGetIntelligentEqualizerMode(void *arg);
+IARM_Result_t _dsSetGraphicEqualizerMode(void *arg);
+IARM_Result_t _dsGetGraphicEqualizerMode(void *arg);
 
 IARM_Result_t _dsGetVolumeLeveller(void *arg);
 IARM_Result_t _dsSetVolumeLeveller(void *arg);
@@ -121,6 +123,9 @@ IARM_Result_t _dsGetSurroundVirtualizer(void *arg);
 IARM_Result_t _dsSetSurroundVirtualizer(void *arg);
 IARM_Result_t _dsGetMISteering(void *arg);
 IARM_Result_t _dsSetMISteering(void *arg);
+IARM_Result_t _dsGetMS12AudioProfileList(void *arg);
+IARM_Result_t _dsGetMS12AudioProfile(void *arg);
+IARM_Result_t _dsSetMS12AudioProfile(void *arg);
 
 IARM_Result_t _dsGetAudioCapabilities(void *arg);
 IARM_Result_t _dsGetMS12Capabilities(void *arg);
@@ -907,6 +912,101 @@ void AudioConfigInit()
             printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
         }
     }
+
+
+    typedef dsError_t (*dsSetGraphicEqualizerMode_t)(int handle, int mode);
+    static dsSetGraphicEqualizerMode_t dsSetGraphicEqualizerModeFunc = 0;
+    if (dsSetGraphicEqualizerModeFunc == 0) {
+        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            dsSetGraphicEqualizerModeFunc = (dsSetGraphicEqualizerMode_t) dlsym(dllib, "dsSetGraphicEqualizerMode");
+            if (dsSetGraphicEqualizerModeFunc) {
+                printf("dsSetGraphicEqualizerMode_t(int, int) is defined and loaded\r\n");
+                std::string _GEQMode("0");
+                int m_GEQMode = 0;
+                handle = 0;
+                dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
+                try {
+                    _GEQMode = device::HostPersistence::getInstance().getProperty("audio.GraphicEQ");
+                }
+                catch(...) {
+                    _GEQMode = "0";
+                    printf("Exception in Getting the Graphic EQ mode settings from persistence storage..... \r\n");
+                }
+                m_GEQMode = atoi(_GEQMode.c_str());
+
+//SPEAKER init
+                handle = 0;
+                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                    if (dsSetGraphicEqualizerModeFunc(handle, m_GEQMode) == dsERR_NONE) {
+                        printf("Port %s: Initialized Graphic Equalizer mode : %d\n","SPEAKER0", m_GEQMode);
+                    }
+                }
+//HDMI init
+                handle = 0;
+                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                    if (dsSetGraphicEqualizerModeFunc(handle, m_GEQMode) == dsERR_NONE) {
+                        printf("Port %s: Initialized Graphic Equalizer mode : %d\n","HDMI0", m_GEQMode);
+                    }
+                }
+            }
+            else {
+                printf("dsSetGraphicEqualizerMode_t(int, int) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+
+    typedef dsError_t (*dsSetMS12AudioProfile_t)(int handle, const char* profile);
+    static dsSetMS12AudioProfile_t dsSetMS12AudioProfileFunc = 0;
+    if (dsSetMS12AudioProfileFunc == 0) {
+        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            dsSetMS12AudioProfileFunc = (dsSetMS12AudioProfile_t) dlsym(dllib, "dsSetMS12AudioProfile");
+            if (dsSetMS12AudioProfileFunc) {
+                printf("dsSetMS12AudioProfile_t(int, const char*) is defined and loaded\r\n");
+                std::string _AProfile("Off");
+                handle = 0;
+                dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
+                try {
+                    _AProfile = device::HostPersistence::getInstance().getProperty("audio.MS12Profile");
+                }
+                catch(...) {
+                    _AProfile = "Off";
+                    printf("Exception in Getting the Audio Profile setting from persistence storage..... \r\n");
+                }
+
+//SPEAKER init
+                handle = 0;
+                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                    if (dsSetMS12AudioProfileFunc(handle, _AProfile.c_str()) == dsERR_NONE) {
+                        printf("Port %s: Initialized MS12 Audio Profile : %s\n","SPEAKER0", _AProfile.c_str());
+                    }
+                }
+#if 0
+//HDMI init
+                handle = 0;
+                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                    if (dsSetMS12AudioProfileFunc(handle, _AProfile.c_str()) == dsERR_NONE) {
+                        printf("Port %s: Initialized MS12 Audio Profile  : %d\n","HDMI0", _AProfile.c_str());
+                    }
+                }
+#endif
+            }
+            else {
+                printf("dsSetMS12AudioProfile_t(int, const char*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
 #endif //DS_AUDIO_SETTINGS_PERSISTENCE
 }
 
@@ -986,10 +1086,10 @@ IARM_Result_t dsAudioMgr_init()
                 {
                         _srv_HDMI_ARC_Audiomode = dsAUDIO_STEREO_PASSTHRU;
                 }
-	        else
+                else
                 {
                         _srv_HDMI_ARC_Audiomode = dsAUDIO_STEREO_STEREO;
-	        }
+                }
 	}
 	catch(...) 
 	{
@@ -1073,6 +1173,11 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetSurroundVirtualizer, _dsSetSurroundVirtualizer);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMISteering, _dsGetMISteering);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetMISteering, _dsSetMISteering);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetGraphicEqualizerMode, _dsGetGraphicEqualizerMode);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetGraphicEqualizerMode, _dsSetGraphicEqualizerMode);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMS12AudioProfileList, _dsGetMS12AudioProfileList);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMS12AudioProfile, _dsGetMS12AudioProfile);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetMS12AudioProfile, _dsSetMS12AudioProfile);
 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioCapabilities,_dsGetAudioCapabilities); 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMS12Capabilities,_dsGetMS12Capabilities); 
@@ -3268,6 +3373,247 @@ IARM_Result_t _dsSetMISteering(void *arg)
     IARM_BUS_Unlock(lock);
     return result;
 }
+
+
+IARM_Result_t _dsSetGraphicEqualizerMode(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetGraphicEqualizerMode_t)(int handle, int mode);
+    static dsSetGraphicEqualizerMode_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetGraphicEqualizerMode_t) dlsym(dllib, "dsSetGraphicEqualizerMode");
+            if (func) {
+                printf("dsSetGraphicEqualizerMode_t(int, int) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetGraphicEqualizerMode_t(int, int) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsGraphicEqualizerModeParam_t *param = (dsGraphicEqualizerModeParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->mode) == dsERR_NONE)
+        {
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+            std::string _GraphicEQ = std::to_string(param->mode);
+            printf("%s: persist graphic equalizer value: %d\n",__func__, param->mode);
+            device::HostPersistence::getInstance().persistHostProperty("audio.GraphicEQ",_GraphicEQ);
+#endif
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsGetGraphicEqualizerMode(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetGraphicEqualizerMode_t)(int handle, int *mode);
+    static dsGetGraphicEqualizerMode_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetGraphicEqualizerMode_t) dlsym(dllib, "dsGetGraphicEqualizerMode");
+            if (func) {
+                printf("dsGetGraphicEqualizerMode_t(int, int *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetGraphicEqualizerMode_t(int, int *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsGraphicEqualizerModeParam_t *param = (dsGraphicEqualizerModeParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        int  mode = 0;
+        param->mode = 0;
+        if (func(param->handle, &mode) == dsERR_NONE)
+        {
+            param->mode = mode;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsGetMS12AudioProfileList(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetMS12AudioProfileList_t)(int handle, dsMS12AudioProfileList_t* profiles);
+    static dsGetMS12AudioProfileList_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetMS12AudioProfileList_t) dlsym(dllib, "dsGetMS12AudioProfileList");
+            if (func) {
+                printf("dsGetMS12AudioProfileList_t(int, dsMS12AudioProfileList_t*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetMS12AudioProfileList_t(int, dsMS12AudioProfileList_t*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsMS12AudioProfileListParam_t *param = (dsMS12AudioProfileListParam_t *)arg;
+    dsMS12AudioProfileList_t pList;
+    dsError_t ret = dsERR_NONE;
+    if (func != 0 && param != NULL)
+    {
+	ret = func(param->handle, &pList);
+        if (ret == dsERR_NONE)
+        {
+	    printf("%s: Total number of supported profiles: %d\n",__FUNCTION__, pList.audioProfileCount);
+	    printf("%s: Profile List: %s\n",__FUNCTION__, pList.audioProfileList);
+
+	    param->profileList.audioProfileCount = pList.audioProfileCount;
+	    strncpy(param->profileList.audioProfileList,pList.audioProfileList,MAX_PROFILE_LIST_BUFFER_LEN);
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsGetMS12AudioProfile(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetMS12AudioProfile_t)(int handle, char* profile);
+    static dsGetMS12AudioProfile_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetMS12AudioProfile_t) dlsym(dllib, "dsGetMS12AudioProfile");
+            if (func) {
+                printf("dsGetMS12AudioProfile_t(int, char* ) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetMS12AudioProfile_t(int, char*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsMS12AudioProfileParam_t *param = (dsMS12AudioProfileParam_t *)arg;
+    char m_profile[MAX_PROFILE_STRING_LEN] = {0};
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, m_profile) == dsERR_NONE)
+        {
+            strcpy(param->profile, m_profile);
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsSetMS12AudioProfile(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetMS12AudioProfile_t)(int handle, const char* profile);
+    static dsSetMS12AudioProfile_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetMS12AudioProfile_t) dlsym(dllib, "dsSetMS12AudioProfile");
+            if (func) {
+                printf("dsSetMS12AudioProfile_t(int, const char*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetMS12AudioProfile_t(int, const char*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsMS12AudioProfileParam_t *param = (dsMS12AudioProfileParam_t*)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->profile) == dsERR_NONE)
+        {
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+            printf("%s: persist MS12 Audio Profile selection : %s\n", __func__, param->profile);
+            device::HostPersistence::getInstance().persistHostProperty("audio.MS12Profile",param->profile);
+#endif
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
 
 IARM_Result_t _dsGetSupportedARCTypes(void *arg)
 {

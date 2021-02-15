@@ -39,6 +39,7 @@
 #include "list.hpp"
 #include <sstream>
 #include <string>
+#include <string.h>
 #include <list>
 #include "dsAudio.h"
 #include "dsError.h"
@@ -1008,6 +1009,139 @@ bool AudioOutputPort::getMISteering() const
             throw Exception(ret);
         }
 }
+
+
+/**
+ * @fn const int AudioOutputPort::getGraphicEqualizerMode()
+ * @brief This API is used to get the current Graphical EQ mode.
+ *
+ * @return Current Graphical EQ mode
+ */
+int AudioOutputPort::getGraphicEqualizerMode() const
+{
+        dsError_t ret = dsERR_NONE;
+        int _mode = 0;
+		ret = dsGetGraphicEqualizerMode(_handle, &_mode);
+        if (ret == dsERR_NONE)
+        {
+        return _mode;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+
+/**
+ * @fn AudioOutputPort::setGraphicEqualizerMode(const int mode)
+ * @brief This API is used to set the compression mode in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] New graphic EQ mode for the given audio Output port.
+ *
+ * @return None
+ */
+void AudioOutputPort::setGraphicEqualizerMode(const int mode)
+{
+        dsError_t ret = dsERR_NONE;
+		ret = dsSetGraphicEqualizerMode(_handle, mode);
+
+        if (ret != dsERR_NONE) {
+            throw Exception(ret);
+        }
+}
+
+
+/**
+ * @fn  void AudioOutputPort::getMS12AudioProfile(std::string profile)
+ * @brief This API is used to get the current MS12 Audio profile 
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @return[string] Profile Name 
+ */
+const std::string AudioOutputPort::getMS12AudioProfile() const
+{
+        dsError_t ret = dsERR_NONE;
+	char ap[32] = {0};
+	std::string profile;
+        if ( (ret = dsGetMS12AudioProfile(_handle, ap)) == dsERR_NONE)
+        {
+            profile.assign(ap);
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+
+	return profile;
+}
+
+
+/**
+ * @fn AudioOutputPort::setMS12AudioProfile(std::string profile)
+ * @brief This API is used to set MS12 Audio Profile
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[string] Profile name to be set
+ *
+ * @return None
+ */
+void AudioOutputPort::setMS12AudioProfile(std::string profile)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsSetMS12AudioProfile(_handle, profile.c_str())) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+
+/**
+ * @fn std::vector<std::string> AudioOutputPort::getMS12AudioProfileList()
+ * @brief This API is used to get the supported MS12 Audio profiles
+ *
+ * @return List of audio profiles
+ */
+std::vector<std::string> AudioOutputPort::getMS12AudioProfileList() const
+{
+        dsError_t ret = dsERR_NONE;
+        int count = 0;
+	int i = 0;
+
+	std::vector<std::string> profileList;
+	dsMS12AudioProfileList_t apList;
+	ret = dsGetMS12AudioProfileList(_handle, &apList);
+        if ( ret != dsERR_NONE)
+        {
+		throw Exception(ret);
+        }
+
+	char* token;
+
+        token = strtok(apList.audioProfileList, ",");
+        while(token != NULL) {
+	        profileList.push_back(token);
+		token = strtok(NULL, ",");
+        }
+
+	if(profileList.size() != apList.audioProfileCount){
+		std::cout << "Number of profiles in list doesn't match audio profile count from HAL" << std::endl;
+		throw Exception(dsERR_GENERAL);
+        }
+
+	return profileList;
+}
+
 
 /**
  * @fn AudioOutputPort::setStereoMode(const int newMode,const bool toPersist)

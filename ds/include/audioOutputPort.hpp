@@ -119,6 +119,9 @@ public:
         int getDRCMode() const;
         int getSurroundVirtualizer() const;
         bool getMISteering() const;
+	int getGraphicEqualizerMode() const;
+	const std::string getMS12AudioProfile() const;
+	std::vector<std::string> getMS12AudioProfileList() const;
 	const AudioStereoMode &getStereoMode(bool usePersist = false);
 
     dsError_t setEnablePort(bool enabled);	
@@ -157,6 +160,8 @@ public:
         void setDRCMode(const int mode);
         void setSurroundVirtualizer(const int boost);
         void setMISteering(const bool enable);
+	void setGraphicEqualizerMode(const int mode);
+	void setMS12AudioProfile(std::string profile);
 
 	void setStereoMode(const int mode, const bool toPersist = true);
 	void setStereoAuto(const bool autoMode, const bool toPersist = true);

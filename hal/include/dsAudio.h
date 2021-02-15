@@ -223,6 +223,46 @@ dsError_t  dsGetSurroundVirtualizer(int handle, int* boost);
 
 dsError_t  dsGetMISteering(int handle, bool *enabled);
 
+
+/**
+ * @brief Get the Graphic Equalizer Mode.
+ *
+ * This function returns the Graphic Equalizer Mode setting used in the specified audio port.
+ *
+ * @param[in] handle Handle for the audio port.
+ * @param[out] .
+ *
+ * @return Device Settings error code
+ * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
+ */
+dsError_t  dsGetGraphicEqualizerMode(int handle, int *mode);
+
+
+/**
+ * @brief To get the supported MS12 audio profiles
+ *
+ * This function will get the list of supported ms12 audio profiles
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [out] *profiles      List of supported audio profiles
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetMS12AudioProfileList(int handle, dsMS12AudioProfileList_t* profiles);
+
+/**
+ * @brief To get current audio profile selection
+ *
+ * This function will get the current audio profile configured
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [out] *profile    Audio profile configured currently
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetMS12AudioProfile(int handle, char *profile);
+
+
 /**
  * @brief Get the supported ARC types of the connected ARC/eARC device
  *
@@ -627,6 +667,33 @@ dsError_t  dsSetSurroundVirtualizer(int handle, int boost);
  */
 
 dsError_t  dsSetMISteering(int handle, bool enabled);
+
+
+/**
+ * @brief Get the Graphic Equalizer Mode.
+ *
+ * This function returns the Graphic Equalizer Mode setting used in the specified audio port.
+ *
+ * @param[in] handle Handle for the audio port.
+ * @param[out] .
+ *
+ * @return Device Settings error code
+ * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
+ */
+dsError_t  dsSetGraphicEqualizerMode(int handle, int mode);
+
+
+/**
+ * @brief To set the ms12 audio profile
+ *
+ * This function will configure the user selected ms12 audio profile
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [in] *profile      Audio profile name
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsSetMS12AudioProfile(int handle, const char* profile);
 
 
 /**

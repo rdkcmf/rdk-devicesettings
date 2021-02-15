@@ -98,6 +98,11 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsSetSurroundVirtualizer  "dsSetSurroundVirtualizer"
 #define  IARM_BUS_DSMGR_API_dsGetMISteering  "dsGetMISteering"
 #define  IARM_BUS_DSMGR_API_dsSetMISteering  "dsSetMISteering"
+#define  IARM_BUS_DSMGR_API_dsSetGraphicEqualizerMode  "dsSetGraphicEqualizerMode"
+#define  IARM_BUS_DSMGR_API_dsGetGraphicEqualizerMode  "dsGetGraphicEqualizerMode"
+#define  IARM_BUS_DSMGR_API_dsGetMS12AudioProfileList  "dsGetMS12AudioProfileList"	
+#define  IARM_BUS_DSMGR_API_dsGetMS12AudioProfile  "dsGetMS12AudioProfile"
+#define  IARM_BUS_DSMGR_API_dsSetMS12AudioProfile  "dsSetMS12AudioProfile"
 
 
 #define IARM_BUS_DSMGR_API_dsAudioOutIsConnected     "dsAudioOutIsConnected"
@@ -364,6 +369,21 @@ typedef struct _dsMISteeringParam_t {
        bool enable;
 } dsMISteeringParam_t;
 
+typedef struct _dsGrpahicEqualizerModeParam_t {
+       int handle;
+       int mode;
+} dsGraphicEqualizerModeParam_t;
+
+#define MAX_PROFILE_STRING_LEN 32
+typedef struct _dsMS12AudioProfileParam_t {
+	int handle;
+	char profile [MAX_PROFILE_STRING_LEN];
+} dsMS12AudioProfileParam_t;
+
+typedef struct _dsMS12AudioProfileListParam_t {
+	int handle;
+	dsMS12AudioProfileList_t profileList;
+} dsMS12AudioProfileListParam_t;
 
 typedef struct _dsVideoPortGetHandleParam_t {
 	dsVideoPortType_t type;
