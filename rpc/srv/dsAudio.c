@@ -3385,7 +3385,11 @@ IARM_Result_t _dsEnableLEConfig(void *arg)
                 result = IARM_RESULT_SUCCESS;
             }
         }
-    }else {
+        else
+        {
+            __TIMESTAMP();printf("LE: %s Current enable status is same as requested:%d \r\n",__FUNCTION__,param->enable);
+            result = IARM_RESULT_SUCCESS;
+        }
     }
 
     IARM_BUS_Unlock(lock);
