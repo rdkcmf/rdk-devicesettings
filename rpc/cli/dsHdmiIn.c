@@ -54,19 +54,9 @@
 #include "libIARM.h"
 #include "libIBus.h"
 
-/* Enable for debug tracing */
-/* #define HDMI_IN_DEBUG */
-#ifdef HDMI_IN_DEBUG
-   #define HDMI_IN_TRACE( m ) printf m
-#else
-   #define HDMI_IN_TRACE( m )
-#endif
 
 dsError_t dsHdmiInInit (void)
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-    HDMI_IN_TRACE(("<<<<< HDMI In is initialized in Multi-App Mode >>>>>>>>\r\n"));
-
     IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
 
 	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
@@ -76,11 +66,11 @@ dsError_t dsHdmiInInit (void)
   
 	if (IARM_RESULT_SUCCESS == rpcRet)
 	{
-        HDMI_IN_TRACE(("%s <--- dsERR_NONE\n", __PRETTY_FUNCTION__));
+            printf("%s:%d - dsERR_NONE\n", __PRETTY_FUNCTION__,__LINE__);
 		return dsERR_NONE;
 	}
 
-    HDMI_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
@@ -88,7 +78,6 @@ dsError_t dsHdmiInInit (void)
 dsError_t dsHdmiInTerm (void)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
@@ -98,11 +87,11 @@ dsError_t dsHdmiInTerm (void)
 	
 	if (IARM_RESULT_SUCCESS == rpcRet)
 	{
-        HDMI_IN_TRACE(("%s <--- dsERR_NONE\n", __PRETTY_FUNCTION__));
+        printf("%s:%d - dsERR_NONE\n", __PRETTY_FUNCTION__,__LINE__);
 		return dsERR_NONE;
 	}
 
-    HDMI_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL ;
 }
 
@@ -111,8 +100,6 @@ dsError_t dsHdmiInGetNumberOfInputs (uint8_t *pNumHdmiInputs)
 {
     _DEBUG_ENTER();
     _RETURN_IF_ERROR(pNumHdmiInputs != NULL, dsERR_INVALID_PARAM);
-
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsHdmiInGetNumberOfInputsParam_t param;
     param.numHdmiInputs = 0;
@@ -127,11 +114,11 @@ dsError_t dsHdmiInGetNumberOfInputs (uint8_t *pNumHdmiInputs)
     if (IARM_RESULT_SUCCESS == rpcRet)
     {
         *pNumHdmiInputs = param.numHdmiInputs;
-        HDMI_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param.result));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param.result);
         return param.result;
 	}
 
-    HDMI_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
@@ -140,7 +127,6 @@ dsError_t dsHdmiInGetStatus (dsHdmiInStatus_t *pStatus)
     _DEBUG_ENTER();
     _RETURN_IF_ERROR(pStatus != NULL, dsERR_INVALID_PARAM);
 
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsHdmiInGetStatusParam_t param;
     memset (&param, 0, sizeof(param));
@@ -155,18 +141,17 @@ dsError_t dsHdmiInGetStatus (dsHdmiInStatus_t *pStatus)
     if (IARM_RESULT_SUCCESS == rpcRet)
     {
         *pStatus = param.status;
-        HDMI_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param.result));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param.result);
         return param.result;
 	}
 
-    HDMI_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
 dsError_t dsHdmiInSelectPort (dsHdmiInPort_t ePort)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsHdmiInSelectPortParam_t param;
     param.port = ePort;
@@ -180,18 +165,17 @@ dsError_t dsHdmiInSelectPort (dsHdmiInPort_t ePort)
   
     if (IARM_RESULT_SUCCESS == rpcRet)
     {
-        HDMI_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param.result));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param.result);
         return param.result;
 	}
 
-    HDMI_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
 dsError_t dsHdmiInScaleVideo (int32_t x, int32_t y, int32_t width, int32_t height)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> x=%d, y=%d, width=%d, height=%d\n", __PRETTY_FUNCTION__, x, y, width, height));
 
     dsHdmiInScaleVideoParam_t param;
     param.videoRect.x      = x;
@@ -207,18 +191,17 @@ dsError_t dsHdmiInScaleVideo (int32_t x, int32_t y, int32_t width, int32_t heigh
   
 	if (IARM_RESULT_SUCCESS == rpcRet)
 	{
-        HDMI_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param.result));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param.result);
         return param.result;
 	}
 
-    HDMI_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
 dsError_t dsHdmiInSelectZoomMode (dsVideoZoom_t requestedZoomMode)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsHdmiInSelectZoomModeParam_t param;
     param.zoomMode = requestedZoomMode;
@@ -231,18 +214,17 @@ dsError_t dsHdmiInSelectZoomMode (dsVideoZoom_t requestedZoomMode)
 
 	if (IARM_RESULT_SUCCESS == rpcRet)
 	{
-        HDMI_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param.result));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param.result);
         return param.result;
 	}
 
-    HDMI_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
 dsError_t dsHdmiInPauseAudio ()
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsError_t param;
     IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
@@ -254,18 +236,17 @@ dsError_t dsHdmiInPauseAudio ()
 
 	if (IARM_RESULT_SUCCESS == rpcRet)
 	{
-        HDMI_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param);
         return param;
 	}
 
-    HDMI_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
 dsError_t dsHdmiInResumeAudio ()
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsError_t param;
     IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
@@ -277,11 +258,11 @@ dsError_t dsHdmiInResumeAudio ()
 
 	if (IARM_RESULT_SUCCESS == rpcRet)
 	{
-        HDMI_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param);
         return param;
 	}
 
-    HDMI_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
@@ -290,7 +271,6 @@ dsError_t dsHdmiInGetCurrentVideoMode (dsVideoPortResolution_t *resolution)
     _DEBUG_ENTER();
     _RETURN_IF_ERROR(resolution != NULL, dsERR_INVALID_PARAM);
 
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     _dsHdmiInGetResolutionParam_t param;
     param.resolution = *resolution;
@@ -305,11 +285,11 @@ dsError_t dsHdmiInGetCurrentVideoMode (dsVideoPortResolution_t *resolution)
     if (IARM_RESULT_SUCCESS == rpcRet)
     {
         *resolution = param.resolution;
-        HDMI_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param.result));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param.result);
         return param.result;
 	}
 
-    HDMI_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 

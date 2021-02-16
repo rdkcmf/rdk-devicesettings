@@ -65,13 +65,6 @@
 #include "dsHdmiIn.h"
 #include "dsUtl.h"
 
-// Enable for debug tracing
-// #define HDMI_IN_DEBUG
-#ifdef HDMI_IN_DEBUG
-   #define HDMI_IN_TRACE( m ) printf m
-#else
-   #define HDMI_IN_TRACE( m )
-#endif
 
 namespace device 
 {
@@ -88,12 +81,7 @@ namespace device
  */
 HdmiInput::HdmiInput() 
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-    
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInInit()\n", __PRETTY_FUNCTION__));
     dsHdmiInInit();
-    
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));    
 }
 
 /**
@@ -107,12 +95,7 @@ HdmiInput::HdmiInput()
  */
 HdmiInput::~HdmiInput() 
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInTerm()\n", __PRETTY_FUNCTION__));
     dsHdmiInTerm();
-
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -127,11 +110,7 @@ HdmiInput::~HdmiInput()
 HdmiInput & HdmiInput::getInstance()
 {
     static HdmiInput _singleton;
-
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
-    
-	return _singleton;
+    return _singleton;
 }
 
 /**
@@ -145,9 +124,6 @@ HdmiInput & HdmiInput::getInstance()
  */
 uint8_t HdmiInput::getNumberOfInputs() const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInGetNumberOfInputs()\n", __PRETTY_FUNCTION__));
     
     uint8_t numHdmiInputs;
     dsError_t eError = dsHdmiInGetNumberOfInputs (&numHdmiInputs);
@@ -155,11 +131,8 @@ uint8_t HdmiInput::getNumberOfInputs() const
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError) 
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-	
-    HDMI_IN_TRACE(("%s <--- Number of inputs=%d\n", __PRETTY_FUNCTION__, numHdmiInputs));
     
     return (numHdmiInputs);
 }
@@ -176,23 +149,16 @@ uint8_t HdmiInput::getNumberOfInputs() const
  */
 bool HdmiInput::isPresented() const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-    
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInGetStatus()\n", __PRETTY_FUNCTION__));
     dsHdmiInStatus_t Status;
     dsError_t eError = dsHdmiInGetStatus (&Status);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError) 
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
 	
 	return (Status.isPresented);
-	
-	
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -207,23 +173,16 @@ bool HdmiInput::isPresented() const
  */
 bool HdmiInput::isActivePort(int8_t Port) const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-    
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInGetStatus()\n", __PRETTY_FUNCTION__));
     dsHdmiInStatus_t Status;
     dsError_t eError = dsHdmiInGetStatus (&Status);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError) 
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
 	
 	return (Status.activePort == Port);
-	
-	
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -238,23 +197,16 @@ bool HdmiInput::isActivePort(int8_t Port) const
  */
 int8_t HdmiInput::getActivePort() const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-    
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInGetStatus()\n", __PRETTY_FUNCTION__));
     dsHdmiInStatus_t Status;
     dsError_t eError = dsHdmiInGetStatus (&Status);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError) 
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
 	
 	return (Status.activePort);
-	
-	
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -269,23 +221,16 @@ int8_t HdmiInput::getActivePort() const
  */
 bool HdmiInput::isPortConnected(int8_t Port) const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-    
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInGetStatus()\n", __PRETTY_FUNCTION__));
     dsHdmiInStatus_t Status;
     dsError_t eError =  dsHdmiInGetStatus (&Status);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError) 
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
 	
 	return (Status.isPortConnected[Port]);
-	
-	
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -300,19 +245,14 @@ bool HdmiInput::isPortConnected(int8_t Port) const
  */
 void HdmiInput::selectPort (int8_t Port) const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInSelectPort()\n", __PRETTY_FUNCTION__));
     dsError_t eError = dsHdmiInSelectPort ((dsHdmiInPort_t)Port);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError) 
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
 	
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -329,19 +269,13 @@ void HdmiInput::selectPort (int8_t Port) const
  */
 void HdmiInput::scaleVideo (int32_t x, int32_t y, int32_t width, int32_t height) const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInScaleVideo(%d, %d, %d, %d)\n", __PRETTY_FUNCTION__, x, y, width, height));
     dsError_t eError = dsHdmiInScaleVideo (x, y, width, height);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError) 
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-	
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -356,19 +290,13 @@ void HdmiInput::scaleVideo (int32_t x, int32_t y, int32_t width, int32_t height)
  */
 void HdmiInput::selectZoomMode (int8_t zoomMode) const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInSelectPort()\n", __PRETTY_FUNCTION__));
     dsError_t eError = dsHdmiInSelectZoomMode ((dsVideoZoom_t)zoomMode);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -382,19 +310,13 @@ void HdmiInput::selectZoomMode (int8_t zoomMode) const
  */
 void HdmiInput::pauseAudio () const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInPauseAudio()\n", __PRETTY_FUNCTION__));
     dsError_t eError = dsHdmiInPauseAudio ();
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -408,26 +330,18 @@ void HdmiInput::pauseAudio () const
  */
 void HdmiInput::resumeAudio () const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInResumeAudio()\n", __PRETTY_FUNCTION__));
     dsError_t eError = dsHdmiInResumeAudio ();
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-
-    HDMI_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 
 static std::string getResolutionStr (dsVideoResolution_t resolution)
 {
-    printf("%s ---> \n", __PRETTY_FUNCTION__);
-
     std::string resolutionStr;
 
     switch (resolution)
@@ -461,14 +375,12 @@ static std::string getResolutionStr (dsVideoResolution_t resolution)
             break;
     }
 
-    printf ("%s <--- %s\n", __PRETTY_FUNCTION__, resolutionStr.c_str());
+    printf ("%s:%d - ResolutionStr:  %s\n", __PRETTY_FUNCTION__,__LINE__, resolutionStr.c_str());
     return resolutionStr;
 }
 
 static std::string getFrameRateStr (dsVideoFrameRate_t frameRate)
 {
-    printf("%s ---> \n", __PRETTY_FUNCTION__);
-
     std::string FrameRateStr;
 
     switch (frameRate)
@@ -510,29 +422,24 @@ static std::string getFrameRateStr (dsVideoFrameRate_t frameRate)
             break;
     }
 
-    printf ("%s <--- %s\n", __PRETTY_FUNCTION__, FrameRateStr.c_str());
+    printf ("%s:%d - FrameRateStr: %s\n", __PRETTY_FUNCTION__,__LINE__, FrameRateStr.c_str());
     return FrameRateStr;
 }
 
 static std::string getInterlacedStr (bool interlaced)
 {
-    printf("%s ---> \n", __PRETTY_FUNCTION__);
-
     std::string InterlacedStr = (interlaced) ? "i" : "p";
-
-    printf ("%s <--- %s\n", __PRETTY_FUNCTION__, InterlacedStr.c_str());
+    printf ("%s:%d - InterlacedStr:  %s\n", __PRETTY_FUNCTION__,__LINE__, InterlacedStr.c_str());
     return InterlacedStr;
 }
 
 static std::string CreateResolutionStr (const dsVideoPortResolution_t &resolution)
 {
-    printf("%s ---> \n", __PRETTY_FUNCTION__);
-
     std::string resolutionStr = getResolutionStr(resolution.pixelResolution) +
                                 getInterlacedStr(resolution.interlaced) +
                                 getFrameRateStr(resolution.frameRate);
 
-    printf ("%s <--- %s\n", __PRETTY_FUNCTION__, resolutionStr.c_str());
+    printf ("%s:%d - ResolutionStr: %s\n", __PRETTY_FUNCTION__,__LINE__, resolutionStr.c_str());
     return resolutionStr;
 }
 
@@ -547,23 +454,20 @@ static std::string CreateResolutionStr (const dsVideoPortResolution_t &resolutio
  */
 std::string HdmiInput::getCurrentVideoMode () const
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
-	dsVideoPortResolution_t resolution;
-	memset(&resolution, 0, sizeof(resolution));
+    dsVideoPortResolution_t resolution;
+    memset(&resolution, 0, sizeof(resolution));
 
-    HDMI_IN_TRACE(("%s - invoking dsHdmiInGetCurrentVideoMode()\n", __PRETTY_FUNCTION__));
     dsError_t eError = dsHdmiInGetCurrentVideoMode (&resolution);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        HDMI_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
 
     std::string resolutionStr = CreateResolutionStr (resolution);
-    HDMI_IN_TRACE(("%s <--- resolution =%s\n", __PRETTY_FUNCTION__, resolutionStr.c_str()));
+    printf("%s:%d - Resolution =%s\n", __PRETTY_FUNCTION__,__LINE__, resolutionStr.c_str());
     return resolutionStr;
 }
 

@@ -108,40 +108,31 @@ static dsHdmiInCap_t hdmiInCap_gs;
 #include "hostPersistence.hpp"
 #include <sstream>
 
-/* Enable for debug tracing */
-/* #define HDMI_IN_DEBUG */
-#ifdef HDMI_IN_DEBUG
-   #define HDMI_IN_TRACE( m ) printf m
-#else
-   #define HDMI_IN_TRACE( m )
-#endif
 
 using namespace std;
 
 
 static dsError_t isHdmiARCPort (int iPort, bool* isArcEnabled) {
     dsError_t eRet = dsERR_GENERAL; 
-    printf("%s: %d - dsIsHdmiARCPort\n", __FUNCTION__, __LINE__);
 
     typedef bool (*dsIsHdmiARCPort_t)(int iPortArg);
     static dsIsHdmiARCPort_t dsIsHdmiARCPortFunc = 0;
     if (dsIsHdmiARCPortFunc == 0) {
-        printf("%s: %d - dsIsHdmiARCPort %s\n", __FUNCTION__, __LINE__, dlerror());
         void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
         if (dllib) {
             dsIsHdmiARCPortFunc = (dsIsHdmiARCPort_t) dlsym(dllib, "dsIsHdmiARCPort");
             if(dsIsHdmiARCPortFunc == 0) {
-                printf("%s: dsIsHdmiARCPort (int) is not defined %s\r\n", __FUNCTION__, dlerror());
+                printf("%s:%d dsIsHdmiARCPort (int) is not defined %s\r\n", __FUNCTION__,__LINE__, dlerror());
                 eRet = dsERR_GENERAL;
             }
             else {
-                printf("%s: dsIsHdmiARCPort dsIsHdmiARCPortFunc loaded\r\n", __FUNCTION__);
+                printf("%s:%d dsIsHdmiARCPort dsIsHdmiARCPortFunc loaded\r\n", __FUNCTION__,__LINE__);
             }
             dlclose(dllib);
         }
         else {
-            printf("%s: dsIsHdmiARCPort  Opening RDK_DSHAL_NAME [%s] failed %s\r\n", 
-                   __FUNCTION__, RDK_DSHAL_NAME, dlerror());
+            printf("%s:%d dsIsHdmiARCPort  Opening RDK_DSHAL_NAME [%] failed %s\r\n", 
+                   __FUNCTION__,__LINE__, RDK_DSHAL_NAME, dlerror());
             eRet = dsERR_GENERAL;
         }
     }
@@ -157,44 +148,30 @@ static dsError_t isHdmiARCPort (int iPort, bool* isArcEnabled) {
 
 IARM_Result_t dsHdmiInMgr_init()
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    HDMI_IN_TRACE(("%s - invoking _dsHdmiInInit()\n", __PRETTY_FUNCTION__));
     _dsHdmiInInit(NULL);
 
-    HDMI_IN_TRACE(("%s - invoking IARM_Bus_RegisterCall()\n", __PRETTY_FUNCTION__));
-	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInInit, _dsHdmiInInit);
+    IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInInit, _dsHdmiInInit);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
-
-	return IARM_RESULT_SUCCESS;
+    return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t dsHdmiInMgr_term()
 {
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    HDMI_IN_TRACE(("%s - invoking _dsHdmiInTerm()\n", __PRETTY_FUNCTION__));
     _dsHdmiInTerm(NULL);
-
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsHdmiInInit(void *arg)
 {
-    HDMI_IN_TRACE(("%s ---> m_isInitialized=%d, m_isPlatInitialized=%d \n",
-                   __PRETTY_FUNCTION__, m_isInitialized, m_isPlatInitialized));
+    printf("%s:%d ---> m_isInitialized=%d, m_isPlatInitialized=%d \n",
+                   __PRETTY_FUNCTION__,__LINE__, m_isInitialized, m_isPlatInitialized);
 
     IARM_BUS_Lock(lock);
-
-    INFO("<<<<< called _dsHdmiInInit >>>>>>>>\r\n");
 
 #ifdef HAS_HDMI_IN_SUPPORT
     if (!m_isPlatInitialized)
     {
         /* Nexus init, if any here */
-        HDMI_IN_TRACE(("%s - invoking dsHdmiInInit()\n", __PRETTY_FUNCTION__));
         dsError_t eError = dsHdmiInInit();
     }
     m_isPlatInitialized++;
@@ -203,7 +180,6 @@ IARM_Result_t _dsHdmiInInit(void *arg)
     if (!m_isInitialized)
     {
 #ifdef HAS_HDMI_IN_SUPPORT
-        HDMI_IN_TRACE(("%s - invoking dsHdmiInRegisterConnectCB()\n", __PRETTY_FUNCTION__));
         dsHdmiInRegisterConnectCB(_dsHdmiInConnectCB);
 
         typedef dsError_t (*dsHdmiInRegisterSignalChangeCB_t)(dsHdmiInSignalChangeCB_t CBFunc);
@@ -223,7 +199,6 @@ IARM_Result_t _dsHdmiInInit(void *arg)
         }
 
         if(signalChangeCBFunc) {
-             HDMI_IN_TRACE(("%s - invoking dsHdmiInRegisterSignalChangeCB()\n", __PRETTY_FUNCTION__));
              signalChangeCBFunc(_dsHdmiInSignalChangeCB);
         }
 
@@ -244,12 +219,10 @@ IARM_Result_t _dsHdmiInInit(void *arg)
         }
 
         if(statusChangeCBFunc) {
-             HDMI_IN_TRACE(("%s - invoking dsHdmiInRegisterStatusChangeCB()\n", __PRETTY_FUNCTION__));
              statusChangeCBFunc(_dsHdmiInStatusChangeCB);
         }
 
 #endif
-        HDMI_IN_TRACE(("%s - invoking IARM_Bus_RegisterCall()\n", __PRETTY_FUNCTION__));
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInTerm,                  _dsHdmiInTerm);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInGetNumberOfInputs,     _dsHdmiInGetNumberOfInputs);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInGetStatus,             _dsHdmiInGetStatus);
@@ -272,7 +245,6 @@ IARM_Result_t _dsHdmiInInit(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
@@ -280,7 +252,6 @@ IARM_Result_t _dsHdmiInInit(void *arg)
 IARM_Result_t _dsHdmiInTerm(void *arg)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> m_isPlatInitialized=%d\n", __PRETTY_FUNCTION__, m_isPlatInitialized));
 
     IARM_BUS_Lock(lock);
 #ifdef HAS_HDMI_IN_SUPPORT
@@ -289,14 +260,12 @@ IARM_Result_t _dsHdmiInTerm(void *arg)
         m_isPlatInitialized--;
         if (!m_isPlatInitialized)
         {
-            HDMI_IN_TRACE(("%s - invoking dsHdmiInTerm()\n", __PRETTY_FUNCTION__));
             dsHdmiInTerm();
         }
     }
 #endif
     IARM_BUS_Unlock(lock);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
@@ -304,7 +273,6 @@ IARM_Result_t _dsHdmiInTerm(void *arg)
 IARM_Result_t _dsHdmiInGetNumberOfInputs(void *arg)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsHdmiInGetNumberOfInputsParam_t *param = (dsHdmiInGetNumberOfInputsParam_t *)arg;
 
@@ -317,14 +285,12 @@ IARM_Result_t _dsHdmiInGetNumberOfInputs(void *arg)
     #endif
     IARM_BUS_Unlock(lock);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsHdmiInGetStatus(void *arg)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsHdmiInGetStatusParam_t *param= (dsHdmiInGetStatusParam_t *)arg;
 
@@ -338,14 +304,12 @@ IARM_Result_t _dsHdmiInGetStatus(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsHdmiInSelectPort(void *arg)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsHdmiInSelectPortParam_t *param = (dsHdmiInSelectPortParam_t *)arg;
 
@@ -359,19 +323,15 @@ IARM_Result_t _dsHdmiInSelectPort(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsHdmiInScaleVideo(void *arg)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     IARM_BUS_Lock(lock);
     dsHdmiInScaleVideoParam_t *param = (dsHdmiInScaleVideoParam_t *)arg;
-    HDMI_IN_TRACE(("%s - x=%d, y=%d, width=%d, height=%d \n",
-                   __PRETTY_FUNCTION__, param->videoRect.x, param->videoRect.y, param->videoRect.width, param->videoRect.height));
 
 #ifdef HAS_HDMI_IN_SUPPORT
     param->result = dsHdmiInScaleVideo(param->videoRect.x, param->videoRect.y, param->videoRect.width, param->videoRect.height);
@@ -381,16 +341,12 @@ IARM_Result_t _dsHdmiInScaleVideo(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
-	return IARM_RESULT_SUCCESS;
+    return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsHdmiInSelectZoomMode(void *arg)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    IARM_BUS_Lock(lock);
     dsHdmiInSelectZoomModeParam_t *param = (dsHdmiInSelectZoomModeParam_t *)arg;
 
 #ifdef HAS_HDMI_IN_SUPPORT
@@ -401,14 +357,12 @@ IARM_Result_t _dsHdmiInSelectZoomMode(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
-	return IARM_RESULT_SUCCESS;
+    return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsHdmiInPauseAudio(void *arg)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     IARM_BUS_Lock(lock);
     dsError_t *param = (dsError_t *)arg;
@@ -421,14 +375,12 @@ IARM_Result_t _dsHdmiInPauseAudio(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
-	return IARM_RESULT_SUCCESS;
+    return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsHdmiInResumeAudio(void *arg)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     IARM_BUS_Lock(lock);
     dsError_t *param = (dsError_t *)arg;
@@ -441,14 +393,12 @@ IARM_Result_t _dsHdmiInResumeAudio(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
-	return IARM_RESULT_SUCCESS;
+    return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsHdmiInGetCurrentVideoMode(void *arg)
 {
     _DEBUG_ENTER();
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsHdmiInGetResolutionParam_t *param = (dsHdmiInGetResolutionParam_t *)arg;
 
@@ -462,16 +412,14 @@ IARM_Result_t _dsHdmiInGetCurrentVideoMode(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
 void _dsHdmiInConnectCB(dsHdmiInPort_t port, bool isPortConnected)
 {
     IARM_Bus_DSMgr_EventData_t hdmi_in_hpd_eventData;
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
     __TIMESTAMP(); 
-    INFO("HDMI In hotplug update!!!!!!..%d, %d\r\n", port, isPortConnected);
+    printf("%s:%d - HDMI In hotplug update!!!!!!..Port: %d, isPort: %d\r\n",__PRETTY_FUNCTION__,__LINE__, port, isPortConnected);
     hdmi_in_hpd_eventData.data.hdmi_in_connect.port = port;
     hdmi_in_hpd_eventData.data.hdmi_in_connect.isPortConnected = isPortConnected;
 			
@@ -480,15 +428,13 @@ void _dsHdmiInConnectCB(dsHdmiInPort_t port, bool isPortConnected)
 	                        (void *)&hdmi_in_hpd_eventData, 
 	                        sizeof(hdmi_in_hpd_eventData));
            
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
 }
 
 void _dsHdmiInSignalChangeCB(dsHdmiInPort_t port, dsHdmiInSignalStatus_t sigStatus)
 {
     IARM_Bus_DSMgr_EventData_t hdmi_in_sigStatus_eventData;
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
     __TIMESTAMP();
-    HDMI_IN_TRACE(("HDMI In signal status change update!!!!!! Port: %d, Signal Status: %d\r\n", port, sigStatus));
+    printf("%s:%d - HDMI In signal status change update!!!!!! Port: %d, Signal Status: %d\r\n", __PRETTY_FUNCTION__,__LINE__,port, sigStatus);
     hdmi_in_sigStatus_eventData.data.hdmi_in_sig_status.port = port;
     hdmi_in_sigStatus_eventData.data.hdmi_in_sig_status.status = sigStatus;
 
@@ -497,15 +443,13 @@ void _dsHdmiInSignalChangeCB(dsHdmiInPort_t port, dsHdmiInSignalStatus_t sigStat
 			        (void *)&hdmi_in_sigStatus_eventData,
 			        sizeof(hdmi_in_sigStatus_eventData));
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
 }
 
 void _dsHdmiInStatusChangeCB(dsHdmiInStatus_t inputStatus)
 {
     IARM_Bus_DSMgr_EventData_t hdmi_in_status_eventData;
-    HDMI_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
     __TIMESTAMP();
-    HDMI_IN_TRACE(("HDMI In status change update!!!!!! Port: %d, isPresented: %d\r\n", inputStatus.activeport, inputStatus.isPresented));
+    printf("%s:%d - HDMI In status change update!!!!!! Port: %d, isPresented: %d\r\n", __PRETTY_FUNCTION__,__LINE__, inputStatus.activePort, inputStatus.isPresented);
     hdmi_in_status_eventData.data.hdmi_in_status.port = inputStatus.activePort;
     hdmi_in_status_eventData.data.hdmi_in_status.isPresented = inputStatus.isPresented;
 
@@ -514,7 +458,6 @@ void _dsHdmiInStatusChangeCB(dsHdmiInStatus_t inputStatus)
                                 (void *)&hdmi_in_status_eventData,
                                 sizeof(hdmi_in_status_eventData));
 
-    HDMI_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
 }
 
 /** @} */

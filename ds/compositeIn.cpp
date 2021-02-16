@@ -63,13 +63,6 @@
 #include "dsCompositeIn.h"
 #include "dsUtl.h"
 
-// Enable for debug tracing
-// #define COMPOSITE_IN_DEBUG
-#ifdef COMPOSITE_IN_DEBUG
-   #define COMPOSITE_IN_TRACE( m ) printf m
-#else
-   #define COMPOSITE_IN_TRACE( m )
-#endif
 
 namespace device
 {
@@ -86,12 +79,7 @@ namespace device
  */
 CompositeInput::CompositeInput()
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInInit()\n", __PRETTY_FUNCTION__));
     dsCompositeInInit();
-
-    COMPOSITE_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -105,12 +93,7 @@ CompositeInput::CompositeInput()
  */
 CompositeInput::~CompositeInput()
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInTerm()\n", __PRETTY_FUNCTION__));
     dsCompositeInTerm();
-
-    COMPOSITE_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -125,11 +108,7 @@ CompositeInput::~CompositeInput()
 CompositeInput & CompositeInput::getInstance()
 {
     static CompositeInput _singleton;
-
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-    COMPOSITE_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
-
-	return _singleton;
+    return _singleton;
 }
 
 /**
@@ -143,21 +122,15 @@ CompositeInput & CompositeInput::getInstance()
  */
 uint8_t CompositeInput::getNumberOfInputs() const
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInGetNumberOfInputs()\n", __PRETTY_FUNCTION__));
-
     uint8_t numCompositeInputs;
     dsError_t eError = dsCompositeInGetNumberOfInputs (&numCompositeInputs);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        COMPOSITE_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
 
-    COMPOSITE_IN_TRACE(("%s <--- Number of inputs=%d\n", __PRETTY_FUNCTION__, numCompositeInputs));
     return (numCompositeInputs);
 }
 
@@ -173,19 +146,14 @@ uint8_t CompositeInput::getNumberOfInputs() const
  */
 bool CompositeInput::isPresented() const
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInGetStatus()\n", __PRETTY_FUNCTION__));
     dsCompositeInStatus_t Status;
     dsError_t eError = dsCompositeInGetStatus (&Status);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        COMPOSITE_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-    COMPOSITE_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 	return (Status.isPresented);
 }
 
@@ -201,19 +169,14 @@ bool CompositeInput::isPresented() const
  */
 bool CompositeInput::isActivePort(int8_t Port) const
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInGetStatus()\n", __PRETTY_FUNCTION__));
     dsCompositeInStatus_t Status;
     dsError_t eError = dsCompositeInGetStatus (&Status);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        COMPOSITE_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-    COMPOSITE_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 	return (Status.activePort == Port);
 }
 
@@ -229,19 +192,14 @@ bool CompositeInput::isActivePort(int8_t Port) const
  */
 int8_t CompositeInput::getActivePort() const
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInGetStatus()\n", __PRETTY_FUNCTION__));
     dsCompositeInStatus_t Status;
     dsError_t eError = dsCompositeInGetStatus (&Status);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        COMPOSITE_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-    COMPOSITE_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 	return (Status.activePort);
 }
 
@@ -257,19 +215,14 @@ int8_t CompositeInput::getActivePort() const
  */
 bool CompositeInput::isPortConnected(int8_t Port) const
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInGetStatus()\n", __PRETTY_FUNCTION__));
     dsCompositeInStatus_t Status;
     dsError_t eError =  dsCompositeInGetStatus (&Status);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        COMPOSITE_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-    COMPOSITE_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 	return (Status.isPortConnected[Port]);
 }
 
@@ -285,18 +238,13 @@ bool CompositeInput::isPortConnected(int8_t Port) const
  */
 void CompositeInput::selectPort (int8_t Port) const
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInSelectPort()\n", __PRETTY_FUNCTION__));
     dsError_t eError = dsCompositeInSelectPort ((dsCompositeInPort_t)Port);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        COMPOSITE_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-    COMPOSITE_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 /**
@@ -313,18 +261,13 @@ void CompositeInput::selectPort (int8_t Port) const
  */
 void CompositeInput::scaleVideo (int32_t x, int32_t y, int32_t width, int32_t height) const
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-
-    COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInScaleVideo(%d, %d, %d, %d)\n", __PRETTY_FUNCTION__, x, y, width, height));
     dsError_t eError = dsCompositeInScaleVideo (x, y, width, height);
 
 	// Throw an exception if there was an error
 	if (dsERR_NONE != eError)
 	{
-        COMPOSITE_IN_TRACE(("%s <--- exception error=%d \n", __PRETTY_FUNCTION__, eError));
 		throw Exception(eError);
 	}
-    COMPOSITE_IN_TRACE(("%s <--- \n", __PRETTY_FUNCTION__));
 }
 
 }

@@ -96,51 +96,33 @@ void _dsCompositeInConnectCB(dsCompositeInPort_t port, bool isPortConnected);
 #include "hostPersistence.hpp"
 #include <sstream>
 
-/* Enable for debug tracing */
-/* #define COMPOSITE_IN_DEBUG */
-#ifdef COMPOSITE_IN_DEBUG
-   #define COMPOSITE_IN_TRACE( m ) printf m
-#else
-   #define COMPOSITE_IN_TRACE( m )
-#endif
 
 using namespace std;
 
 
 IARM_Result_t dsCompositeInMgr_init()
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
-    COMPOSITE_IN_TRACE(("%s - invoking _dsCompositeInInit()\n", __PRETTY_FUNCTION__));
     _dsCompositeInInit(NULL);
-
-    COMPOSITE_IN_TRACE(("%s - invoking IARM_Bus_RegisterCall()\n", __PRETTY_FUNCTION__));
     IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsCompositeInInit, _dsCompositeInInit);
-
-    COMPOSITE_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
 
     return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t dsCompositeInMgr_term()
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
-    COMPOSITE_IN_TRACE(("%s - invoking _dsCompositeInTerm()\n", __PRETTY_FUNCTION__));
     _dsCompositeInTerm(NULL);
-
-    COMPOSITE_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsCompositeInInit(void *arg)
 {
-    COMPOSITE_IN_TRACE(("%s ---> m_isInitialized=%d, m_isPlatInitialized=%d \n",
-                   __PRETTY_FUNCTION__, m_isInitialized, m_isPlatInitialized));
+    printf("%s:%d ---> m_isInitialized=%d, m_isPlatInitialized=%d \n",
+                   __PRETTY_FUNCTION__,__LINE__, m_isInitialized, m_isPlatInitialized);
 
     IARM_BUS_Lock(lock);
 
-    INFO("<<<<< called _dsCompositeInInit >>>>>>>>\r\n");
 
 #ifdef HAS_COMPOSITE_IN_SUPPORT
     if (!m_isPlatInitialized)
@@ -162,7 +144,7 @@ IARM_Result_t _dsCompositeInInit(void *arg)
         }
 
         if(func) {
-              COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInInit()\n", __PRETTY_FUNCTION__));
+              printf("%s:%d - invoking dsCompositeInInit()\n", __PRETTY_FUNCTION__,__LINE__);
               func();
         }
     }
@@ -189,11 +171,10 @@ IARM_Result_t _dsCompositeInInit(void *arg)
         }
 
         if(cbfunc) {
-             COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInRegisterConnectCB()\n", __PRETTY_FUNCTION__));
+             printf("%s:%d - invoking dsCompositeInRegisterConnectCB()\n", __PRETTY_FUNCTION__,__LINE__);
              cbfunc(_dsCompositeInConnectCB);
         }
 #endif
-        COMPOSITE_IN_TRACE(("%s - invoking IARM_Bus_RegisterCall()\n", __PRETTY_FUNCTION__));
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsCompositeInTerm,                  _dsCompositeInTerm);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsCompositeInGetNumberOfInputs,     _dsCompositeInGetNumberOfInputs);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsCompositeInGetStatus,             _dsCompositeInGetStatus);
@@ -205,7 +186,6 @@ IARM_Result_t _dsCompositeInInit(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    COMPOSITE_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
@@ -213,7 +193,7 @@ IARM_Result_t _dsCompositeInInit(void *arg)
 IARM_Result_t _dsCompositeInTerm(void *arg)
 {
     _DEBUG_ENTER();
-    COMPOSITE_IN_TRACE(("%s ---> m_isPlatInitialized=%d\n", __PRETTY_FUNCTION__, m_isPlatInitialized));
+    printf("%s:%d ---> m_isPlatInitialized=%d\n", __PRETTY_FUNCTION__,__LINE__, m_isPlatInitialized);
 
     IARM_BUS_Lock(lock);
 #ifdef HAS_COMPOSITE_IN_SUPPORT
@@ -238,7 +218,7 @@ IARM_Result_t _dsCompositeInTerm(void *arg)
                 }
             }
             if(func) {
-                 COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInTerm()\n", __PRETTY_FUNCTION__));
+                 printf("%s:%d - invoking dsCompositeInTerm()\n", __PRETTY_FUNCTION__,__LINE__);
                  func();
             }
         }
@@ -246,7 +226,6 @@ IARM_Result_t _dsCompositeInTerm(void *arg)
 #endif
     IARM_BUS_Unlock(lock);
 
-    COMPOSITE_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
@@ -254,7 +233,6 @@ IARM_Result_t _dsCompositeInTerm(void *arg)
 IARM_Result_t _dsCompositeInGetNumberOfInputs(void *arg)
 {
     _DEBUG_ENTER();
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsCompositeInGetNumberOfInputsParam_t *param = (dsCompositeInGetNumberOfInputsParam_t *)arg;
 
@@ -277,22 +255,19 @@ IARM_Result_t _dsCompositeInGetNumberOfInputs(void *arg)
         }
     }
     if(func) {
-        COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInGetNumberOfInputs()\n", __PRETTY_FUNCTION__));
+        printf("%s:%d - invoking dsCompositeInGetNumberOfInputs()\n", __PRETTY_FUNCTION__,__LINE__);
         param->result = func(&param->numCompositeInputs);
     }
 #else
     param->result = dsERR_GENERAL;
     #endif
     IARM_BUS_Unlock(lock);
-
-    COMPOSITE_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsCompositeInGetStatus(void *arg)
 {
     _DEBUG_ENTER();
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsCompositeInGetStatusParam_t *param= (dsCompositeInGetStatusParam_t *)arg;
 
@@ -315,7 +290,7 @@ IARM_Result_t _dsCompositeInGetStatus(void *arg)
         }
     }
     if(func) {
-        COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInGetStatus()\n", __PRETTY_FUNCTION__));
+        printf("%s:%d - invoking dsCompositeInGetStatus()\n", __PRETTY_FUNCTION__,__LINE__);
         param->result = func(&param->status);
     }
 #else
@@ -324,14 +299,12 @@ IARM_Result_t _dsCompositeInGetStatus(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    COMPOSITE_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsCompositeInSelectPort(void *arg)
 {
     _DEBUG_ENTER();
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsCompositeInSelectPortParam_t *param = (dsCompositeInSelectPortParam_t *)arg;
 
@@ -354,7 +327,7 @@ IARM_Result_t _dsCompositeInSelectPort(void *arg)
         }
     }
     if(func) {
-        COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInSelectPort()\n", __PRETTY_FUNCTION__));
+        printf("%s:%d - invoking dsCompositeInSelectPort()\n", __PRETTY_FUNCTION__,__LINE__);
         param->result = func(param->port);
     }
 #else
@@ -363,19 +336,15 @@ IARM_Result_t _dsCompositeInSelectPort(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    COMPOSITE_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
     return IARM_RESULT_SUCCESS;
 }
 
 IARM_Result_t _dsCompositeInScaleVideo(void *arg)
 {
     _DEBUG_ENTER();
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     IARM_BUS_Lock(lock);
     dsCompositeInScaleVideoParam_t *param = (dsCompositeInScaleVideoParam_t *)arg;
-    COMPOSITE_IN_TRACE(("%s - x=%d, y=%d, width=%d, height=%d \n",
-                   __PRETTY_FUNCTION__, param->videoRect.x, param->videoRect.y, param->videoRect.width, param->videoRect.height));
 
 #ifdef HAS_COMPOSITE_IN_SUPPORT
     typedef dsError_t (*dsCompositeInScaleVideo_t)(int32_t , int32_t , int32_t , int32_t);
@@ -395,7 +364,7 @@ IARM_Result_t _dsCompositeInScaleVideo(void *arg)
     }
 
     if(func) {
-        COMPOSITE_IN_TRACE(("%s - invoking dsCompositeInScaleVideo()\n", __PRETTY_FUNCTION__));
+        printf("%s:%d - invoking dsCompositeInScaleVideo()\n", __PRETTY_FUNCTION__,__LINE__);
         param->result = func(param->videoRect.x, param->videoRect.y, param->videoRect.width, param->videoRect.height);
     }
 #else
@@ -404,7 +373,6 @@ IARM_Result_t _dsCompositeInScaleVideo(void *arg)
 
     IARM_BUS_Unlock(lock);
 
-    COMPOSITE_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
 	return IARM_RESULT_SUCCESS;
 }
 
@@ -412,9 +380,8 @@ IARM_Result_t _dsCompositeInScaleVideo(void *arg)
 void _dsCompositeInConnectCB(dsCompositeInPort_t port, bool isPortConnected)
 {
     IARM_Bus_DSMgr_EventData_t composite_in_hpd_eventData;
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
     __TIMESTAMP();
-    COMPOSITE_IN_TRACE(("COMPOSITE In hotplug update!!!!!!..%d, %d\r\n", port, isPortConnected));
+    printf("%s:%d - COMPOSITE In hotplug update!!!!!!..%d, %d\r\n",__PRETTY_FUNCTION__,__LINE__, port, isPortConnected);
     composite_in_hpd_eventData.data.composite_in_connect.port = port;
     composite_in_hpd_eventData.data.composite_in_connect.isPortConnected = isPortConnected;
 
@@ -423,7 +390,6 @@ void _dsCompositeInConnectCB(dsCompositeInPort_t port, bool isPortConnected)
 	                        (void *)&composite_in_hpd_eventData,
 	                        sizeof(composite_in_hpd_eventData));
 
-    COMPOSITE_IN_TRACE(("%s <-- \n", __PRETTY_FUNCTION__));
 }
 
 /** @} */

@@ -54,18 +54,9 @@
 #include "libIARM.h"
 #include "libIBus.h"
 
-/* Enable for debug tracing */
-/* #define COMPOSITE_IN_DEBUG */
-#ifdef COMPOSITE_IN_DEBUG
-   #define COMPOSITE_IN_TRACE( m ) printf m
-#else
-   #define COMPOSITE_IN_TRACE( m )
-#endif
 
 dsError_t dsCompositeInInit (void)
 {
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
-    COMPOSITE_IN_TRACE(("<<<<< COMPOSITE In is initialized in Multi-App Mode >>>>>>>>\r\n"));
 
     IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
 
@@ -76,11 +67,11 @@ dsError_t dsCompositeInInit (void)
 
 	if (IARM_RESULT_SUCCESS == rpcRet)
 	{
-        COMPOSITE_IN_TRACE(("%s <--- dsERR_NONE\n", __PRETTY_FUNCTION__));
+        printf("%s:%d - dsERR_NONE\n", __PRETTY_FUNCTION__,__LINE__);
 		return dsERR_NONE;
 	}
 
-    COMPOSITE_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
@@ -88,7 +79,6 @@ dsError_t dsCompositeInInit (void)
 dsError_t dsCompositeInTerm (void)
 {
     _DEBUG_ENTER();
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
@@ -98,11 +88,11 @@ dsError_t dsCompositeInTerm (void)
 
 	if (IARM_RESULT_SUCCESS == rpcRet)
 	{
-        COMPOSITE_IN_TRACE(("%s <--- dsERR_NONE\n", __PRETTY_FUNCTION__));
+        printf("%s:%d - dsERR_NONE\n", __PRETTY_FUNCTION__,__LINE__);
 		return dsERR_NONE;
 	}
 
-    COMPOSITE_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL ;
 }
 
@@ -112,7 +102,6 @@ dsError_t dsCompositeInGetNumberOfInputs (uint8_t *pNumCompositeInputs)
     _DEBUG_ENTER();
     _RETURN_IF_ERROR(pNumCompositeInputs != NULL, dsERR_INVALID_PARAM);
 
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsCompositeInGetNumberOfInputsParam_t param;
     param.numCompositeInputs = 0;
@@ -127,11 +116,11 @@ dsError_t dsCompositeInGetNumberOfInputs (uint8_t *pNumCompositeInputs)
     if (IARM_RESULT_SUCCESS == rpcRet)
     {
         *pNumCompositeInputs = param.numCompositeInputs;
-        COMPOSITE_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param.result));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param.result);
         return param.result;
 	}
 
-    COMPOSITE_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
@@ -140,7 +129,6 @@ dsError_t dsCompositeInGetStatus (dsCompositeInStatus_t *pStatus)
     _DEBUG_ENTER();
     _RETURN_IF_ERROR(pStatus != NULL, dsERR_INVALID_PARAM);
 
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsCompositeInGetStatusParam_t param;
     memset (&param, 0, sizeof(param));
@@ -155,18 +143,17 @@ dsError_t dsCompositeInGetStatus (dsCompositeInStatus_t *pStatus)
     if (IARM_RESULT_SUCCESS == rpcRet)
     {
         *pStatus = param.status;
-        COMPOSITE_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param.result));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param.result);
         return param.result;
 	}
 
-    COMPOSITE_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
 dsError_t dsCompositeInSelectPort (dsCompositeInPort_t ePort)
 {
     _DEBUG_ENTER();
-    COMPOSITE_IN_TRACE(("%s ---> \n", __PRETTY_FUNCTION__));
 
     dsCompositeInSelectPortParam_t param;
     param.port = ePort;
@@ -180,18 +167,17 @@ dsError_t dsCompositeInSelectPort (dsCompositeInPort_t ePort)
 
     if (IARM_RESULT_SUCCESS == rpcRet)
     {
-        COMPOSITE_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param.result));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param.result);
         return param.result;
 	}
 
-    COMPOSITE_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
 dsError_t dsCompositeInScaleVideo (int32_t x, int32_t y, int32_t width, int32_t height)
 {
     _DEBUG_ENTER();
-    COMPOSITE_IN_TRACE(("%s ---> x=%d, y=%d, width=%d, height=%d\n", __PRETTY_FUNCTION__, x, y, width, height));
 
     dsCompositeInScaleVideoParam_t param;
     param.videoRect.x      = x;
@@ -207,11 +193,11 @@ dsError_t dsCompositeInScaleVideo (int32_t x, int32_t y, int32_t width, int32_t 
 
 	if (IARM_RESULT_SUCCESS == rpcRet)
 	{
-        COMPOSITE_IN_TRACE(("%s <--- %d\n", __PRETTY_FUNCTION__, param.result));
+        printf("%s:%d - %d\n", __PRETTY_FUNCTION__,__LINE__, param.result);
         return param.result;
 	}
 
-    COMPOSITE_IN_TRACE(("%s <--- dsERR_GENERAL\n", __PRETTY_FUNCTION__));
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
 	return dsERR_GENERAL;
 }
 
