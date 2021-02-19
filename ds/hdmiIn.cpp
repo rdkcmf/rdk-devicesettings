@@ -435,11 +435,15 @@ static std::string getInterlacedStr (bool interlaced)
 
 static std::string CreateResolutionStr (const dsVideoPortResolution_t &resolution)
 {
-    std::string resolutionStr = getResolutionStr(resolution.pixelResolution) +
+    printf("%s ---> \n", __PRETTY_FUNCTION__);
+
+    std::string resolutionStr = getResolutionStr(resolution.pixelResolution);
+    if(resolutionStr.compare("unknown") != 0){
+    	resolutionStr = getResolutionStr(resolution.pixelResolution) +
                                 getInterlacedStr(resolution.interlaced) +
                                 getFrameRateStr(resolution.frameRate);
-
-    printf ("%s:%d - ResolutionStr: %s\n", __PRETTY_FUNCTION__,__LINE__, resolutionStr.c_str());
+    }
+    printf ("%s <--- %s\n", __PRETTY_FUNCTION__, resolutionStr.c_str());
     return resolutionStr;
 }
 
