@@ -49,6 +49,7 @@
 #define _DS_HDMIIN_HPP_
 
 #include <stdint.h>
+#include <vector>
 
 /**
  * @file hdmiIn.hpp
@@ -83,6 +84,7 @@ public:
     void    pauseAudio               () const;
     void    resumeAudio              () const;
     std::string  getCurrentVideoMode () const;
+    void getEDIDBytesInfo (int iHdmiPort, std::vector<uint8_t> &edid) const;
     
 private:
     HdmiInput ();           /* default constructor */

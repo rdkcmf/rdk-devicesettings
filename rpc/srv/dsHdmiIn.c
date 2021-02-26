@@ -97,6 +97,7 @@ IARM_Result_t _dsHdmiInSelectZoomMode(void *arg);
 IARM_Result_t _dsHdmiInPauseAudio(void *arg);
 IARM_Result_t _dsHdmiInResumeAudio(void *arg);
 IARM_Result_t _dsHdmiInGetCurrentVideoMode(void *arg);
+IARM_Result_t _dsGetEDIDBytesInfo (void *arg);
 
 void _dsHdmiInConnectCB(dsHdmiInPort_t port, bool isPortConnected);
 void _dsHdmiInSignalChangeCB(dsHdmiInPort_t port, dsHdmiInSignalStatus_t sigStatus);
@@ -118,8 +119,8 @@ static dsError_t isHdmiARCPort (int iPort, bool* isArcEnabled) {
     typedef bool (*dsIsHdmiARCPort_t)(int iPortArg);
     static dsIsHdmiARCPort_t dsIsHdmiARCPortFunc = 0;
     if (dsIsHdmiARCPortFunc == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
+       void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+       if (dllib) {
             dsIsHdmiARCPortFunc = (dsIsHdmiARCPort_t) dlsym(dllib, "dsIsHdmiARCPort");
             if(dsIsHdmiARCPortFunc == 0) {
                 printf("%s:%d dsIsHdmiARCPort (int) is not defined %s\r\n", __FUNCTION__,__LINE__, dlerror());
@@ -142,6 +143,39 @@ static dsError_t isHdmiARCPort (int iPort, bool* isArcEnabled) {
     }
     else {
         printf("%s: dsIsHdmiARCPort  dsIsHdmiARCPortFunc = %p\n", dsIsHdmiARCPortFunc);
+    }
+    return eRet;
+}
+
+static dsError_t getEDIDBytesInfo (int iHdmiPort, unsigned char **edid, int *length) {
+    dsError_t eRet = dsERR_GENERAL;
+    typedef dsError_t (*dsGetEDIDBytesInfo_t)(int iHdmiPort, unsigned char **edid, int *length);
+    static dsGetEDIDBytesInfo_t dsGetEDIDBytesInfoFunc = 0;
+    if (dsGetEDIDBytesInfoFunc == 0) {
+       void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+       if (dllib) {
+            dsGetEDIDBytesInfoFunc = (dsGetEDIDBytesInfo_t) dlsym(dllib, "dsGetEDIDBytesInfo");
+            if(dsGetEDIDBytesInfoFunc == 0) {
+                printf("%s:%d dsGetEDIDBytesInfo (int) is not defined %s\r\n", __FUNCTION__,__LINE__, dlerror());
+                eRet = dsERR_GENERAL;
+            }
+            else {
+                printf("%s:%d dsGetEDIDBytesInfoFunc loaded\r\n", __FUNCTION__,__LINE__);
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("%s:%d dsGetEDIDBytesInfo  Opening RDK_DSHAL_NAME [%] failed %s\r\n",
+                   __FUNCTION__,__LINE__, RDK_DSHAL_NAME, dlerror());
+            eRet = dsERR_GENERAL;
+        }
+    }
+    if (0 != dsGetEDIDBytesInfoFunc) {
+        eRet = dsGetEDIDBytesInfoFunc (iHdmiPort, edid, length);
+        printf("[srv] %s: dsGetEDIDBytesInfoFunc eRet: %d data len: %d \r\n", __FUNCTION__,eRet, *length);
+    }
+    else {
+        printf("%s:  dsIsHdmiARCPortFunc = %p\n", __FUNCTION__, dsGetEDIDBytesInfoFunc);
     }
     return eRet;
 }
@@ -232,6 +266,7 @@ IARM_Result_t _dsHdmiInInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInPauseAudio,            _dsHdmiInPauseAudio);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInResumeAudio,           _dsHdmiInResumeAudio);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInGetCurrentVideoMode,   _dsHdmiInGetCurrentVideoMode);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetEDIDBytesInfo,              _dsGetEDIDBytesInfo);
 
         int itr = 0;
         bool isARCCapable = false;
@@ -458,6 +493,19 @@ void _dsHdmiInStatusChangeCB(dsHdmiInStatus_t inputStatus)
                                 (void *)&hdmi_in_status_eventData,
                                 sizeof(hdmi_in_status_eventData));
 
+}
+
+IARM_Result_t _dsGetEDIDBytesInfo (void *arg) {
+    dsError_t eRet = dsERR_GENERAL;
+    dsGetEDIDBytesInfoParam_t *param = (dsGetEDIDBytesInfoParam_t *) arg;
+    memset (param->edid, '\0', MAX_EDID_BYTES_LEN);
+    unsigned char *edidArg = NULL;
+    IARM_BUS_Lock(lock);
+    eRet = getEDIDBytesInfo (param->iHdmiPort, (unsigned char **)(&edidArg), &(param->length));
+    memcpy(param->edid, edidArg, param->length);
+    param->result = eRet;
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
 }
 
 /** @} */

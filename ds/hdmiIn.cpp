@@ -64,7 +64,7 @@
 #include "dsTypes.h"
 #include "dsHdmiIn.h"
 #include "dsUtl.h"
-
+#include "edid-parser.hpp"
 
 namespace device 
 {
@@ -475,6 +475,46 @@ std::string HdmiInput::getCurrentVideoMode () const
     return resolutionStr;
 }
 
+void HdmiInput::getEDIDBytesInfo (int iHdmiPort, std::vector<uint8_t> &edidArg) const
+{
+
+    printf("HdmiInput::getEDIDBytesInfo \r\n");
+
+    dsError_t ret = dsERR_NONE;
+    int length = 0;
+    unsigned char* edid = NULL;
+
+    const char* exceptionstr = "";
+    ret = dsGetEDIDBytesInfo (iHdmiPort, (unsigned char**)(&edid), &length);
+    if (NULL == edid) {
+        printf("HdmiInput::getEDIDBytesInfo dsGetEDIDBytesInfo returned NULL \r\n");
+        exceptionstr = "EDID is NULL";
+        ret = dsERR_GENERAL;
+    }
+
+    printf("HdmiInput::getEDIDBytesInfo has ret %d\r\n", ret);
+    if (ret == dsERR_NONE) {
+        if (length <= MAX_EDID_BYTES_LEN) {
+            printf("HdmiInput::getEDIDBytesInfo has %d bytes\r\n", length);
+            if (edid_parser::EDID_STATUS_OK == edid_parser::EDID_Verify(edid, length)) {
+                edidArg.clear();
+                edidArg.insert(edidArg.begin(), edid, edid + length);
+            } else {
+                ret = dsERR_GENERAL;
+                exceptionstr = "EDID verification failed";
+            }
+        } else {
+            ret = dsERR_OPERATION_NOT_SUPPORTED;
+            exceptionstr = "EDID length > MAX_EDID_BYTES_LEN";
+        }
+    } else {
+        exceptionstr = "dsGetEDIDBytesInfo failed";
+    }
+
+    if (ret != dsERR_NONE) {
+        throw Exception(ret, exceptionstr);
+    }
+}
 
 }
 

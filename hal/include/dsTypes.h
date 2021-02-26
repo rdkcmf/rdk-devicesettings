@@ -791,6 +791,8 @@ typedef enum __dsFPDMode_t{
 
 #define dsEEDID_MAX_MON_NAME_LENGTH        14    /**< Maximum Length of Connected Display Monitor Name . */
 
+#define MAX_EDID_BYTES_LEN  (1024)
+
 /**
  * @ingroup DSHAL_DISPLAY_TYPES
  * @brief Defines the structure that is used to get the EDID information of the video display.

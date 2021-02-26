@@ -293,5 +293,32 @@ dsError_t dsHdmiInGetCurrentVideoMode (dsVideoPortResolution_t *resolution)
 	return dsERR_GENERAL;
 }
 
+dsError_t dsGetEDIDBytesInfo (int iHdmiPort, unsigned char **edid, int *length)
+{
+    _DEBUG_ENTER();
+    _RETURN_IF_ERROR(edid != NULL, dsERR_INVALID_PARAM);
+    _RETURN_IF_ERROR(length != NULL, dsERR_INVALID_PARAM);
+
+
+    dsGetEDIDBytesInfoParam_t param;
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+    param.iHdmiPort = iHdmiPort;
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *)IARM_BUS_DSMGR_API_dsGetEDIDBytesInfo,
+                            (void *)&param,
+                            sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+        *length = param.length;
+        *edid = param.edid;
+        printf("[cli] %s: dsGetEDIDBytesInfo eRet: %d data len: %d \r\n", __FUNCTION__, param.result, *length);
+        return param.result;
+    }
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
+    return dsERR_GENERAL;
+}
+
+
 /** @} */
 /** @} */

@@ -210,6 +210,7 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsHdmiInPauseAudio           "dsHdmiInPauseAudio"
 #define IARM_BUS_DSMGR_API_dsHdmiInResumeAudio          "dsHdmiInResumeAudio"
 #define IARM_BUS_DSMGR_API_dsHdmiInGetCurrentVideoMode  "dsHdmiInGetCurrentVideoMode"
+#define IARM_BUS_DSMGR_API_dsGetEDIDBytesInfo             "dsGetEDIDBytesInfo"
 
 /*
  * Declare RPC COMPOSITE INPUT API names
@@ -786,6 +787,14 @@ typedef struct _dsAudioOutIsConnectedParam_t
     int                     handle;
     bool                    isCon;
 } dsAudioOutIsConnectedParam_t;
+
+typedef struct _dsGetEDIDBytesInfoParam_t
+{
+    dsError_t               result;
+    int                     iHdmiPort;
+    unsigned char           edid [MAX_EDID_BYTES_LEN];
+    int                     length;
+}dsGetEDIDBytesInfoParam_t;
 
 
 #ifdef __cplusplus
