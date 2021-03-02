@@ -104,7 +104,7 @@ static   dsFPDColorConfig_t  kIndicatorColors[dsFPD_COLOR_MAX] = {
 
 };
 
-static const dsFPDIndicatorConfig_t kIndicators[dsFPD_INDICATOR_MAX] = {
+static const dsFPDIndicatorConfig_t kIndicators[] = {
 	{
 		/*.id = */ 			dsFPD_INDICATOR_MESSAGE,
 		/*.supportedColors = */ kIndicatorColors,
@@ -145,15 +145,6 @@ static const dsFPDIndicatorConfig_t kIndicators[dsFPD_INDICATOR_MAX] = {
         /*.levels          = */ _DEFAULT_LEVELS,
         /*.colorMode       = */ _DEFAULT_COLOR_MODE,
 
-	},
-	{
-		/*.id = */ 				dsFPD_INDICATOR_RFBYPASS,
-		/*.supportedColors = */ kIndicatorColors,
-		/*.maxBrightness   = */ _MAX_BRIGHTNESS,
-		/*.maxCycleRate   = */  _MAX_CYCLERATE,
-		/*.minBrightness   = */ _MIN_BRIGHTNESS,
-        /*.levels          = */ _DEFAULT_LEVELS,
-        /*.colorMode       = */ _DEFAULT_COLOR_MODE,
 	},
 };
 
