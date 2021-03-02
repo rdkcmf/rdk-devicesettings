@@ -1611,7 +1611,27 @@ IARM_Result_t _dsSetAudioMute(void *arg)
 
     dsAudioSetMutedParam_t *param = (dsAudioSetMutedParam_t *)arg;
     ret = dsSetAudioMute(param->handle, param->mute);
-    if(ret == dsERR_NONE) {
+    if (ret == dsERR_NONE) {
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+            std::string _mute = param->mute ? "TRUE" : "FALSE";
+            dsAudioPortType_t _APortType = _GetAudioPortType(param->handle);
+            switch(_APortType) {
+                case dsAUDIOPORT_TYPE_SPDIF:
+                    printf("%s: port: %s , persist audio mute: %s\n",__func__,"SPDIF0", param->mute ? "TRUE" : "FALSE");
+                    device::HostPersistence::getInstance().persistHostProperty("SPDIF0.audio.mute", _mute);
+                    break;
+                case dsAUDIOPORT_TYPE_HDMI:
+                    printf("%s: port: %s , persist audio mute: %s\n",__func__,"HDMI0", param->mute ? "TRUE" : "FALSE");
+                    device::HostPersistence::getInstance().persistHostProperty("HDMI0.audio.mute", _mute);
+                    break;
+                case dsAUDIOPORT_TYPE_SPEAKER:
+                    printf("%s: port: %s , persist audio mute: %s\n",__func__,"SPEAKER0", param->mute ? "TRUE" : "FALSE");
+                    device::HostPersistence::getInstance().persistHostProperty("SPEAKER0.audio.mute", _mute);
+                    break;
+                default:
+                    break;
+            }
+#endif
         result = IARM_RESULT_SUCCESS;
     }
 
@@ -1635,6 +1655,37 @@ IARM_Result_t _dsIsAudioMute(void *arg)
     dsError_t ret = dsIsAudioMute(param->handle, &muted);
     if (ret == dsERR_NONE) {
         param->mute = muted;
+
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+        std::string isMuteKey("");
+        std::string _mute("FALSE");
+        dsAudioPortType_t _APortType = _GetAudioPortType(param->handle);
+            switch(_APortType) {
+                case dsAUDIOPORT_TYPE_SPDIF:
+                    isMuteKey.append("SPDIF0.audio.mute");
+                    break;
+                case dsAUDIOPORT_TYPE_HDMI:
+                    isMuteKey.append("HDMI0.audio.mute");
+                    break;
+                case dsAUDIOPORT_TYPE_SPEAKER:
+                    isMuteKey.append("SPEAKER0.audio.mute");
+                    break;
+                default:
+                    break;
+            }
+        try {
+            _mute = device::HostPersistence::getInstance().getProperty(isMuteKey);
+        }
+        catch(...) {
+            printf("%s : Exception in getting the %s from persistence storage\n", __FUNCTION__, isMuteKey.c_str());
+            _mute = "FALSE";
+        }
+        if ("TRUE" == _mute) {
+            param->mute = true;
+        }
+        printf("%s: persist value:%s for :%s\n", __FUNCTION__, _mute.c_str(), isMuteKey.c_str());
+#endif //DS_AUDIO_SETTINGS_PERSISTENCE end
+
         result = IARM_RESULT_SUCCESS;
     }
 
