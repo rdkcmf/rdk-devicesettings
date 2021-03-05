@@ -308,12 +308,17 @@ IARM_Result_t _dsFPTerm(void *arg)
 IARM_Result_t _dsSetFPText(void *arg)
 {
     _DEBUG_ENTER();
-    
+   
+    IARM_Result_t ret = IARM_RESULT_SUCCESS; 
      #ifdef HAS_CLOCK_DISPLAY
     IARM_BUS_Lock(lock);
 
     if ((_dsFPDMode  == dsFPD_MODE_ANY) || (_dsFPDMode  == dsFPD_MODE_TEXT)) {
-	dsSetFPText((char *) arg);
+	dsError_t dsStatus = dsSetFPText((char *) arg);
+        if(dsStatus != dsERR_NONE)
+        {
+            ret = IARM_RESULT_INVALID_PARAM;
+        }
     }
     else {
        INFO("_dsSetFPText: Not setting Text, Clock mode enabled \r\n");
@@ -322,19 +327,24 @@ IARM_Result_t _dsSetFPText(void *arg)
     IARM_BUS_Unlock(lock);
     #endif
 	
-	return IARM_RESULT_SUCCESS;
+	return ret;
 }
 
 IARM_Result_t _dsSetFPTime(void *arg)
 {
     _DEBUG_ENTER();
-    
+   
+    IARM_Result_t ret = IARM_RESULT_SUCCESS; 
     #ifdef HAS_CLOCK_DISPLAY
     IARM_BUS_Lock(lock);
 
     if ((_dsFPDMode  == dsFPD_MODE_ANY) || (_dsFPDMode  == dsFPD_MODE_CLOCK)) {
 	dsFPDTimeParam_t *param = (dsFPDTimeParam_t *)arg;
-        dsSetFPTime(_dsTextTimeFormat, param->nHours, param->nMinutes);
+        dsError_t dsStatus = dsSetFPTime(_dsTextTimeFormat, param->nHours, param->nMinutes);
+        if(dsStatus != dsERR_NONE)
+        {
+            ret = IARM_RESULT_INVALID_PARAM;
+        }
     }
     else {
        INFO("_dsSetFPTime: Not setting Clock, Text mode enabled \r\n");
@@ -343,35 +353,45 @@ IARM_Result_t _dsSetFPTime(void *arg)
     IARM_BUS_Unlock(lock);
     #endif
 	
-	return IARM_RESULT_SUCCESS;
+	return ret;
 }
 
 IARM_Result_t _dsSetFPScroll(void *arg)
 {
     _DEBUG_ENTER();
    	
+    IARM_Result_t ret = IARM_RESULT_SUCCESS;
    	#ifdef HAS_CLOCK_DISPLAY
     IARM_BUS_Lock(lock);
 
 	dsFPDScrollParam_t *param = (dsFPDScrollParam_t *)arg;
-    dsSetFPScroll(param->nScrollHoldOnDur, param->nHorzScrollIterations, param->nVertScrollIterations);
+    dsError_t dsStatus = dsSetFPScroll(param->nScrollHoldOnDur, param->nHorzScrollIterations, param->nVertScrollIterations);
+    if(dsStatus != dsERR_NONE)
+    {
+        ret = IARM_RESULT_INVALID_PARAM;
+    }
 
     IARM_BUS_Unlock(lock);
     #endif
 
-	return IARM_RESULT_SUCCESS;
+	return ret;
 }
 
 IARM_Result_t _dsSetFPBlink(void *arg)
 {
     _DEBUG_ENTER();
+    IARM_Result_t ret = IARM_RESULT_SUCCESS;
     IARM_BUS_Lock(lock);
 
 	dsFPDBlinkParam_t *param = (dsFPDBlinkParam_t *)arg;
-    dsSetFPBlink(param->eIndicator, param->nBlinkDuration, param->nBlinkIterations);
+    dsError_t dsStatus = dsSetFPBlink(param->eIndicator, param->nBlinkDuration, param->nBlinkIterations);
+    if(dsStatus != dsERR_NONE)
+    {
+        ret = IARM_RESULT_INVALID_PARAM;
+    }
 
     IARM_BUS_Unlock(lock);
-	return IARM_RESULT_SUCCESS;
+	return ret;
 }
 
 IARM_Result_t _dsGetFPBrightness(void *arg)
@@ -401,6 +421,7 @@ IARM_Result_t _dsGetFPBrightness(void *arg)
 IARM_Result_t _dsSetFPBrightness(void *arg)
 {
     _DEBUG_ENTER();
+    IARM_Result_t ret = IARM_RESULT_SUCCESS;
     IARM_BUS_Lock(lock);
 
 	dsFPDBrightParam_t *param = (dsFPDBrightParam_t *)arg;
@@ -408,10 +429,12 @@ IARM_Result_t _dsSetFPBrightness(void *arg)
 	
 	if (param->eBrightness <= dsFPD_BRIGHTNESS_MAX)
     {
-		dsSetFPBrightness(param->eIndicator, param->eBrightness);
-		srvFPDSettings[param->eIndicator].brightness = param->eBrightness;
+		dsError_t dsStatus = dsSetFPBrightness(param->eIndicator, param->eBrightness);
+                if(dsStatus == dsERR_NONE)
+                {
+		    srvFPDSettings[param->eIndicator].brightness = param->eBrightness;
 
-		try{
+		    try{
 			switch (param->eIndicator)
 			{
 				case dsFPD_INDICATOR_POWER:
@@ -435,18 +458,27 @@ IARM_Result_t _dsSetFPBrightness(void *arg)
 					break;
 				}
 			}
-		}
-		catch(...)
-		{
+		    }    
+		    catch(...)
+		    {
 			ERROR("Error in Persisting the Power Brightness Value \r\n");
-		}
+		    }
+                }
+                else
+                {
+                    ret = IARM_RESULT_INVALID_PARAM;
+                }
 
 	}
+        else
+        {
+            ret = IARM_RESULT_INVALID_PARAM;
+        }
 	//printf("_dsSetFPBrightness Power Brighnes is %d \r\n",_dsPowerBrightness);
 	//printf("_dsSetFPBrightness Text Brighnes is %d \r\n",_dsTextBrightness);
 
     IARM_BUS_Unlock(lock);
-	return IARM_RESULT_SUCCESS;
+	return ret;
 }
 
 
@@ -472,6 +504,7 @@ IARM_Result_t _dsGetFPTextBrightness(void *arg)
 IARM_Result_t _dsSetFPTextBrightness(void *arg)
 {
     _DEBUG_ENTER();
+    IARM_Result_t ret = IARM_RESULT_SUCCESS;
 	#ifdef HAS_CLOCK_DISPLAY
     IARM_BUS_Lock(lock);
 
@@ -480,9 +513,11 @@ IARM_Result_t _dsSetFPTextBrightness(void *arg)
 	
 	if (param->eBrightness <= dsFPD_BRIGHTNESS_MAX)
     {
-		dsSetFPTextBrightness(param->eIndicator, param->eBrightness);
-		try
-		{
+		dsError_t dsStatus = dsSetFPTextBrightness(param->eIndicator, param->eBrightness);
+                if(dsStatus == dsERR_NONE)
+                {
+		    try
+		    {
 			switch (param->eIndicator)
 			{
 				case dsFPD_TEXTDISP_TEXT:
@@ -497,18 +532,27 @@ IARM_Result_t _dsSetFPTextBrightness(void *arg)
 					break;
 				}
 			}
-		}
-		catch(...)
-		{
+		    }
+		    catch(...)
+		    {
 			ERROR("Error in Persisting the Text Brightness Value \r\n");
-		}
+		    }
+                }
+                else
+                {
+                    ret = IARM_RESULT_INVALID_PARAM;
+                }     
 		
 	}
+        else
+        {
+            ret = IARM_RESULT_INVALID_PARAM;
+        }
 	
 	IARM_BUS_Unlock(lock);
 
 	#endif
-	return IARM_RESULT_SUCCESS;
+	return ret;
 }
 
 
@@ -578,23 +622,30 @@ IARM_Result_t _dsSetFPColor(void *arg)
 IARM_Result_t _dsFPEnableCLockDisplay(void *arg)
 {
 
+    IARM_Result_t ret = IARM_RESULT_SUCCESS;
 #ifdef HAS_CLOCK_DISPLAY
 	IARM_BUS_Lock(lock);
 	int *enable = (int *)arg;
 	int lenable = *enable;
-    dsFPEnableCLockDisplay(lenable);
+    dsError_t dsStatus = dsFPEnableCLockDisplay(lenable);
+    if(dsStatus != dsERR_NONE)
+    {
+        ret = IARM_RESULT_INVALID_PARAM;
+    }
 	IARM_BUS_Unlock(lock);
 #endif
-	return IARM_RESULT_SUCCESS;
+	return ret;
 }
 
 
 IARM_Result_t _dsSetFPState(void *arg)
 {
     _DEBUG_ENTER();
+    IARM_Result_t ret = IARM_RESULT_SUCCESS;
     IARM_BUS_Lock(lock);
 
 	dsFPDStateParam_t *param = (dsFPDStateParam_t *)arg;
+        dsError_t dsStatus = dsERR_NONE;
 
 	if (param->state == dsFPD_STATE_ON)
     {
@@ -602,23 +653,37 @@ IARM_Result_t _dsSetFPState(void *arg)
 			* Power LED Indicator Brightness is the Global LED brightness
 			* for all indicators
 		*/
-		dsSetFPBrightness(param->eIndicator,_dsPowerBrightness);
-		if(param->eIndicator == dsFPD_INDICATOR_POWER)
+		dsStatus = dsSetFPBrightness(param->eIndicator,_dsPowerBrightness);
+                if(dsStatus == dsERR_NONE)
+                {
+		    if(param->eIndicator == dsFPD_INDICATOR_POWER)
 			INFO("_dsSetFPState Setting Power LED to ON with Brightness %d \r\n",_dsPowerBrightness);
 	
-		srvFPDSettings[param->eIndicator].state = param->state;
+		    srvFPDSettings[param->eIndicator].state = param->state;
+                }
+                else
+                {
+                    ret = IARM_RESULT_INVALID_PARAM;
+                }
 	}
 	else if (param->state == dsFPD_STATE_OFF)
 	{
-		dsSetFPBrightness(param->eIndicator,0);
-		if(param->eIndicator == dsFPD_INDICATOR_POWER)
+		dsStatus = dsSetFPBrightness(param->eIndicator,0);
+                if(dsStatus == dsERR_NONE)
+                {
+		    if(param->eIndicator == dsFPD_INDICATOR_POWER)
 			INFO("_dsSetFPState Setting Power LED to OFF with Brightness 0 \r\n");
 
-		srvFPDSettings[param->eIndicator].state = param->state;
+		    srvFPDSettings[param->eIndicator].state = param->state;
+                }
+                else
+                {
+                    ret = IARM_RESULT_INVALID_PARAM;
+                }
 	}
 
     IARM_BUS_Unlock(lock);
-	return IARM_RESULT_SUCCESS;
+	return ret;
 }
 
 

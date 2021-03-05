@@ -185,7 +185,10 @@ FrontPanelTextDisplay::~FrontPanelTextDisplay()
  */
 void FrontPanelTextDisplay::setText(const std::string &text)
 {
-    dsSetFPText(text.c_str());
+    dsError_t ret = dsSetFPText(text.c_str());
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
 }
 
 
@@ -199,7 +202,10 @@ void FrontPanelTextDisplay::setText(const std::string &text)
  */
 void FrontPanelTextDisplay::enableDisplay(const int enable)
 {
-	dsFPEnableCLockDisplay(enable);
+	dsError_t ret = dsFPEnableCLockDisplay(enable);
+        if (ret != dsERR_NONE) {
+            throw Exception(ret);
+        }
 }
 
 
@@ -213,8 +219,14 @@ void FrontPanelTextDisplay::enableDisplay(const int enable)
  */
 void FrontPanelTextDisplay::setTextBrightness(const int &brightness)
 {
-    dsSetFPTextBrightness((dsFPDTextDisplay_t)_id, brightness);
-    _TextBrightness = brightness;
+    dsError_t ret = dsSetFPTextBrightness((dsFPDTextDisplay_t)_id, brightness);
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+    else
+    {
+        _TextBrightness = brightness;
+    }
 }
 
 
@@ -227,8 +239,14 @@ void FrontPanelTextDisplay::setTextBrightness(const int &brightness)
 int FrontPanelTextDisplay::getTextBrightness()
 {
 	dsFPDBrightness_t brightness;
-	dsGetFPTextBrightness((dsFPDTextDisplay_t)_id,&brightness);
-	_TextBrightness = brightness;
+	dsError_t ret = dsGetFPTextBrightness((dsFPDTextDisplay_t)_id,&brightness);
+        if (ret != dsERR_NONE) {
+            throw Exception(ret);
+        }
+        else
+        {
+	    _TextBrightness = brightness;
+        }
 	return _TextBrightness;
 }
 
@@ -279,8 +297,14 @@ int  FrontPanelTextDisplay::getTextColorMode()
  */
 void FrontPanelTextDisplay::setScroll(const Scroll & scroll)
 {
-    dsSetFPScroll(scroll.getHoldDuration(), scroll.getHorizontalIteration(), scroll.getVerticalIteration());
-    _scroll = scroll;
+    dsError_t ret = dsSetFPScroll(scroll.getHoldDuration(), scroll.getHorizontalIteration(), scroll.getVerticalIteration());
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+    else
+    {
+        _scroll = scroll;
+    }
 }
 
 
@@ -295,8 +319,14 @@ void FrontPanelTextDisplay::setScroll(const Scroll & scroll)
 int FrontPanelTextDisplay::getCurrentTimeFormat ()  
 {
 	dsFPDTimeFormat_t timeFormat;
-	dsGetFPTimeFormat(&timeFormat);
-	_timeFormat = timeFormat;
+	dsError_t ret = dsGetFPTimeFormat(&timeFormat);
+        if (ret != dsERR_NONE) {
+            throw Exception(ret);
+        }
+        else
+        {
+	    _timeFormat = timeFormat;
+        }
 	return timeFormat;
 };
 
@@ -349,7 +379,10 @@ void FrontPanelTextDisplay::setTime(const int uiHours, const int uiMinutes)
         throw IllegalArgumentException();
     }
 
-    dsSetFPTime ((dsFPDTimeFormat_t)_timeFormat, uiHours, uiMinutes);
+    dsError_t ret = dsSetFPTime ((dsFPDTimeFormat_t)_timeFormat, uiHours, uiMinutes);
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
 }
 
 /**
@@ -368,7 +401,10 @@ void FrontPanelTextDisplay::setTime(const int uiHours, const int uiMinutes)
 void FrontPanelTextDisplay::setMode(int mode)
 {
     if ((mode == 0) || (mode == 1) || (mode == 2)) {
-        dsSetFPDMode ((dsFPDMode_t)mode);
+        dsError_t ret = dsSetFPDMode ((dsFPDMode_t)mode);
+        if (ret != dsERR_NONE) {
+            throw Exception(ret);
+        }
     }
     else
     {

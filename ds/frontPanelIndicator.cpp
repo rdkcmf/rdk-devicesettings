@@ -328,6 +328,10 @@ bool FrontPanelIndicator::getState()
 		_retState = ((state == dsFPD_STATE_ON )? true: false);
 		return _retState;
 	}
+        else
+        {
+                throw IllegalArgumentException();
+        }
 }
 
 
@@ -343,14 +347,18 @@ bool FrontPanelIndicator::getState()
 void FrontPanelIndicator::setState(const bool &enable)
 {
     _state = enable;
+    dsError_t ret = dsERR_NONE;
 	if (_state)
     {
-		dsSetFPState((dsFPDIndicator_t)_id,dsFPD_STATE_ON);
+		ret =  dsSetFPState((dsFPDIndicator_t)_id,dsFPD_STATE_ON);
 	}
 	else
 	{
-		dsSetFPState((dsFPDIndicator_t)_id,dsFPD_STATE_OFF);
+		ret = dsSetFPState((dsFPDIndicator_t)_id,dsFPD_STATE_OFF);
 	}
+        if (ret != dsERR_NONE) {
+            throw Exception(ret);
+        }
 }
 
 
@@ -364,8 +372,14 @@ int FrontPanelIndicator::getBrightness()
 {
 	dsFPDBrightness_t brightness;
 
-	dsGetFPBrightness((dsFPDIndicator_t)_id,&brightness);
-	_brightness = brightness;
+	dsError_t ret = dsGetFPBrightness((dsFPDIndicator_t)_id,&brightness);
+        if (ret != dsERR_NONE) {
+            throw Exception(ret);
+        }
+        else
+        {
+	    _brightness = brightness;
+        }
 	return _brightness;
 }
 
@@ -418,8 +432,14 @@ int  FrontPanelIndicator::getColorMode()
  */
 void FrontPanelIndicator::setBlink(const Blink &blink)
 {
-    dsSetFPBlink((dsFPDIndicator_t)_id, blink.getIteration(), blink.getInterval());
-    _blink = blink;
+    dsError_t ret = dsSetFPBlink((dsFPDIndicator_t)_id, blink.getIteration(), blink.getInterval());
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+    else
+    {
+        _blink = blink;
+    }
 }
 
 
