@@ -267,6 +267,21 @@ void AudioConfigInit()
                         printf("Port %s: Initialized audio level : %f\n","SPEAKER0", m_audioLevel);
                     }
                 }
+//HEADPHONE init
+                handle = 0;
+                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HEADPHONE,0,&handle) == dsERR_NONE) {
+                    try {
+                        _AudioLevel = device::HostPersistence::getInstance().getProperty("HEADPHONE0.audio.Level");
+                    }
+                    catch(...) {
+                        printf("Port %s: Exception in Getting the Audio Level settings from persistence storage..... \r\n","HEADPHONE0");
+                        _AudioLevel = "40";
+                    }
+                    m_audioLevel = atof(_AudioLevel.c_str());
+                    if (dsSetAudioLevelFunc(handle, m_audioLevel) == dsERR_NONE) {
+                        printf("Port %s: Initialized audio level : %f\n","HEADPHONE0", m_audioLevel);
+                    }
+                }
 //HDMI init
                 handle = 0;
                 if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
@@ -1748,6 +1763,10 @@ IARM_Result_t _dsSetAudioLevel(void *arg)
                     printf("%s: port: %s , persist audio level: %f\n",__func__,"SPEAKER0", param->level);
                     device::HostPersistence::getInstance().persistHostProperty("SPEAKER0.audio.Level",_AudioLevel);
                     break;
+                case dsAUDIOPORT_TYPE_HEADPHONE:
+                    printf("%s: port: %s , persist audio level: %f\n",__func__,"HEADPHONE0", param->level);
+                    device::HostPersistence::getInstance().persistHostProperty("HEADPHONE0.audio.Level",_AudioLevel);
+                    break;
                 default:
                     break;
             }
@@ -1790,6 +1809,10 @@ IARM_Result_t _dsSetAudioMute(void *arg)
                     printf("%s: port: %s , persist audio mute: %s\n",__func__,"SPEAKER0", param->mute ? "TRUE" : "FALSE");
                     device::HostPersistence::getInstance().persistHostProperty("SPEAKER0.audio.mute", _mute);
                     break;
+                case dsAUDIOPORT_TYPE_HEADPHONE:
+                    printf("%s: port: %s , persist audio mute: %s\n",__func__,"HEADPHONE0", param->mute ? "TRUE" : "FALSE");
+                    device::HostPersistence::getInstance().persistHostProperty("HEADPHONE0.audio.mute", _mute);
+                    break;
                 default:
                     break;
             }
@@ -1831,6 +1854,9 @@ IARM_Result_t _dsIsAudioMute(void *arg)
                     break;
                 case dsAUDIOPORT_TYPE_SPEAKER:
                     isMuteKey.append("SPEAKER0.audio.mute");
+                    break;
+                case dsAUDIOPORT_TYPE_HEADPHONE:
+                    isMuteKey.append("HEADPHONE0.audio.mute");
                     break;
                 default:
                     break;
