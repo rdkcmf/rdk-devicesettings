@@ -182,6 +182,7 @@ dsError_t dsCompositeInScaleVideo (int32_t x, int32_t y, int32_t width, int32_t 
  */
 typedef void (*dsCompositeInConnectCB_t)(dsCompositeInPort_t Port, bool isPortConnected);
 
+
 /**
  * @brief Register for the COMPOSITE Input hot plug event.
  *
@@ -192,6 +193,61 @@ typedef void (*dsCompositeInConnectCB_t)(dsCompositeInPort_t Port, bool isPortCo
  * @retval    ::dsError_t
  */
 dsError_t dsCompositeInRegisterConnectCB (dsCompositeInConnectCB_t CBFunc);
+
+
+/**
+ * @brief Callback function used to notify applications of Composite In signal change status
+ *
+ * HAL Implementation should call this method to deliver Composite In signal change status
+ * to the application (e.g. NoSignal/UnstableSignal/NotSupportedSignal/StableSignal for Composite In ports).
+ *
+ * @param port                Composite Input port.
+ * @param sigStatus           signal Status of Composite In Port.
+ *
+ *
+ * @return None.
+ */
+typedef void (*dsCompositeInSignalChangeCB_t)(dsCompositeInPort_t port, dsCompInSignalStatus_t sigStatus);
+
+
+/**
+ * @brief Register for the Composite Input Signal Change event.
+ *
+ * This function is used to register for the Composite Input Signal Change event.
+ *
+ * @param[in] CBFunc Composite Input Signal change callback function.
+ * @return Device Settings error code
+ * @retval    ::dsError_t
+ */
+dsError_t dsCompositeInRegisterSignalChangeCB (dsCompositeInSignalChangeCB_t CBFunc);
+
+
+
+/**
+ * @brief Callback function used to notify applications of Composite Input status
+ *
+ * HAL Implementation should call this method to deliver Composite Input status
+ * to the application (e.g. port, isPresented(true/false) etc. for Composite In ports).
+ *
+ * @param inputStatus         Composite Input status of a specific Port.
+ *
+ *
+ * @return None.
+ */
+typedef void (*dsCompositeInStatusChangeCB_t)(dsCompositeInStatus_t inputStatus);
+
+
+/**
+ * @brief Register for the Composite Input Status Change event.
+ *
+ * This function is used to register for the Composite Input Status Change event.
+ *
+ * @param[in] CBFunc Composite Input Status change callback function.
+ * @return Device Settings error code
+ * @retval    ::dsError_t
+ */
+dsError_t dsCompositeInRegisterStatusChangeCB (dsCompositeInStatusChangeCB_t CBFunc);
+
 
 /* End of DSHAL_CompositeIn_API doxygen group */
 /**

@@ -55,6 +55,8 @@ typedef enum _DSMgr_EventId_t {
 	IARM_BUS_DSMGR_EVENT_HDMI_IN_SIGNAL_STATUS,    /*!< HDMI IN signal status change event */
 	IARM_BUS_DSMGR_EVENT_HDMI_IN_STATUS,          /*!< HDMI IN status change event */
 	IARM_BUS_DSMGR_EVENT_COMPOSITE_IN_HOTPLUG,         /*!< COMPOSITE IN HPD change event */
+	IARM_BUS_DSMGR_EVENT_COMPOSITE_IN_SIGNAL_STATUS,    /*!< COMPOSITE IN signal status change event */
+	IARM_BUS_DSMGR_EVENT_COMPOSITE_IN_STATUS,          /*!< COMPOSITE IN status change event */
     IARM_BUS_DSMGR_EVENT_TIME_FORMAT_CHANGE,           /*!< Clock Time Format Change Event*/
     IARM_BUS_DSMGR_EVENT_AUDIO_LEVEL_CHANGED,           /*!< Audio Level Change Event*/
     IARM_BUS_DSMGR_EVENT_AUDIO_OUT_HOTPLUG,            /*!< AUDIO OUT HPD change event */
@@ -106,7 +108,7 @@ typedef struct _DSMgr_EventData_t {
         struct _HDMI_IN_STATUS_DATA{
          /* Declare HDMI Input status*/
             dsHdmiInPort_t port;
-	    bool           isPresented;
+            bool           isPresented;
         }hdmi_in_status; /*HDMI in status change detect*/
 
         struct _HDMI_IN_SIG_STATUS_DATA{
@@ -119,7 +121,19 @@ typedef struct _DSMgr_EventData_t {
             dsCompositeInPort_t port;
             bool           isPortConnected;
         }composite_in_connect;
-        
+
+        struct _COMPOSITE_IN_STATUS_DATA{
+         /* Declare Composite Input status*/
+            dsCompositeInPort_t port;
+            bool           isPresented;
+        }composite_in_status; /*Composite in status change detect*/
+
+        struct _COMPOSITE_IN_SIG_STATUS_DATA{
+         /* Declare Composite In signal status*/
+            dsCompositeInPort_t port;
+            dsCompInSignalStatus_t status;
+        }composite_in_sig_status; /*Composite in signal change detect*/
+
         struct _FPD_TIME_FORMAT
         {
             dsFPDTimeFormat_t  eTimeFormat;   

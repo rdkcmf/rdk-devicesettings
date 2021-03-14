@@ -91,6 +91,9 @@ IARM_Result_t _dsCompositeInSelectPort(void *arg);
 IARM_Result_t _dsCompositeInScaleVideo(void *arg);
 
 void _dsCompositeInConnectCB(dsCompositeInPort_t port, bool isPortConnected);
+void _dsCompositeInSignalChangeCB(dsCompositeInPort_t port, dsCompInSignalStatus_t sigStatus);
+void _dsCompositeInStatusChangeCB(dsCompositeInStatus_t inputStatus);
+
 
 #include <iostream>
 #include "hostPersistence.hpp"
@@ -174,6 +177,49 @@ IARM_Result_t _dsCompositeInInit(void *arg)
              printf("%s:%d - invoking dsCompositeInRegisterConnectCB()\n", __PRETTY_FUNCTION__,__LINE__);
              cbfunc(_dsCompositeInConnectCB);
         }
+
+        typedef dsError_t (*dsCompositeInRegisterSignalCB_t)(dsCompositeInSignalChangeCB_t CBFunc);
+        static dsCompositeInRegisterSignalCB_t signalChangeCBFunc = 0;
+        if (signalChangeCBFunc == 0) {
+            void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+            if (dllib) {
+                signalChangeCBFunc = (dsCompositeInRegisterSignalCB_t) dlsym(dllib, "dsCompositeInRegisterSignalChangeCB");
+                if(signalChangeCBFunc == 0) {
+                    printf("dsCompositeInRegisterSignalChangeCB(dsCompositeInSignalChangeCB_t) is not defined\r\n");
+                }
+                dlclose(dllib);
+            }
+            else {
+                printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+            }
+        }
+
+        if(signalChangeCBFunc) {
+             printf("%s - invoking dsCompositeInRegisterSignalChangeCB()\n", __PRETTY_FUNCTION__);
+             signalChangeCBFunc(_dsCompositeInSignalChangeCB);
+        }
+
+        typedef dsError_t (*dsCompositeInRegisterStatusChangeCB_t)(dsCompositeInStatusChangeCB_t CBFunc);
+        static dsCompositeInRegisterStatusChangeCB_t statusChangeCBFunc = 0;
+        if (statusChangeCBFunc == 0) {
+            void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+            if (dllib) {
+                statusChangeCBFunc = (dsCompositeInRegisterStatusChangeCB_t) dlsym(dllib, "dsCompositeInRegisterStatusChangeCB");
+                if(statusChangeCBFunc == 0) {
+                    printf("dsCompositeInRegisterStatusChangeCB(dsCompositeInStatusChangeCB_t) is not defined\r\n");
+                }
+                dlclose(dllib);
+            }
+            else {
+                printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+            }
+        }
+
+        if(statusChangeCBFunc) {
+             printf("%s - invoking dsCompositeInRegisterStatusChangeCB()\n", __PRETTY_FUNCTION__);
+             statusChangeCBFunc(_dsCompositeInStatusChangeCB);
+        }
+
 #endif
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsCompositeInTerm,                  _dsCompositeInTerm);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsCompositeInGetNumberOfInputs,     _dsCompositeInGetNumberOfInputs);
@@ -390,6 +436,37 @@ void _dsCompositeInConnectCB(dsCompositeInPort_t port, bool isPortConnected)
 	                        (void *)&composite_in_hpd_eventData,
 	                        sizeof(composite_in_hpd_eventData));
 
+}
+
+
+void _dsCompositeInSignalChangeCB(dsCompositeInPort_t port, dsCompInSignalStatus_t sigStatus)
+{
+    IARM_Bus_DSMgr_EventData_t composite_in_sigStatus_eventData;
+    printf("%s:%d Composite In signal change update!!!!!! Port: %d, Signal Status: %d\r\n", __PRETTY_FUNCTION__, __LINE__, port, sigStatus);
+    composite_in_sigStatus_eventData.data.composite_in_sig_status.port = port;
+    composite_in_sigStatus_eventData.data.composite_in_sig_status.status = sigStatus;
+
+    IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+			        (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_COMPOSITE_IN_SIGNAL_STATUS,
+			        (void *)&composite_in_sigStatus_eventData,
+			        sizeof(composite_in_sigStatus_eventData));
+
+    printf("%s <-- \n", __PRETTY_FUNCTION__);
+}
+
+void _dsCompositeInStatusChangeCB(dsCompositeInStatus_t inputStatus)
+{
+    IARM_Bus_DSMgr_EventData_t hdmi_in_status_eventData;
+    printf("%s:%d Composite In status change update!!!!!! Port: %d, isPresented: %d\r\n", __PRETTY_FUNCTION__, __LINE__, inputStatus.activePort, inputStatus.isPresented);
+    hdmi_in_status_eventData.data.composite_in_status.port = inputStatus.activePort;
+    hdmi_in_status_eventData.data.composite_in_status.isPresented = inputStatus.isPresented;
+
+    IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                                (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_COMPOSITE_IN_STATUS,
+                                (void *)&hdmi_in_status_eventData,
+                                sizeof(hdmi_in_status_eventData));
+
+    printf("%s <-- \n", __PRETTY_FUNCTION__);
 }
 
 /** @} */

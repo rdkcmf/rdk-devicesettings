@@ -923,6 +923,20 @@ typedef struct _dsHdmiInCap_t
  */
 
 
+/** @addtogroup DSHAL_COMPOSITE_IN_TYPES Device Settings HAL Composite IN Signal Status Definitions
+ *  @ingroup DSHAL_COMPOSITE_IN
+ *  @{
+ */
+typedef enum _dsCompInSignalStatus_t
+{
+    dsCOMP_IN_SIGNAL_STATUS_NONE = -1,
+    dsCOMP_IN_SIGNAL_STATUS_NOSIGNAL,
+    dsCOMP_IN_SIGNAL_STATUS_UNSTABLE,
+    dsCOMP_IN_SIGNAL_STATUS_NOTSUPPORTED,
+    dsCOMP_IN_SIGNAL_STATUS_STABLE,
+    dsCOMP_IN_SIGNAL_STATUS_MAX
+} dsCompInSignalStatus_t;
+
 
  /** @addtogroup DSHAL_HDMI_IN_TYPES Device Settings HAL COMPOSITE IN Type Definitions
  *  @ingroup DSHAL_COMPOSITE_IN
@@ -932,7 +946,7 @@ typedef enum _dsCompositeInPort_t
 {
     dsCOMPOSITE_IN_PORT_NONE = -1,
     dsCOMPOSITE_IN_PORT_0,
-	dsCOMPOSITE_IN_PORT_1,
+    dsCOMPOSITE_IN_PORT_1,
     dsCOMPOSITE_IN_PORT_MAX
 } dsCompositeInPort_t;
 
