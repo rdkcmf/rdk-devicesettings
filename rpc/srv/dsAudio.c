@@ -447,6 +447,7 @@ void AudioConfigInit()
     }
 
 
+#ifndef LLAMA_AUDIO_MODES_INIT
     typedef dsError_t (*dsSetAudioCompression_t)(int handle, int compressionLevel);
     static dsSetAudioCompression_t dsSetAudioCompressionFunc = 0;
     if (dsSetAudioCompressionFunc == 0) {
@@ -960,6 +961,7 @@ void AudioConfigInit()
         }
     }
 
+#endif
 
     typedef dsError_t (*dsSetMS12AudioProfile_t)(int handle, const char* profile);
     static dsSetMS12AudioProfile_t dsSetMS12AudioProfileFunc = 0;
@@ -969,9 +971,14 @@ void AudioConfigInit()
             dsSetMS12AudioProfileFunc = (dsSetMS12AudioProfile_t) dlsym(dllib, "dsSetMS12AudioProfile");
             if (dsSetMS12AudioProfileFunc) {
                 printf("dsSetMS12AudioProfile_t(int, const char*) is defined and loaded\r\n");
+	#ifdef LLAMA_AUDIO_MODES_INIT
+		std::string _AProfile("Entertainment");
+	#else
                 std::string _AProfile("Off");
+	#endif
                 handle = 0;
                 dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
+	#ifndef LLAMA_AUDIO_MODES_INIT
                 try {
                     _AProfile = device::HostPersistence::getInstance().getProperty("audio.MS12Profile");
                 }
@@ -979,6 +986,7 @@ void AudioConfigInit()
                     _AProfile = "Off";
                     printf("Exception in Getting the Audio Profile setting from persistence storage..... \r\n");
                 }
+	#endif
 
 //SPEAKER init
                 handle = 0;
@@ -986,6 +994,9 @@ void AudioConfigInit()
                     if (dsSetMS12AudioProfileFunc(handle, _AProfile.c_str()) == dsERR_NONE) {
                         printf("Port %s: Initialized MS12 Audio Profile : %s\n","SPEAKER0", _AProfile.c_str());
                     }
+                   else {
+                        printf("Port %s: Initialization failed !!!  MS12 Audio Profile : %s\n","SPEAKER0", _AProfile.c_str());
+                   }
                 }
 #if 0
 //HDMI init
