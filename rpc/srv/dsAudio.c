@@ -1253,11 +1253,11 @@ IARM_Result_t _dsGetStereoMode(void *arg)
     dsError_t ret = dsERR_NONE;
     dsAudioSetStereoModeParam_t *param = (dsAudioSetStereoModeParam_t *)arg;
 
-    if (param != NULL && param->toPersist) {
+    if (param != NULL && param->toPersist && NULL != param->handle) {
         _GetAudioModeFromPersistent(arg);
         result = IARM_RESULT_SUCCESS;
     }
-    else if (param != NULL)
+    else if (param != NULL && NULL != param->handle)
     {
         /* In Auto Mode, get the effective mode */
         if (_srv_AudioAuto) {
@@ -1304,9 +1304,14 @@ IARM_Result_t _dsSetStereoMode(void *arg)
     IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     dsError_t ret = dsERR_NONE;
     dsAudioSetStereoModeParam_t *param = (dsAudioSetStereoModeParam_t *)arg;
-
-    ret = dsSetStereoMode(param->handle, param->mode);
-    param->rpcResult = ret;
+    if (NULL != param->handle) {
+        ret = dsSetStereoMode(param->handle, param->mode);
+        param->rpcResult = ret;
+    }
+    else {
+        ret = dsERR_INVALID_PARAM;
+        param->rpcResult = dsERR_INVALID_PARAM;
+    }
 
     if (ret == dsERR_NONE)
     {
@@ -2007,10 +2012,11 @@ static dsAudioPortType_t _GetAudioPortType(int handle)
     
     for(i=0; i< numPorts; i++)
     {
-        dsGetAudioPort(kPorts[i].id.type, kPorts[i].id.index, &halhandle);
-        if (handle == halhandle)
-        {
-            return kPorts[i].id.type;
+        if(dsGetAudioPort (kPorts[i].id.type, kPorts[i].id.index, &halhandle) == dsERR_NONE) {
+            if (handle == halhandle)
+            {
+                return kPorts[i].id.type;
+            }
         }
     }
     __TIMESTAMP();printf("Error: The Requested Audio Port is not part of Platform Port Configuration \r\n");

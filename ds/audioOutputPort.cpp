@@ -121,27 +121,30 @@ AudioOutputPort::AudioOutputPort(const int type, const int index, const int id) 
 								 _gain(0.0), _db(0.0), _maxDb(0.0), _minDb(0.0), _optimalLevel(0.0),
 								 _level(0.0), _loopThru(false), _muted(false), _audioDelayMs(0), _audioDelayOffsetMs(0)
 {
-	dsGetAudioPort((dsAudioPortType_t)_type, _index, &_handle);
+	dsError_t ret = dsERR_NONE;
+	ret = dsGetAudioPort((dsAudioPortType_t)_type, _index, &_handle);
 	{
 		/* Construct Port Name as "Type+Index", such as "HDMI0" */
 		std::stringstream out;
 		out << getType().getName() << _index;
 		_name = out.str();
 	}
-
-	//dsGetAudioCompression	(_handle, (dsAudioCompression_t *)&_compression);
-	dsGetAudioEncoding		(_handle, (dsAudioEncoding_t *)&_encoding);
-	dsGetStereoMode			(_handle, (dsAudioStereoMode_t *)&_stereoMode, false);
-	dsGetAudioGain			(_handle, &_gain);
-	dsGetAudioLevel			(_handle, &_level);
-	dsGetAudioOptimalLevel	(_handle, &_optimalLevel);
-	dsGetAudioMaxDB			(_handle, &_maxDb);
-	dsGetAudioMinDB			(_handle, &_minDb);
-	dsGetAudioDB				(_handle, &_db);
-	dsIsAudioLoopThru		(_handle, &_loopThru);
-	dsIsAudioMute			(_handle, &_muted);
-        dsGetAudioDelay                 (_handle, &_audioDelayMs);
-        dsGetAudioDelayOffset      (_handle, &_audioDelayOffsetMs);
+        printf ("\nAudioOutputPort init: _type:%d _index:%d _handle:%d\n", _type, _index, _handle);
+        if (dsERR_NONE == ret) {
+		//dsGetAudioCompression	(_handle, (dsAudioCompression_t *)&_compression);
+		dsGetAudioEncoding		(_handle, (dsAudioEncoding_t *)&_encoding);
+		dsGetStereoMode			(_handle, (dsAudioStereoMode_t *)&_stereoMode, false);
+		dsGetAudioGain			(_handle, &_gain);
+		dsGetAudioLevel			(_handle, &_level);
+		dsGetAudioOptimalLevel	(_handle, &_optimalLevel);
+		dsGetAudioMaxDB			(_handle, &_maxDb);
+		dsGetAudioMinDB			(_handle, &_minDb);
+		dsGetAudioDB				(_handle, &_db);
+		dsIsAudioLoopThru		(_handle, &_loopThru);
+		dsIsAudioMute			(_handle, &_muted);
+        	dsGetAudioDelay                 (_handle, &_audioDelayMs);
+        	dsGetAudioDelayOffset      (_handle, &_audioDelayOffsetMs);
+	}
 }
 
 
