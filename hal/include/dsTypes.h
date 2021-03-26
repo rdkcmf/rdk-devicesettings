@@ -993,6 +993,20 @@ typedef struct
     dsVideoCodecProfileSupport_t entries[10];
 } dsVideoCodecInfo_t;
 
+struct dsSpd_infoframe_st {
+    uint8_t pkttype;
+    uint8_t version;
+    uint8_t length;             /*length=25*/
+    uint8_t rsd;
+    uint8_t checksum;
+    /*Vendor Name Character*/
+    uint8_t vendor_name[8];
+    /*Product Description Character*/
+    uint8_t product_des[16];
+    /*byte 25*/
+    uint8_t source_info;
+} ;
+
   /** @addtogroup DSHAL_VERSION_TYPES Device Settings HAL VERSION Definitions
  *  @ingroup DSHAL_VERSION
  *  @{

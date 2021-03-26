@@ -85,6 +85,7 @@ public:
     void    resumeAudio              () const;
     std::string  getCurrentVideoMode () const;
     void getEDIDBytesInfo (int iHdmiPort, std::vector<uint8_t> &edid) const;
+    void getHDMISPDInfo (int iHdmiPort, std::vector<uint8_t> &data);
     
 private:
     HdmiInput ();           /* default constructor */

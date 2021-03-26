@@ -211,6 +211,7 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsHdmiInResumeAudio          "dsHdmiInResumeAudio"
 #define IARM_BUS_DSMGR_API_dsHdmiInGetCurrentVideoMode  "dsHdmiInGetCurrentVideoMode"
 #define IARM_BUS_DSMGR_API_dsGetEDIDBytesInfo             "dsGetEDIDBytesInfo"
+#define IARM_BUS_DSMGR_API_dsGetHDMISPDInfo             "dsGetHDMISPDInfo"
 
 /*
  * Declare RPC COMPOSITE INPUT API names
@@ -796,6 +797,12 @@ typedef struct _dsGetEDIDBytesInfoParam_t
     int                     length;
 }dsGetEDIDBytesInfoParam_t;
 
+typedef struct _dsGetHDMISPDInfoParam_t
+{
+    dsError_t               result;
+    int                     iHdmiPort;
+    unsigned char           spdInfo [1024];
+}dsGetHDMISPDInfoParam_t;
 
 #ifdef __cplusplus
 }

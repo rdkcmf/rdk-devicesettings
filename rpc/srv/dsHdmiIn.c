@@ -98,6 +98,7 @@ IARM_Result_t _dsHdmiInPauseAudio(void *arg);
 IARM_Result_t _dsHdmiInResumeAudio(void *arg);
 IARM_Result_t _dsHdmiInGetCurrentVideoMode(void *arg);
 IARM_Result_t _dsGetEDIDBytesInfo (void *arg);
+IARM_Result_t _dsGetHDMISPDInfo (void *arg);
 
 void _dsHdmiInConnectCB(dsHdmiInPort_t port, bool isPortConnected);
 void _dsHdmiInSignalChangeCB(dsHdmiInPort_t port, dsHdmiInSignalStatus_t sigStatus);
@@ -176,6 +177,39 @@ static dsError_t getEDIDBytesInfo (int iHdmiPort, unsigned char **edid, int *len
     }
     else {
         printf("%s:  dsIsHdmiARCPortFunc = %p\n", __FUNCTION__, dsGetEDIDBytesInfoFunc);
+    }
+    return eRet;
+}
+
+static dsError_t getHDMISPDInfo (int iHdmiPort, unsigned char **spd) {
+    dsError_t eRet = dsERR_GENERAL;
+    typedef dsError_t (*dsGetHDMISPDInfo_t)(int iHdmiPort, unsigned char **data);
+    static dsGetHDMISPDInfo_t dsGetHDMISPDInfoFunc = 0;
+    if (dsGetHDMISPDInfoFunc == 0) {
+       void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+       if (dllib) {
+            dsGetHDMISPDInfoFunc = (dsGetHDMISPDInfo_t) dlsym(dllib, "dsGetHDMISPDInfo");
+            if(dsGetHDMISPDInfoFunc == 0) {
+                printf("%s:%d dsGetHDMISPDInfo (int) is not defined %s\r\n", __FUNCTION__,__LINE__, dlerror());
+                eRet = dsERR_GENERAL;
+            }
+            else {
+                printf("%s:%d dsGetHDMISPDInfoFunc loaded\r\n", __FUNCTION__,__LINE__);
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("%s:%d dsGetHDMISPDInfo  Opening RDK_DSHAL_NAME [%] failed %s\r\n",
+                   __FUNCTION__,__LINE__, RDK_DSHAL_NAME, dlerror());
+            eRet = dsERR_GENERAL;
+        }
+    }
+    if (0 != dsGetHDMISPDInfoFunc) {
+        eRet = dsGetHDMISPDInfoFunc (iHdmiPort, spd);
+        printf("[srv] %s: dsGetHDMISPDInfoFunc eRet: %d \r\n", __FUNCTION__,eRet);
+    }
+    else {
+        printf("%s:  dsGetHDMISPDInfoFunc = %p\n", __FUNCTION__, dsGetHDMISPDInfoFunc);
     }
     return eRet;
 }
@@ -267,6 +301,7 @@ IARM_Result_t _dsHdmiInInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInResumeAudio,           _dsHdmiInResumeAudio);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInGetCurrentVideoMode,   _dsHdmiInGetCurrentVideoMode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetEDIDBytesInfo,              _dsGetEDIDBytesInfo);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetHDMISPDInfo,              _dsGetHDMISPDInfo);
 
         int itr = 0;
         bool isARCCapable = false;
@@ -505,6 +540,28 @@ IARM_Result_t _dsGetEDIDBytesInfo (void *arg) {
     memcpy(param->edid, edidArg, param->length);
     param->result = eRet;
     IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsGetHDMISPDInfo(void *arg)
+{
+    _DEBUG_ENTER();
+    printf("%s:%d [srv] _dsGetHDMISPDInfo \n", __PRETTY_FUNCTION__,__LINE__);
+
+    dsGetHDMISPDInfoParam_t *param = (dsGetHDMISPDInfoParam_t *)arg;
+
+    IARM_BUS_Lock(lock);
+
+    memset (param->spdInfo, '\0', sizeof(struct dsSpd_infoframe_st));
+    unsigned char *spdArg = NULL;
+    param->result = getHDMISPDInfo(param->iHdmiPort, (unsigned char **)(&spdArg));
+    printf("[srv] %s: dsGetHDMISPDInfo eRet: %d\r\n", __FUNCTION__, param->result);
+    if (spdArg != NULL) {
+        memcpy(param->spdInfo, spdArg, sizeof(struct dsSpd_infoframe_st));
+    }
+
+    IARM_BUS_Unlock(lock);
+
     return IARM_RESULT_SUCCESS;
 }
 

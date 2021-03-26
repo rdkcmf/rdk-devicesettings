@@ -319,6 +319,30 @@ dsError_t dsGetEDIDBytesInfo (int iHdmiPort, unsigned char **edid, int *length)
     return dsERR_GENERAL;
 }
 
+dsError_t dsGetHDMISPDInfo (int iHdmiPort, unsigned char **spdInfo)
+{
+    _DEBUG_ENTER();
+
+     printf("[cli] %s: dsGetHDMISPDInfo \r\n", __FUNCTION__);
+    _RETURN_IF_ERROR(spdInfo != NULL, dsERR_INVALID_PARAM);
+
+    dsGetHDMISPDInfoParam_t param;
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+    param.iHdmiPort = iHdmiPort;
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *)IARM_BUS_DSMGR_API_dsGetHDMISPDInfo,
+                            (void *)&param,
+                            sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+        *spdInfo = param.spdInfo;
+        printf("[cli] %s: dsGetHDMISPDInfo eRet: %d \r\n", __FUNCTION__, param.result);
+        return param.result;
+    }
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
+    return dsERR_GENERAL;
+}
 
 /** @} */
 /** @} */

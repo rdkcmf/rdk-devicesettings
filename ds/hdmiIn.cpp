@@ -516,6 +516,43 @@ void HdmiInput::getEDIDBytesInfo (int iHdmiPort, std::vector<uint8_t> &edidArg) 
     }
 }
 
+void HdmiInput::getHDMISPDInfo (int iHdmiPort, std::vector<uint8_t> &data) {
+    printf("HdmiInput::getHDMISPDInfo \r\n");
+
+    unsigned char* spdinfo = NULL;
+    const char* exceptionstr = "";
+    dsError_t ret = dsGetHDMISPDInfo (iHdmiPort, (unsigned char**)(&spdinfo));
+    if (NULL == spdinfo) {
+        printf("HdmiInput::dsGetHDMISPDInfo returned NULL \r\n");
+        exceptionstr = "SPDInfo is NULL";
+        ret = dsERR_GENERAL;
+    }
+ 
+    printf("HdmiInput::getHDMISPDInfo has ret %d\r\n", ret);
+    data.clear();
+    if (ret == dsERR_NONE) {
+        if (sizeof(spdinfo) <= sizeof(struct dsSpd_infoframe_st)) {
+            printf("HdmiInput::getHDMISPDInfo has %d bytes\r\n", sizeof(spdinfo));
+                data.insert(data.begin(), spdinfo, spdinfo + sizeof(struct dsSpd_infoframe_st));
+        } else {
+            ret = dsERR_OPERATION_NOT_SUPPORTED;
+            exceptionstr = "size is greater";
+        }
+    } else {
+        exceptionstr = "getHDMISPDInfo failed";
+    }
+    printf("HdmiInput::getHDMISPDInfo data: \r\n");
+        for (int itr = 0; itr < data.size(); itr++) {
+            printf("%02X ", data[itr]);
+        }
+    printf("\n");
+
+    if (ret != dsERR_NONE) {
+        throw Exception(ret, exceptionstr);
+    }
+	
+}
+
 }
 
 
