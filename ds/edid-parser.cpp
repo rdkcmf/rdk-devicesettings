@@ -29,7 +29,6 @@
 
 #define UNUSED(_x_) _x_ = _x_
 
-#define DEBUG(...)
 
 namespace edid_parser {
 
@@ -59,7 +58,7 @@ static void parse_std_timing(unsigned char* bytes, edid_data_t* data_ptr) {
         default: return;
     }
     int r = (bytes[idx + 1] & 0x3F) + 60;
-    DEBUG("STD %dx%d@%d\n", h, v, r);
+    INT_DEBUG("STD %dx%d@%d\n", h, v, r);
 
     UNUSED(h);
     UNUSED(v);
@@ -75,7 +74,7 @@ void parse_monitor_descriptor(unsigned char* bytes, edid_data_t* data_ptr) {
           for (int i = 5; (i < (5 + 14)) && (bytes[i] != '\n') && isprint(bytes[i]); i++) {
               data_ptr->monitor_name[i - 5] = bytes[i];
           }
-          DEBUG("Monitor name:'%s'\n", data_ptr->monitor_name);
+          INT_DEBUG("Monitor name:'%s'\n", data_ptr->monitor_name);
       }
   }
 }
@@ -126,7 +125,7 @@ static void parse_dtd(unsigned char* bytes, edid_data_t* data_ptr, char native) 
         char p = (bytes[idx] & 0x80) ? 0 : 1;
         idx += 1;
 
-        DEBUG("DTD, %dx%d@%c, native: %d (%s found already)\n", h, v, (p ? 'p' : 'i'), native, (data_ptr->res.native == EDID_NOT_NATIVE ? "not" : ""));
+        INT_DEBUG("DTD, %dx%d@%c, native: %d (%s found already)\n", h, v, (p ? 'p' : 'i'), native, (data_ptr->res.native == EDID_NOT_NATIVE ? "not" : ""));
 
         if (native) {
             data_ptr->res.progressive = p ? EDID_PROGRESSIVE : EDID_INTERLACED;
@@ -265,7 +264,7 @@ static void parse_ext_video(const unsigned char* bytes, edid_res_t* edid_res, co
 
         for (idx = 0; idx < len; idx++) {
             res = bytes[idx];
-            DEBUG("EXT RES byte 0x%x (num: %d) %s\n", res, (((res >= 129) && (res <= 192)) ? (res & 0x7F) : res), (((res >= 129) && (res <= 192)) ? "native" : ""));
+            INT_DEBUG("EXT RES byte 0x%x (num: %d) %s\n", res, (((res >= 129) && (res <= 192)) ? (res & 0x7F) : res), (((res >= 129) && (res <= 192)) ? "native" : ""));
             /* consider only native codes (CTA-861.F.pdf page 81) */
             if ((res >= 129) && (res <= 192)) {
                 /* it is number of resolution in table, not index, so -1 */
@@ -287,7 +286,7 @@ static void parse_ext_video(const unsigned char* bytes, edid_res_t* edid_res, co
                     edid_res->refresh = vic[res].r;
                     edid_res->progressive = vic[res].p ? EDID_PROGRESSIVE : EDID_INTERLACED;
                     edid_res->native = EDID_NATIVE;
-                    DEBUG("EXT RES native found: %dx%d%c@%d\n", vic[res].w, vic[res].h, vic[res].p ? 'p' : 'i', vic[res].r);
+                    INT_DEBUG("EXT RES native found: %dx%d%c@%d\n", vic[res].w, vic[res].h, vic[res].p ? 'p' : 'i', vic[res].r);
                     return;
                 }
             }
@@ -297,12 +296,12 @@ static void parse_ext_video(const unsigned char* bytes, edid_res_t* edid_res, co
 
 static void parse_colorimetry_block(unsigned char* bytes, edid_data_t* data_ptr) {
     data_ptr->colorimetry_info = ((uint32_t)bytes[2] << 8) | ((uint32_t)bytes[3]);
-    DEBUG("colorimetry info:0x%x\n", data_ptr->colorimetry_info);
+    INT_DEBUG("colorimetry info:0x%x\n", data_ptr->colorimetry_info);
 }
 
 static void parse_extended_db(uint8_t* bytes, edid_data_t* data_ptr) {
     const uint8_t extended_code = bytes[1];
-    DEBUG("parse_extended_db extended_code=%d\n", extended_code);
+    INT_DEBUG("parse_extended_db extended_code=%d\n", extended_code);
 
     // 0x5 - "Colorimetry Data block"
     if (extended_code == 5) {
@@ -331,7 +330,7 @@ static void parse_extended_db(uint8_t* bytes, edid_data_t* data_ptr) {
             data_ptr->hdr_capabilities |= HDR_standard_HLG;
         }
     } else {
-        DEBUG("Extended DB - extended code %d not supported\n", extended_code);
+        INT_DEBUG("Extended DB - extended code %d not supported\n", extended_code);
     }
 }
 
@@ -340,7 +339,7 @@ static void parse_vendodr_specific_block(unsigned char* bytes, edid_data_t* data
     data_ptr->physical_address_b = bytes[4] & 0x0F;
     data_ptr->physical_address_c = bytes[3]  >> 4;
     data_ptr->physical_address_d = bytes[5] & 0x0F;
-    DEBUG("Vendor specific bolck, physical adress a:0x%x b:0x%x c:0x%x d:0x%x\n",
+    INT_DEBUG("Vendor specific bolck, physical adress a:0x%x b:0x%x c:0x%x d:0x%x\n",
           data_ptr->physical_address_a,
           data_ptr->physical_address_b,
           data_ptr->physical_address_c,
@@ -350,12 +349,12 @@ static void parse_vendodr_specific_block(unsigned char* bytes, edid_data_t* data
 static void parse_ext_timing(unsigned char* bytes, edid_data_t* data_ptr) {
     int idx = 0;
     // dtd start
-    DEBUG("TimingExtension version: %d\n", bytes[-1]);
+    INT_DEBUG("TimingExtension version: %d\n", bytes[-1]);
     int dtd_start = bytes[idx] - 2;
     idx += 1;
     // extension dtds number (0x0F), underscan (0x80), basic audio (0x40), ycbcr444 (0x20), ycbcr422 (0x10), native formats (0x07)
     int native_cnt = bytes[idx] & 0x07;
-    DEBUG("Native cnt: %d\n", native_cnt);
+    INT_DEBUG("Native cnt: %d\n", native_cnt);
     idx += 1;
     if (dtd_start != 2) {
         int end = dtd_start;
@@ -365,7 +364,7 @@ static void parse_ext_timing(unsigned char* bytes, edid_data_t* data_ptr) {
         while (idx < end) {
             int tag = (bytes[idx] & 0xE0) >> 5;
             int len = bytes[idx] & 0x1F;
-            DEBUG("parse_ext_timing: extension tag=%d len=%d\n", tag, len);
+            INT_DEBUG("parse_ext_timing: extension tag=%d len=%d\n", tag, len);
 
             switch (tag) {
                 // reserved
@@ -385,7 +384,7 @@ static void parse_ext_timing(unsigned char* bytes, edid_data_t* data_ptr) {
                 // 'Use Extended Tag'
                 case 7: parse_extended_db(&bytes[idx], data_ptr); break;
                 // default - unsupported
-                default: DEBUG("Unsupported extension tag: 0x%X\n", tag);
+                default: INT_DEBUG("Unsupported extension tag: 0x%X\n", tag);
             }
             idx += len + 1;
         }
@@ -504,7 +503,7 @@ static void parse_est_timing(unsigned char b1, unsigned char b2, unsigned char b
         refresh = 75;
     }
 
-    DEBUG("EST %dx%d%c@%d\n", width, height, progressive ? 'p' : 'i', refresh);
+    INT_DEBUG("EST %dx%d%c@%d\n", width, height, progressive ? 'p' : 'i', refresh);
 
     UNUSED(width);
     UNUSED(height);
@@ -548,7 +547,7 @@ edid_status_e parse_extension_block(uint32_t base_idx, unsigned char* bytes, edi
         case EXTENSION_TAG_BLOCK_MAP: break;
         // Manufacturer extension
         case MANUFACTURER_EXTENSION: break;
-        default: DEBUG("Unsupported tag: 0x%X\n", ext_tag);
+        default: INT_DEBUG("Unsupported tag: 0x%X\n", ext_tag);
     }
 
     return EDID_STATUS_OK;
@@ -557,7 +556,7 @@ edid_status_e parse_extension_block(uint32_t base_idx, unsigned char* bytes, edi
 edid_status_e parse_extension_blocks(uint32_t extensions, unsigned char* bytes, size_t count, edid_data_t* data_ptr)
 {
     if (count < 128 * (1 + extensions)) {
-        ERROR("parse_extension_blocks: too short for extension count - count:%zu extensions:%u\n",count,extensions);
+        INT_ERROR("parse_extension_blocks: too short for extension count - count:%zu extensions:%u\n",count,extensions);
         return EDID_STATUS_INVALID_HEADER;
     }
 
@@ -569,7 +568,7 @@ edid_status_e parse_extension_blocks(uint32_t extensions, unsigned char* bytes, 
     if (count == 128 * (2 + extensions)) {
         // there is 1 more block (128 bytes) than would seem from extensions count
         // assume we are handling 'incorrectly designed' device & attempt to read 1 more extension
-        WARN("extensions:%d, but count: %zu - increase extension cnt\n", extensions, count);
+        INT_WARN("extensions:%d, but count: %zu - increase extension cnt\n", extensions, count);
         ++extensions;
     }
 
@@ -579,7 +578,7 @@ edid_status_e parse_extension_blocks(uint32_t extensions, unsigned char* bytes, 
 
     if (extensions > 1 ) {
         if (first_ext_tag != EXTENSION_TAG_BLOCK_MAP) {
-            ERROR("Incorrect input, more than one extension: %d - but block 1 is not extension block map\n", extensions);
+            INT_ERROR("Incorrect input, more than one extension: %d - but block 1 is not extension block map\n", extensions);
             return EDID_STATUS_NOT_SUPPORTED;
         } else {
             // skip block map; the extensions are tagged anyway
@@ -606,38 +605,38 @@ static void parse_manufacturer_name(uint8_t b1, uint8_t b2, edid_data_t* data_pt
     data_ptr->manufacturer_name[1] = SET_LETTER(((b1 & 0x03) << 3) | ((b2 & 0xE0) >> 5));
     data_ptr->manufacturer_name[2] = SET_LETTER(b2 & 0x1F);
     data_ptr->manufacturer_name[3] = '\0';
-    DEBUG("Manufacturer name:'%s'\n", data_ptr->manufacturer_name);
+    INT_DEBUG("Manufacturer name:'%s'\n", data_ptr->manufacturer_name);
 }
 
 static void parse_product_code(uint8_t b1, uint8_t b2, edid_data_t* data_ptr)
 {
     data_ptr->product_code =  (((int32_t)b1 << 8) | (int32_t)b2);
-    DEBUG("Product code:%d\n", data_ptr->product_code);
+    INT_DEBUG("Product code:%d\n", data_ptr->product_code);
 }
 
 static void parse_serial_number(uint8_t* serial_ptr, edid_data_t* data_ptr)
 {
     data_ptr->serial_number = ((int32_t)serial_ptr[0] << 24) | ((int32_t)serial_ptr[1] << 16) | ((int32_t)serial_ptr[2] << 8) | ((int32_t)serial_ptr[3]);
-    DEBUG("Serial number:%d\n", data_ptr->serial_number);
+    INT_DEBUG("Serial number:%d\n", data_ptr->serial_number);
 }
 
 static void parse_manufacture_week(uint8_t b1, edid_data_t* data_ptr)
 {
     data_ptr->manufacture_week = b1;
-    DEBUG("Manufacture week:%d\n", data_ptr->manufacture_week);
+    INT_DEBUG("Manufacture week:%d\n", data_ptr->manufacture_week);
 }
 
 static void parse_manufacture_year(uint8_t b1, edid_data_t* data_ptr)
 {
     data_ptr->manufacture_year = b1;
-    DEBUG("Manufacture year:%d\n", data_ptr->manufacture_year);
+    INT_DEBUG("Manufacture year:%d\n", data_ptr->manufacture_year);
 }
 
 static void parse_edid_version(uint8_t b1, uint8_t b2, edid_data_t* data_ptr)
 {
     data_ptr->edid_version[0] = b1;
     data_ptr->edid_version[1] = b2;
-    DEBUG("EDID version:%d.%d\n", data_ptr->edid_version[0], data_ptr->edid_version[1]);
+    INT_DEBUG("EDID version:%d.%d\n", data_ptr->edid_version[0], data_ptr->edid_version[1]);
 }
 
 edid_status_e EDID_Verify(unsigned char* bytes, size_t count) {
@@ -646,7 +645,7 @@ edid_status_e EDID_Verify(unsigned char* bytes, size_t count) {
     }
     static const unsigned char header[8] = {0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00};
     if (memcmp(bytes, header, sizeof(header)) != 0) {
-        ERROR("Incorrect input, header does not match: %02x %02x %02x %02x %02x %02x %02x %02x\n", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]);
+        INT_ERROR("Incorrect input, header does not match: %02x %02x %02x %02x %02x %02x %02x %02x\n", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]);
         return EDID_STATUS_INVALID_HEADER;
     }
     return EDID_STATUS_OK;
@@ -654,7 +653,7 @@ edid_status_e EDID_Verify(unsigned char* bytes, size_t count) {
 
 edid_status_e EDID_Parse(unsigned char* bytes, size_t count, edid_data_t* data_ptr) {
     if (!data_ptr) {
-        ERROR("Incorrect input, data_ptr null\n");
+        INT_ERROR("Incorrect input, data_ptr null\n");
         return EDID_STATUS_INVALID_PARAMETER;
     }
     edid_status_e verify_status = EDID_Verify(bytes, count);

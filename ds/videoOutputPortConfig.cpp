@@ -137,7 +137,7 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions()
 	List<VideoResolution> supportedResolutions;
 	int isDynamicList = 0;
 	dsError_t dsError = dsERR_NONE;
-	int _handle;
+	int _handle = 0;  //CID:98922 - Uninit
 	bool force_disable_4K = true;
 	
 	_supportedResolutions.clear(); /*Clear the Vector */

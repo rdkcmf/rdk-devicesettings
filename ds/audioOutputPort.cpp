@@ -1189,11 +1189,11 @@ void AudioOutputPort::setAudioDelay(const uint32_t audioDelayMs)
 	dsError_t ret = dsERR_NONE;
 	uint32_t ms = audioDelayMs;
 
-	INFO("AudioOutputPort [%s], setting delay to [%lu] ms\n", _name.c_str(), audioDelayMs);
+	INT_INFO("AudioOutputPort [%s], setting delay to [%lu] ms\n", _name.c_str(), audioDelayMs);
 
 	if (ms > audioDelayMsMax)
 	{
-		ERROR("AudioOutputPort [%s], delay [%lu] ms, exceeds max [%lu]. Setting Max \n",
+		INT_ERROR("AudioOutputPort [%s], delay [%lu] ms, exceeds max [%lu]. Setting Max \n",
 			_name.c_str(),
 			audioDelayMs,
 			audioDelayMsMax);
@@ -1228,7 +1228,7 @@ void AudioOutputPort::setAudioDelayOffset(const uint32_t audioDelayOffsetMs)
 
 	if (ms > audioDelayOffsetMsMax)
 	{
-		ERROR("AudioOutputPort [%s], delay offset [%lu] ms, exceeds max [%lu]. Setting Max \n",
+		INT_ERROR("AudioOutputPort [%s], delay offset [%lu] ms, exceeds max [%lu]. Setting Max \n",
 			_name.c_str(), audioDelayOffsetMs, audioDelayOffsetMsMax);
 		ms = audioDelayOffsetMsMax;
 	}

@@ -282,8 +282,8 @@ IARM_Result_t _dsGetSocIDFromSDK(void *arg)
             }
             else {
                 printf("dsSRV: dsGetSocIDFromSDK(char* socID) is not defined\r\n");
-                dlclose(dllib);
             }
+	    dlclose(dllib);   //CID:80469,163396,163400,163407 - Resource leak
         }
         else {
             printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);

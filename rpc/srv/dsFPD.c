@@ -194,18 +194,18 @@ IARM_Result_t dsFPDMgr_init()
 		 * set by the user. */
 		if(dsFPD_BRIGHTNESS_MAX == _dsPowerBrightness)
 		{
-			INFO("Applying new default brightness to power indicator. Changing from %d to %d.\n", _dsPowerBrightness, dsFPD_BRIGHTNESS_DEFAULT);
+			INT_INFO("Applying new default brightness to power indicator. Changing from %d to %d.\n", _dsPowerBrightness, dsFPD_BRIGHTNESS_DEFAULT);
 			_dsPowerBrightness = dsFPD_BRIGHTNESS_DEFAULT;
 		}
 		if(dsFPD_BRIGHTNESS_MAX == _dsTextBrightness)
 		{
-			INFO("Applying new default brightness to text indicator. Changing from %d to %d.\n", _dsTextBrightness, dsFPD_BRIGHTNESS_DEFAULT);
+			INT_INFO("Applying new default brightness to text indicator. Changing from %d to %d.\n", _dsTextBrightness, dsFPD_BRIGHTNESS_DEFAULT);
 			_dsTextBrightness = dsFPD_BRIGHTNESS_DEFAULT;
 		}
 #endif
 		
-		INFO("Power Brightness Read from Persistent is %d \r\n",_dsPowerBrightness);
-		INFO("Text Brightness Read from Persistent is %d \r\n",_dsTextBrightness);
+		INT_INFO("Power Brightness Read from Persistent is %d \r\n",_dsPowerBrightness);
+		INT_INFO("Text Brightness Read from Persistent is %d \r\n",_dsTextBrightness);
 
 		#ifdef HAS_CLOCK_DISPLAY
 			string _TimeFormat("12_HOUR");
@@ -221,13 +221,13 @@ IARM_Result_t dsFPDMgr_init()
 				_dsTextTimeFormat = dsFPD_TIME_24_HOUR;
 				device::HostPersistence::getInstance().persistHostProperty("Text.timeformat","24_HOUR");
 			}
-			INFO("Clock Time Format Read from Persistent is %s \r\n",_TimeFormat.c_str());
+			INT_INFO("Clock Time Format Read from Persistent is %s \r\n",_TimeFormat.c_str());
 		#endif
 
 	}
 	catch(...)
 	{
-		ERROR("Error in Reading Brightness Value On Startup.. Use Default value \r\n");
+		INT_ERROR("Error in Reading Brightness Value On Startup.. Use Default value \r\n");
 	}
 
 	return IARM_RESULT_SUCCESS;
@@ -245,7 +245,7 @@ IARM_Result_t _dsFPInit(void *arg)
 
     if (!m_isInitialized) {
 
-    	INFO("<<<<< called _dsFPInit >>>>>>>>\r\n");
+    	INT_INFO("<<<<< called _dsFPInit >>>>>>>>\r\n");
 
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsFPTerm,_dsFPTerm);
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetFPText,_dsSetFPText);
@@ -321,7 +321,7 @@ IARM_Result_t _dsSetFPText(void *arg)
         }
     }
     else {
-       INFO("_dsSetFPText: Not setting Text, Clock mode enabled \r\n");
+       INT_INFO("_dsSetFPText: Not setting Text, Clock mode enabled \r\n");
     }
 
     IARM_BUS_Unlock(lock);
@@ -347,7 +347,7 @@ IARM_Result_t _dsSetFPTime(void *arg)
         }
     }
     else {
-       INFO("_dsSetFPTime: Not setting Clock, Text mode enabled \r\n");
+       INT_INFO("_dsSetFPTime: Not setting Clock, Text mode enabled \r\n");
     }
 
     IARM_BUS_Unlock(lock);
@@ -409,7 +409,7 @@ IARM_Result_t _dsGetFPBrightness(void *arg)
 
 	param->eBrightness = _dsPowerBrightness;
 
-	INFO("_dsGetFPBrightness Power  Brightness is %d \r\n",param->eBrightness);
+	INT_INFO("_dsGetFPBrightness Power  Brightness is %d \r\n",param->eBrightness);
 
 	IARM_BUS_Unlock(lock);
 	return IARM_RESULT_SUCCESS;
@@ -439,7 +439,7 @@ IARM_Result_t _dsSetFPBrightness(void *arg)
 			{
 				case dsFPD_INDICATOR_POWER:
 				{	
-					 INFO("_dsSetFPBrightness Power Brightness From  App is %d \r\n",param->eBrightness);
+					 INT_INFO("_dsSetFPBrightness Power Brightness From  App is %d \r\n",param->eBrightness);
 					
 					if(param->toPersist)
 					{	
@@ -461,7 +461,7 @@ IARM_Result_t _dsSetFPBrightness(void *arg)
 		    }    
 		    catch(...)
 		    {
-			ERROR("Error in Persisting the Power Brightness Value \r\n");
+			INT_ERROR("Error in Persisting the Power Brightness Value \r\n");
 		    }
                 }
                 else
@@ -494,7 +494,7 @@ IARM_Result_t _dsGetFPTextBrightness(void *arg)
 			* Text Display Indicator Brightness
 		*/
 		param->eBrightness = _dsTextBrightness;
-		INFO("_dsGetFPTextBrightness Brightness is %d \r\n",param->eBrightness);
+		INT_INFO("_dsGetFPTextBrightness Brightness is %d \r\n",param->eBrightness);
 
 		IARM_BUS_Unlock(lock);
 	#endif
@@ -522,7 +522,7 @@ IARM_Result_t _dsSetFPTextBrightness(void *arg)
 			{
 				case dsFPD_TEXTDISP_TEXT:
 				{	
-					 INFO("_dsSetFPTextBrightness Brightness frm App is %d \r\n",param->eBrightness);
+					 INT_INFO("_dsSetFPTextBrightness Brightness frm App is %d \r\n",param->eBrightness);
 					_dsTextBrightness = param->eBrightness;
 					device::HostPersistence::getInstance().persistHostProperty("Text.brightness",numberToString(_dsTextBrightness));
 					break;
@@ -535,7 +535,7 @@ IARM_Result_t _dsSetFPTextBrightness(void *arg)
 		    }
 		    catch(...)
 		    {
-			ERROR("Error in Persisting the Text Brightness Value \r\n");
+			INT_ERROR("Error in Persisting the Text Brightness Value \r\n");
 		    }
                 }
                 else
@@ -580,7 +580,7 @@ IARM_Result_t _dsSetFPColor(void *arg)
     {
     param->eColor &= 0x00FFFFFF;
     srvFPDSettings[param->eIndicator].color = param->eColor;
-    INFO("_dsSetFPColor Value  From  App is %d for Indicator %d \r\n",param->eColor,param->eIndicator);
+    INT_INFO("_dsSetFPColor Value  From  App is %d for Indicator %d \r\n",param->eColor,param->eIndicator);
     try{
 			switch (param->eIndicator)
 			{
@@ -605,12 +605,12 @@ IARM_Result_t _dsSetFPColor(void *arg)
 		}
 		catch(...)
 		{
-			ERROR("Error in Persisting the Color  Value \r\n");
+			INT_ERROR("Error in Persisting the Color  Value \r\n");
 		}
     }
     else
     {
-       ERROR("Error in dsSetFPColor dsStatus:%d \r\n",dsStatus);
+       INT_ERROR("Error in dsSetFPColor dsStatus:%d \r\n",dsStatus);
        ret = IARM_RESULT_INVALID_PARAM;
     }
     IARM_BUS_Unlock(lock);
@@ -657,7 +657,7 @@ IARM_Result_t _dsSetFPState(void *arg)
                 if(dsStatus == dsERR_NONE)
                 {
 		    if(param->eIndicator == dsFPD_INDICATOR_POWER)
-			INFO("_dsSetFPState Setting Power LED to ON with Brightness %d \r\n",_dsPowerBrightness);
+			INT_INFO("_dsSetFPState Setting Power LED to ON with Brightness %d \r\n",_dsPowerBrightness);
 	
 		    srvFPDSettings[param->eIndicator].state = param->state;
                 }
@@ -672,7 +672,7 @@ IARM_Result_t _dsSetFPState(void *arg)
                 if(dsStatus == dsERR_NONE)
                 {
 		    if(param->eIndicator == dsFPD_INDICATOR_POWER)
-			INFO("_dsSetFPState Setting Power LED to OFF with Brightness 0 \r\n");
+			INT_INFO("_dsSetFPState Setting Power LED to OFF with Brightness %d \r\n",_dsPowerBrightness);  //CID:127891 - Print_args
 
 		    srvFPDSettings[param->eIndicator].state = param->state;
                 }
@@ -700,7 +700,7 @@ IARM_Result_t _dsGetTimeFormat(void *arg)
 
 	if( param == NULL)
 	{
-		INFO("Error:_dsGetTimeFormat : NULL Param ... \r\n");
+		INT_INFO("Error:_dsGetTimeFormat : NULL Param ... \r\n");
 		IARM_BUS_Unlock(lock);
 		return IARM_RESULT_INVALID_PARAM;
 	}	
@@ -724,7 +724,7 @@ IARM_Result_t _dsSetTimeFormat(void *arg)
 
 	    if( param == NULL)
 	    {
-	    	INFO("Error:_dsSetTimeFormat : NULL Param ... \r\n");
+	    	INT_INFO("Error:_dsSetTimeFormat : NULL Param ... \r\n");
 	    	IARM_BUS_Unlock(lock);
 	    	return IARM_RESULT_INVALID_PARAM;
 	    }	
@@ -736,12 +736,12 @@ IARM_Result_t _dsSetTimeFormat(void *arg)
 			if (param->eTime == dsFPD_TIME_12_HOUR)
 			{
 				device::HostPersistence::getInstance().persistHostProperty("Text.timeformat","12_HOUR");
-				INFO("Clock Time Format Updated to 12_HOUR ... \r\n");
+				INT_INFO("Clock Time Format Updated to 12_HOUR ... \r\n");
 			}
 			else if (param->eTime == dsFPD_TIME_24_HOUR)
 			{
 				device::HostPersistence::getInstance().persistHostProperty("Text.timeformat","24_HOUR");
-				INFO("Clock Time Format Updated to 24_HOUR ... \r\n");
+				INT_INFO("Clock Time Format Updated to 24_HOUR ... \r\n");
 			}
 	    
 		   	/* Send Time Format Event */
@@ -753,7 +753,7 @@ IARM_Result_t _dsSetTimeFormat(void *arg)
 	    	
 	    	IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,(IARM_EventId_t)_eventId,(void *)&_eventData, sizeof(_eventData));
 		    
-		    INFO("Sent Clock IARM_BUS_DSMGR_EVENT_TIME_FORMAT_CHANGE event ... \r\n");
+		    INT_INFO("Sent Clock IARM_BUS_DSMGR_EVENT_TIME_FORMAT_CHANGE event ... \r\n");
 		}
 
 	    IARM_BUS_Unlock(lock);
@@ -790,10 +790,10 @@ IARM_Result_t _dsSetFPDMode(void *arg)
                 dsFPDModeParam_t *param = (dsFPDModeParam_t *)arg;
                 if ((param->eMode == dsFPD_MODE_ANY) || (param->eMode == dsFPD_MODE_TEXT) || (param->eMode == dsFPD_MODE_CLOCK)) {
                     _dsFPDMode = param->eMode;
-                    INFO("_dsSetFPDMode: Mode set to %d \r\n",param->eMode);
+                    INT_INFO("_dsSetFPDMode: Mode set to %d \r\n",param->eMode);
                 }
                 else {
-                    INFO("Error:_dsSetFPDMode : Invalid Param ... \r\n");
+                    INT_INFO("Error:_dsSetFPDMode : Invalid Param ... \r\n");
                     IARM_BUS_Unlock(lock);
                     return IARM_RESULT_INVALID_PARAM;
                 }

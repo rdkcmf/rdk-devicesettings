@@ -42,15 +42,11 @@ int ds_hal_log(int priority,const char *format, ...);
 
 
 
-#define INT_INFO(FORMAT, ...)           ds_hal_log(INFO_LEVEL ,FORMAT,  __VA_ARGS__ )
-#define INT_WARN(FORMAT, ...)           ds_hal_log(WARN_LEVEL ,FORMAT,  __VA_ARGS__ )
-#define INT_ERROR(FORMAT, ...)          ds_hal_log(ERROR_LEVEL ,FORMAT,  __VA_ARGS__ )
-#define INT_DEBUG(FORMAT, ...)          ds_hal_log(DEBUG_LEVEL ,FORMAT,  __VA_ARGS__ )
+#define INT_INFO(FORMAT, ...)           ds_hal_log(INFO_LEVEL ,FORMAT, ##__VA_ARGS__ )
+#define INT_WARN(FORMAT, ...)           ds_hal_log(WARN_LEVEL ,FORMAT,  ##__VA_ARGS__ )
+#define INT_ERROR(FORMAT, ...)          ds_hal_log(ERROR_LEVEL ,FORMAT,  ##__VA_ARGS__ )
+#define INT_DEBUG(FORMAT, ...)          ds_hal_log(DEBUG_LEVEL ,FORMAT,  ##__VA_ARGS__ )
 
-#define DEBUG(...)	            INT_DEBUG(__VA_ARGS__,"")
-#define ERROR(...)              INT_ERROR(__VA_ARGS__,"")
-#define WARN(...)               INT_WARN(__VA_ARGS__,"")
-#define INFO(...)               INT_INFO(__VA_ARGS__,"")
 
 #endif
 

@@ -159,6 +159,7 @@ FrontPanelTextDisplay::FrontPanelTextDisplay(int id, int maxBrightness, int maxC
                                              const string &supportedCharacters,int colorMode):
                                              FrontPanelIndicator(id, maxBrightness, maxCycleRate, levels, colorMode)
 {
+  _TextBrightness = 0;   //CID:80988 - Uninit_ctor
   _timeFormat = kModeClock24Hr;
   _scroll = Scroll(maxVerticalIterations, maxHorizontalIterations);
 	if (::isValid(id)) {

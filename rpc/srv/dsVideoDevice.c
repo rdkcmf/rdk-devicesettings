@@ -74,6 +74,7 @@ static bool get_HDR_DV_RFC_config();
 IARM_Result_t dsVideoDeviceMgr_init()
 {
    IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsVideoDeviceInit, _dsVideoDeviceInit);
+   IARM_BUS_Lock(lock);
 
 	try
 	{
@@ -121,6 +122,7 @@ IARM_Result_t dsVideoDeviceMgr_init()
     }
     /*coverity[missing_lock]  CID-19380 using Coverity Annotation to ignore error*/
     m_isPlatInitialized++;
+    IARM_BUS_Unlock(lock);   //CID:136385 - Data race condition
     
    return IARM_RESULT_SUCCESS;
 }
@@ -249,7 +251,7 @@ IARM_Result_t _dsGetDFC(void *arg)
 	if (param != NULL)
 	{
 		param->dfc = srv_dfc;
-		INFO("The Zoom Settings value is %d \r\n",param->dfc);
+		INT_INFO("The Zoom Settings value is %d \r\n",param->dfc);
 	}
 
 	IARM_BUS_Unlock(lock);
@@ -436,9 +438,9 @@ static bool get_HDR_DV_RFC_config()
                 is_enabled = true;
             }
         }
+	pclose(pipe);  //CID:154209 - Forward Null
     }
     printf("%s: the feature is %s.\n", __FUNCTION__, (true == is_enabled? "enabled" : "disabled"));
-    pclose(pipe);
     return is_enabled;
 }
 

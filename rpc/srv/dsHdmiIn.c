@@ -133,8 +133,8 @@ static dsError_t isHdmiARCPort (int iPort, bool* isArcEnabled) {
             dlclose(dllib);
         }
         else {
-            printf("%s:%d dsIsHdmiARCPort  Opening RDK_DSHAL_NAME [%] failed %s\r\n", 
-                   __FUNCTION__,__LINE__, RDK_DSHAL_NAME, dlerror());
+            printf("%s:%d dsIsHdmiARCPort  Opening RDK_DSHAL_NAME[%s] failed %s\r\n", 
+                   __FUNCTION__,__LINE__, RDK_DSHAL_NAME, dlerror());  //CID 168096 - Print Args
             eRet = dsERR_GENERAL;
         }
     }
@@ -199,7 +199,7 @@ static dsError_t getHDMISPDInfo (int iHdmiPort, unsigned char **spd) {
             dlclose(dllib);
         }
         else {
-            printf("%s:%d dsGetHDMISPDInfo  Opening RDK_DSHAL_NAME [%] failed %s\r\n",
+            printf("%s:%d dsGetHDMISPDInfo  Opening RDK_DSHAL_NAME [%s] failed %s\r\n",
                    __FUNCTION__,__LINE__, RDK_DSHAL_NAME, dlerror());
             eRet = dsERR_GENERAL;
         }

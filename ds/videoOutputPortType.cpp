@@ -148,7 +148,11 @@ VideoOutputPortType & VideoOutputPortType::getInstance(const std::string &name)
  * @return Reference to the instance of the videooutputport type id.
  */
 VideoOutputPortType::VideoOutputPortType(const int id)
- {
+{
+	_dtcpSupported = false;
+	_hdcpSupported = false;
+	_dynamic = false;
+	_restrictedResolution = 0;
 	if (::isValid(id)) {
 		_id = id;
 		_name = std::string(_names[id]);

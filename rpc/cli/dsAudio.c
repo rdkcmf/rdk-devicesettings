@@ -1277,7 +1277,7 @@ dsError_t dsGetAudioDelay(int handle, uint32_t *audioDelayMs)
 
 	if (IARM_RESULT_SUCCESS != rpcRet)
 	{
-		ERROR("%s: AUDIODELAY CLIENT (GET) GENERAL ERROR\n", __FUNCTION__);
+		INT_ERROR("%s: AUDIODELAY CLIENT (GET) GENERAL ERROR\n", __FUNCTION__);
 		return dsERR_GENERAL;
 	}
 

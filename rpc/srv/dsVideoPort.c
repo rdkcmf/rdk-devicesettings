@@ -122,7 +122,7 @@ static dsVideoResolution_t getPixelResolution(std::string &resolution);
 
 IARM_Result_t dsVideoPortMgr_init()
 {
-	
+   IARM_BUS_Lock(lock);
    std::string _Resolution(DEFAULT_RESOLUTION);
 	
 	try
@@ -178,6 +178,7 @@ IARM_Result_t dsVideoPortMgr_init()
 	{
 		printf("Exception in getting force-disable-4K setting at start up.\r\n");
 	}
+	IARM_BUS_Unlock(lock);  //CID:136282 - Data race condition
 	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsVideoPortInit, _dsVideoPortInit);
     return IARM_RESULT_SUCCESS;
 }
@@ -727,23 +728,21 @@ IARM_Result_t _dsSetResolution(void *arg)
 	dsError_t ret = dsERR_NONE;
     
 	IARM_BUS_Lock(lock);
-	
 
 	dsVideoPortSetResolutionParam_t *param = (dsVideoPortSetResolutionParam_t *)arg;
-        dsVideoPortType_t _VPortType = _GetVideoPortType(param->handle);
-        bool isConnected = 0;
-        dsIsDisplayConnected(param->handle,&isConnected);
-        if(!isConnected)
+	if (param != NULL)   //CID:82753 - Reverse_inull
         {
-            printf("Port _VPortType:%d  not connected..Ignoring Resolution Request------\r\n",_VPortType);
-            ret = dsERR_OPERATION_NOT_SUPPORTED;
-            param->result = ret;
-            IARM_BUS_Unlock(lock);
-            return IARM_RESULT_SUCCESS;
-        }
-	
-	if (param != NULL)
-	{
+		dsVideoPortType_t _VPortType = _GetVideoPortType(param->handle);
+		bool isConnected = 0;
+		dsIsDisplayConnected(param->handle,&isConnected);
+		if(!isConnected)
+		{
+		    printf("Port _VPortType:%d  not connected..Ignoring Resolution Request------\r\n",_VPortType);
+		    ret = dsERR_OPERATION_NOT_SUPPORTED;
+		    param->result = ret;
+		    IARM_BUS_Unlock(lock);
+		    return IARM_RESULT_SUCCESS;
+		}
 	
 		dsVideoPortResolution_t resolution = param->resolution;
 		std::string resolutionName(resolution.name);
@@ -1487,8 +1486,8 @@ IARM_Result_t _dsSetScartParameter(void *arg)
             }
             else {
                 printf("dsSRV: dsSetScartParameter(int,const char*,const char*) is not defined\r\n");
-                dlclose(dllib);
             }
+	    dlclose(dllib);  //CID:87033 - Resource leak
         }
         else {
             printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
@@ -1528,8 +1527,8 @@ IARM_Result_t _dsIsOutputHDR(void *arg)
             }
             else {
                 printf("dsSRV: dsIsOutputHDR(int handle, bool *hdr) is not defined\r\n");
-                dlclose(dllib);
             }
+	    dlclose(dllib);   //CID:83623 - Resource leak
         }
         else {
             printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
@@ -1569,8 +1568,8 @@ IARM_Result_t _dsResetOutputToSDR(void *arg)
             }
             else {
                 printf("dsSRV: dsResetOutputToSDR() is not defined\r\n");
-                dlclose(dllib);
             }
+	    dlclose(dllib);  //CID:88069 - Resource leak
         }
         else {
             printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
@@ -1607,8 +1606,8 @@ IARM_Result_t _dsSetHdmiPreference(void *arg)
             }
             else {
                 printf("dsSRV: dsSetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol) is not defined\r\n");
-                dlclose(dllib);
             }
+	    dlclose(dllib);  //CID:83238 - Resource leak
         }
         else {
             printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
@@ -1649,8 +1648,8 @@ IARM_Result_t _dsGetHdmiPreference(void *arg)
             }
             else {
                 printf("dsSRV: dsGetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol) is not defined\r\n");
-                dlclose(dllib);
             }
+	    dlclose(dllib);   //CID:82165 - Resource leak
         }
         else {
             printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
@@ -1689,8 +1688,8 @@ IARM_Result_t _dsSetBackgroundColor(void *arg)
             }
             else {
                 printf("dsSRV: dsError_t dsSetBackgroundColor(int handle, dsVideoBackgroundColor_t color) is not defined\r\n");
-                dlclose(dllib);
             }
+	    dlclose(dllib);  //CID:86640 - Resource leak
         }
         else {
             printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);

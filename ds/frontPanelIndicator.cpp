@@ -272,6 +272,10 @@ FrontPanelIndicator & FrontPanelIndicator::getInstance(const std::string &name)
 FrontPanelIndicator::FrontPanelIndicator(int id, int maxBrightness, int maxCycleRate, int levels , int colorMode):
                                          _maxBrightness(maxBrightness), _maxCycleRate(maxCycleRate), _levels(levels),_colorMode(colorMode)
 {
+	_brightness = 0;
+	_state = 0;
+	_color = 0;
+	_color_rgb32 = 0;  //CID:88908 - Uninit_ctor
 	if (::isIndicatorValid(id)) {
 		_id = id;
 		_name = std::string(_indicatorNames[id]);
@@ -321,17 +325,16 @@ void FrontPanelIndicator::setBrightness(const int &brightness,bool toPersist)
 bool FrontPanelIndicator::getState() 
 {
 	dsFPDState_t state;
-	bool _retState;
 	
 	if (dsERR_NONE == dsGetFPState((dsFPDIndicator_t)_id,&state))
 	{
-		_retState = ((state == dsFPD_STATE_ON )? true: false);
-		return _retState;
+		return state == dsFPD_STATE_ON;
 	}
         else
         {
                 throw IllegalArgumentException();
         }
+	return false;   //CID:82714 - Missing return
 }
 
 

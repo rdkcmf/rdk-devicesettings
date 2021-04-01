@@ -1048,6 +1048,7 @@ void AudioConfigInit()
 
 IARM_Result_t dsAudioMgr_init()
 {
+   IARM_BUS_Lock(lock);
    try
 	{
 		/* Get the AudioModesettings FOR HDMI from Persistence */
@@ -1140,7 +1141,9 @@ IARM_Result_t dsAudioMgr_init()
         /*coverity[missing_lock]  CID-19380 using Coverity Annotation to ignore error*/
         m_isPlatInitialized ++;
 
+        IARM_BUS_Unlock(lock);  //CID:136568 - Data race condition
 	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioPortInit, _dsAudioPortInit);
+	
     return IARM_RESULT_SUCCESS;
 }
 
@@ -1476,6 +1479,10 @@ IARM_Result_t _dsSetStereoAuto(void *arg)
     IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     dsAudioSetStereoAutoParam_t *param = (dsAudioSetStereoAutoParam_t *)arg;
 
+    if(param == NULL)
+    {
+	printf("Param is  null\r\n");
+    }
     if (param->toPersist) {
         device::HostPersistence::getInstance().persistHostProperty("HDMI0.AudioMode.AUTO", param->autoMode ? "TRUE" : "FALSE");
         device::HostPersistence::getInstance().persistHostProperty("HDMI_ARC0.AudioMode.AUTO", param->autoMode ? "TRUE" : "FALSE");
@@ -2845,9 +2852,10 @@ IARM_Result_t _dsGetDolbyVolumeMode(void *arg)
 
     dsSetDolbyVolumeParam_t *param = (dsSetDolbyVolumeParam_t *)arg;
     bool enable = false;
-    param->enable = false;
+
     if (func != 0 && param != NULL)
     {
+	param->enable = false;
         if (func(param->handle, &enable) == dsERR_NONE)
         {
             param->enable = enable;
@@ -3082,9 +3090,9 @@ IARM_Result_t _dsGetBassEnhancer(void *arg)
 
     dsBassEnhancerParam_t *param = (dsBassEnhancerParam_t *)arg;
     int boost = 0;
-    param->boost = 0;
     if (func != 0 && param != NULL)
     {
+        param->boost = 0;  //CID:155155 - Rverse_inull
         if (func(param->handle, &boost) == dsERR_NONE)
         {
             param->boost = boost;
@@ -3177,9 +3185,10 @@ IARM_Result_t _dsIsSurroundDecoderEnabled(void *arg)
 
     dsSurroundDecoderParam_t *param = (dsSurroundDecoderParam_t *)arg;
     bool enable = false;
-    param->enable = false;
+
     if (func != 0 && param != NULL)
     {
+        param->enable = false;   //CID:155170 - Reverse_inull
         if (func(param->handle, &enable) == dsERR_NONE)
         {
             param->enable = enable;
@@ -3461,9 +3470,9 @@ IARM_Result_t _dsGetMISteering(void *arg)
 
     dsMISteeringParam_t *param = (dsMISteeringParam_t *)arg;
     bool enable = false;
-    param->enable = false;
     if (func != 0 && param != NULL)
     {
+        param->enable = false;  //CID:155153 - Reverse_inull
         if (func(param->handle, &enable) == dsERR_NONE)
         {
             param->enable = enable;
@@ -3795,10 +3804,10 @@ IARM_Result_t _dsGetSupportedARCTypes(void *arg)
 
     dsGetSupportedARCTypesParam_t *param = (dsGetSupportedARCTypesParam_t *)arg;
     int types = dsAUDIOARCSUPPORT_NONE;
-    param->types = dsAUDIOARCSUPPORT_NONE;
 
     if (func != 0 && param != NULL)
     {
+        param->types = dsAUDIOARCSUPPORT_NONE;   //CID:163840 - Reverse_inull
         if (func(param->handle, &types) == dsERR_NONE)
         {
             param->types = types;

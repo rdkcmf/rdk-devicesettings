@@ -69,7 +69,7 @@ static dsVideoPortType_t _GetDisplayPortType(int handle);
 
 IARM_Result_t dsDisplayMgr_init()
 {
-	
+	IARM_BUS_Lock(lock);
 	if (!m_isPlatInitialized) {
     	/* Nexus init, if any here */
     	dsDisplayInit();
@@ -77,6 +77,7 @@ IARM_Result_t dsDisplayMgr_init()
 	/*coverity[missing_lock]  CID-19379 using Coverity Annotation to ignore error*/
 	m_isPlatInitialized++;
 
+	IARM_BUS_Unlock(lock);  //CID:136387 - Data race condition
 	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsDisplayInit, _dsDisplayInit);
     return IARM_RESULT_SUCCESS;
 }
