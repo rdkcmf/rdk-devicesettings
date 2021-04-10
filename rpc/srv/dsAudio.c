@@ -979,13 +979,15 @@ void AudioConfigInit()
                 handle = 0;
                 dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
 	#ifndef LLAMA_AUDIO_MODES_INIT
-                try {
+// HISENSE-742: DVT1 Factory requirement. Disable DAP by default.
+//              Force MS12 audio profile Off. Don't initialise from persistence store
+/*                try {
                     _AProfile = device::HostPersistence::getInstance().getProperty("audio.MS12Profile");
                 }
                 catch(...) {
                     _AProfile = "Off";
                     printf("Exception in Getting the Audio Profile setting from persistence storage..... \r\n");
-                }
+                }*/
 	#endif
 
 //SPEAKER init
