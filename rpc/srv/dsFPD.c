@@ -540,7 +540,7 @@ IARM_Result_t _dsSetFPTextBrightness(void *arg)
                 }
                 else
                 {
-                    ret = IARM_RESULT_INVALID_PARAM;
+                    ret = IARM_RESULT_SUCCESS;
                 }     
 		
 	}
