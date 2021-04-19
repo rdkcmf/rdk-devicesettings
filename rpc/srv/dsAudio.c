@@ -68,6 +68,7 @@ dsAudioStereoMode_t _srv_HDMI_ARC_Audiomode = dsAUDIO_STEREO_STEREO;
 IARM_Result_t _dsAudioPortInit(void *arg);
 IARM_Result_t _dsGetAudioPort(void *arg);
 IARM_Result_t _dsGetSupportedARCTypes(void *arg);
+IARM_Result_t _dsAudioSetSAD(void *arg);
 IARM_Result_t _dsAudioEnableARC(void *arg);
 IARM_Result_t _dsSetStereoMode(void *arg);
 IARM_Result_t _dsSetStereoAuto(void *arg);
@@ -1061,7 +1062,9 @@ IARM_Result_t dsAudioMgr_init()
             #endif
           
 	    _AudioModeAuto = device::HostPersistence::getInstance().getProperty("HDMI0.AudioMode.AUTO",_AudioModeAuto);
-	    if (_AudioModeAuto.compare("TRUE") == 0)
+           std::string _ARCAudioModeAuto("FALSE");
+           _ARCAudioModeAuto = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.AudioMode.AUTO",_ARCAudioModeAuto);
+           if ((_AudioModeAuto.compare("TRUE") == 0) || (_ARCAudioModeAuto.compare("TRUE") == 0))	    
 	    {
 	        _srv_AudioAuto = 1;
 	    }
@@ -1089,7 +1092,7 @@ IARM_Result_t dsAudioMgr_init()
         }
                 /* Get the AudioModesettings for HDMI_ARC from Persistence */
                 std::string _ARCModeSettings("STEREO");
-                _ARCModeSettings = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.AudioMode",_SPDIFModeSettings);
+                _ARCModeSettings = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.AudioMode",_ARCModeSettings);
                 __TIMESTAMP();printf("The HDMI ARC Audio Mode Setting on startup  is %s \r\n",_ARCModeSettings.c_str());
                 if (_ARCModeSettings.compare("SURROUND") == 0)
                 {
@@ -1134,6 +1137,7 @@ IARM_Result_t _dsAudioPortInit(void *arg)
 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioPort,_dsGetAudioPort);
 	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetSupportedARCTypes,_dsGetSupportedARCTypes);
+	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioSetSAD,_dsAudioSetSAD);
 	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioEnableARC,_dsAudioEnableARC);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetStereoMode,_dsSetStereoMode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetStereoMode,_dsGetStereoMode);
@@ -1447,10 +1451,42 @@ IARM_Result_t _dsSetStereoAuto(void *arg)
     _DEBUG_ENTER();
     IARM_BUS_Lock(lock);
 
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     dsAudioSetStereoAutoParam_t *param = (dsAudioSetStereoAutoParam_t *)arg;
 
     if (param->toPersist) {
         device::HostPersistence::getInstance().persistHostProperty("HDMI0.AudioMode.AUTO", param->autoMode ? "TRUE" : "FALSE");
+        device::HostPersistence::getInstance().persistHostProperty("HDMI_ARC0.AudioMode.AUTO", param->autoMode ? "TRUE" : "FALSE");
+    }
+
+    dsAudioPortType_t _APortType = _GetAudioPortType(param->handle);
+    if (_APortType == dsAUDIOPORT_TYPE_HDMI_ARC) {
+        typedef dsError_t (*dsSetStereoAuto_t)(int handle, int autoMode);
+        static dsSetStereoAuto_t func = 0;
+        if (func == 0) {
+            void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+            if (dllib) {
+                func = (dsSetStereoAuto_t) dlsym(dllib, "dsSetStereoAuto");
+                if (func) {
+                    printf("dsSetStereoAuto_t(int, int *) is defined and loaded\r\n");
+                }
+                else {
+                    printf("dsSetStereoAuto_t(int, int *) is not defined\r\n");
+                }
+                dlclose(dllib);
+            }
+            else {
+                printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+            }
+        }
+
+        if (func != 0 && param != NULL)
+        {
+            if (func(param->handle, param->autoMode) == dsERR_NONE)
+            {
+               result = IARM_RESULT_SUCCESS;
+            }
+        }
     }
 
     _srv_AudioAuto = param->autoMode ? 1 : 0;
@@ -3672,6 +3708,50 @@ IARM_Result_t _dsGetSupportedARCTypes(void *arg)
         if (func(param->handle, &types) == dsERR_NONE)
         {
             param->types = types;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsAudioSetSAD(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsAudioSetSAD_t)(int handle, dsAudioSADList_t sad_list);
+    static dsAudioSetSAD_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsAudioSetSAD_t) dlsym(dllib, "dsAudioSetSAD");
+            if (func) {
+                printf("dsAudioSetSAD_t(int, dsAudioSADList_t) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsAudioSetSAD_t(int, dsAudioSADList_t) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAudioSetSADParam_t *param = (dsAudioSetSADParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->list) == dsERR_NONE)
+        {
             result = IARM_RESULT_SUCCESS;
         }
     }

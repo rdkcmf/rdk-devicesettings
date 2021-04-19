@@ -250,6 +250,16 @@ typedef enum _dsAudioARCTypes_t {
 } dsAudioARCTypes_t;
 
 /**
+ * @brief Structure that defines Short Audio Descriptors retrieved from 
+ * connected ARC device
+ */
+#define MAX_SAD 15
+typedef struct _dsAudioSADList_t {
+	int sad[MAX_SAD];
+	int count;
+} dsAudioSADList_t;
+
+/**
  * @brief Structure that defines ARC status for the HDMI ARC/EARC port.
  */
 typedef struct _dsAudioARCStatus_t {

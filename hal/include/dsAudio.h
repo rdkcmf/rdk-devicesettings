@@ -277,6 +277,23 @@ dsError_t  dsGetMS12AudioProfile(int handle, char *profile);
 
 dsError_t dsGetSupportedARCTypes(int handle, int *types);
 
+
+/**
+ * @brief Set Short Audio Descriptor retrieved from CEC for the connected ARC device
+ *
+ * This function sets the Short Audio Descriptor based on best available options
+ * of Audio capabilities supported by connected ARC device. Required when ARC output
+ * mode is Auto
+ *
+ * @param[in] handle Handle for the HDMI ARC/eARC port.
+ * @param[in] All SADs retrieved from connected ARC device
+ *
+ * @return Device Settings error code
+ * @retval dsERR_NONE Indicates dsGetSupportedARCTypes was successfully called using iarmbus.
+ */
+
+dsError_t dsAudioSetSAD(int handle, dsAudioSADList_t sad_list);
+
 /**
  * @brief enable/disable ARC/EARC and route audio to connected device
  *

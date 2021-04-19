@@ -54,6 +54,7 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsIsAudioMSDecode    "dsIsAudioMSDecode"
 #define  IARM_BUS_DSMGR_API_dsIsAudioMS12Decode    "dsIsAudioMS12Decode"
 #define  IARM_BUS_DSMGR_API_dsGetSupportedARCTypes    "dsGetSupportedARCTypes"
+#define  IARM_BUS_DSMGR_API_dsAudioSetSAD		"dsAudioSetSAD"	
 #define  IARM_BUS_DSMGR_API_dsAudioEnableARC    "dsAudioEnableARC"
 
 #define  IARM_BUS_DSMGR_API_dsIsAudioPortEnabled  "dsIsAudioPortEnabled"
@@ -247,6 +248,11 @@ typedef struct _dsGetSupportedARCTypesParam_t {
         int handle;
         int types;
 } dsGetSupportedARCTypesParam_t;
+
+typedef struct _dsAudioSetSADParam_t {
+	int handle;
+	dsAudioSADList_t list;
+} dsAudioSetSADParam_t;
 
 typedef struct _dsAudioEnableARCParam_t {
         int handle;

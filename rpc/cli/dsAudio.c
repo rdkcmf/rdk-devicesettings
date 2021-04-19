@@ -1214,6 +1214,31 @@ dsError_t dsGetSupportedARCTypes(int handle, int *types)
         return dsERR_NONE;
 }
 
+dsError_t dsAudioSetSAD(int handle, dsAudioSADList_t sad_list)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsAudioSetSADParam_t param;
+        param.handle = handle;
+	param.list.count = sad_list.count;
+
+	for(int i=0;i<sad_list.count;i++) {
+	    param.list.sad[i] = sad_list.sad[i];
+	}
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsAudioSetSAD,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (SET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        return dsERR_NONE;
+}
+
 dsError_t  dsAudioEnableARC(int handle, dsAudioARCStatus_t arcStatus)
 {
         IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;

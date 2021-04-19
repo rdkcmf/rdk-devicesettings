@@ -1302,6 +1302,33 @@ void AudioOutputPort::getSupportedARCTypes(int *types)
 }
 
 /**
+ * @fn AudioOutputPort::setSAD(std::vector<int> sad_list)
+ * @brief This function sets SAD(Short Audio Descriptor) to configure the best available
+ * audio format to send to the ARC device from the passed SAD list
+ *
+ * @param[in] sad_list  List of Short Audio Descriptors from the ARC device
+ *
+ * @return None
+ */
+void AudioOutputPort::setSAD(std::vector<int> sad_list)
+{
+        dsError_t ret = dsERR_NONE;
+	dsAudioSADList_t list;
+	list.count = sad_list.size();
+
+	for(int i=0; i<sad_list.size(); i++) {
+	    list.sad[i] = sad_list[i];
+	}
+
+        ret = dsAudioSetSAD(_handle, list);
+
+        if (ret != dsERR_NONE)
+        {
+                throw Exception(ret);
+        }
+}
+
+/**
  * @fn AudioOutputPort::enableARC(dsAudioARCTypes_t type, bool enable)
  * @brief This function enables/disables ARC/EARC and routes audio to connected device
  *
