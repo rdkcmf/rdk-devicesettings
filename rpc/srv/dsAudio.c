@@ -975,20 +975,23 @@ void AudioConfigInit()
 	#ifdef LLAMA_AUDIO_MODES_INIT
 		std::string _AProfile("Entertainment");
 	#else
-                std::string _AProfile("Off");
+		//Platco and Hisense
+                std::string _AProfile("User");
 	#endif
                 handle = 0;
                 dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
 	#ifndef LLAMA_AUDIO_MODES_INIT
-// HISENSE-742: DVT1 Factory requirement. Disable DAP by default.
-//              Force MS12 audio profile Off. Don't initialise from persistence store
-/*                try {
+		//Platco and Hisense use case. user - MS12 settings system default.  Off - MS12 settings turned off
+                try {
                     _AProfile = device::HostPersistence::getInstance().getProperty("audio.MS12Profile");
+		    if((_AProfile != "User") && (_AProfile != "Off")) {
+                        _AProfile = "User";
+                    }
                 }
                 catch(...) {
-                    _AProfile = "Off";
+                    _AProfile = "User";
                     printf("Exception in Getting the Audio Profile setting from persistence storage..... \r\n");
-                }*/
+                }
 	#endif
 
 //SPEAKER init
