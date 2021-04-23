@@ -88,6 +88,9 @@ public:
     void setVersion(uint32_t versionNumber);
     void getHostEDID(std::vector<uint8_t> &edid) const;
     std::string getSocIDFromSDK();
+    void getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCapability);
+    void setAudioAtmosOutputMode(bool enable);
+    bool isHDMIOutPortPresent();
 
 private:
 	Host();

@@ -535,6 +535,65 @@ namespace device
         return std::string(socID);
    }
 
+   /**
+    * Host::getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCapability)
+    * @brief
+    *
+    * @param[in/out] Sink device ATMOS capability
+    *
+    * @return None
+    */
+   void Host::getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCapability)
+   {
+       dsError_t ret = dsERR_NONE;
+       dsATMOSCapability_t capability;
+
+       //TV panel sink device is panel itsel so audio port is passed as NULL
+       ret = dsGetSinkDeviceAtmosCapability(NULL, &capability);
+
+       if (ret == dsERR_NONE)
+       {
+           atmosCapability = capability;
+       }
+       else
+       {
+           throw Exception(ret);
+       }
+   }
+
+   void Host::setAudioAtmosOutputMode(bool enable)
+   {
+       dsError_t ret = dsERR_NONE;
+       //TV panel sink device is panel itsel so audio port is passed as NULL
+       ret = dsSetAudioAtmosOutputMode(NULL,enable);
+       if (ret != dsERR_NONE)
+       {
+           throw Exception(ret);
+       }
+   }
+
+   bool  Host::isHDMIOutPortPresent()
+   {
+       bool isHDMIOutPort = false;
+
+       List<AudioOutputPortType> aTypes = AudioOutputPortConfig::getInstance().getSupportedTypes();
+       for (size_t i = 0; i < aTypes.size(); i++) {
+           List<AudioOutputPort> aPorts = aTypes.at(i).getPorts();
+           for (size_t j = 0; j < aPorts.size(); j++) {
+               string portName  = aPorts.at(j).getName();
+               if (portName.find("HDMI0") != string::npos) {
+                   isHDMIOutPort = true;
+                   break;
+               }
+           }
+           if (isHDMIOutPort) {
+               break;
+           }
+       }
+
+       return isHDMIOutPort;
+   }
+
 }
 
 
