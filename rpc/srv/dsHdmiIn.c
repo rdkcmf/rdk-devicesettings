@@ -72,6 +72,7 @@
 #include "libIARM.h"
 #include "libIBus.h"
 
+#include "safec_lib.h"
 
 #define direct_list_top(list) ((list))
 #define IARM_BUS_Lock(lock) pthread_mutex_lock(&fpLock)
@@ -688,8 +689,11 @@ void _dsHdmiInVideoModeUpdateCB(dsHdmiInPort_t port, dsVideoPortResolution_t vid
 }
 
 
-IARM_Result_t _dsGetEDIDBytesInfo (void *arg) {
+IARM_Result_t _dsGetEDIDBytesInfo (void *arg) 
+{
+    errno_t rc = -1;
     dsError_t eRet = dsERR_GENERAL;
+
     dsGetEDIDBytesInfoParam_t *param = (dsGetEDIDBytesInfoParam_t *) arg;
     memset (param->edid, '\0', MAX_EDID_BYTES_LEN);
     unsigned char *edidArg = NULL;
@@ -698,7 +702,11 @@ IARM_Result_t _dsGetEDIDBytesInfo (void *arg) {
     param->result = eRet;
     printf("[srv] %s: getEDIDBytesInfo eRet: %d\r\n", __FUNCTION__, param->result);
     if (edidArg != NULL) {
-        memcpy(param->edid, edidArg, param->length);
+	rc = memcpy_s(param->edid,sizeof(param->edid), edidArg, param->length);
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
     }
     IARM_BUS_Unlock(lock);
     return IARM_RESULT_SUCCESS;
@@ -706,6 +714,7 @@ IARM_Result_t _dsGetEDIDBytesInfo (void *arg) {
 
 IARM_Result_t _dsGetHDMISPDInfo(void *arg)
 {
+    errno_t rc = -1;
     _DEBUG_ENTER();
     printf("%s:%d [srv] _dsGetHDMISPDInfo \n", __PRETTY_FUNCTION__,__LINE__);
 
@@ -718,7 +727,11 @@ IARM_Result_t _dsGetHDMISPDInfo(void *arg)
     param->result = getHDMISPDInfo(param->iHdmiPort, (unsigned char **)(&spdArg));
     printf("[srv] %s: dsGetHDMISPDInfo eRet: %d\r\n", __FUNCTION__, param->result);
     if (spdArg != NULL) {
-        memcpy(param->spdInfo, spdArg, sizeof(struct dsSpd_infoframe_st));
+            rc = memcpy_s(param->spdInfo,sizeof(param->spdInfo), spdArg, sizeof(struct dsSpd_infoframe_st));
+            if(rc!=EOK)
+            {
+                    ERR_CHK(rc);
+            }
     }
 
     IARM_BUS_Unlock(lock);

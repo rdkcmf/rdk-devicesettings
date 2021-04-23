@@ -39,6 +39,8 @@
 #include "dsDisplay.h"
 #include "edid-parser.hpp"
 
+#include "safec_lib.h"
+
 #include "illegalArgumentException.hpp"
 #include "unsupportedOperationException.hpp"
 
@@ -452,7 +454,6 @@ bool VideoOutputPort::isDynamicResolutionSupported() const
  */
 void VideoOutputPort::setResolution(const std::string &resolutionName, bool persist/* = true*/)
 {
-
 	if (0 && resolutionName.compare(_resolution) == 0) {
 		return;
 	}
@@ -465,8 +466,12 @@ void VideoOutputPort::setResolution(const std::string &resolutionName, bool pers
 	resolution.interlaced 		= (bool)					newResolution.isInterlaced();
 	resolution.pixelResolution 	= (dsVideoResolution_t)	newResolution.getPixelResolution().getId();
 	resolution.stereoScopicMode = (dsVideoStereoScopicMode_t)newResolution.getStereoscopicMode().getId();
-	strcpy(resolution.name,resolutionName.c_str());
-
+        errno_t rc = -1;
+        rc = strcpy_s(resolution.name,sizeof(resolution.name),resolutionName.c_str());
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
 	dsError_t ret = dsSetResolution(_handle, &resolution, persist);
 
 	if (ret != dsERR_NONE) {

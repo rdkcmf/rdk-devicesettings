@@ -53,6 +53,8 @@
 #include "dsTypes.h"
 #include "dsVideoPortSettings.h"
 
+#include "safec_lib.h"
+
 #ifdef DEVICESETTINGS_DEFAULT_RESOLUTION
   #define DEFAULT_RESOLUTION DEVICESETTINGS_DEFAULT_RESOLUTION
 #else
@@ -703,6 +705,7 @@ IARM_Result_t _dsEnableVideoPort(void *arg)
 
 IARM_Result_t _dsGetResolution(void *arg)
 {
+    errno_t rc = -1;
     _DEBUG_ENTER();
    
 	IARM_BUS_Lock(lock);
@@ -760,9 +763,12 @@ IARM_Result_t _dsGetResolution(void *arg)
                         _Resolution = _dsRFResolution;
                 }
         }
-	
-	strcpy(resolution->name,_Resolution.c_str());
-        printf("%s _VPortType:%d  resolution::%s \n",__FUNCTION__,_VPortType,resolution->name);
+        rc = strcpy_s(resolution->name,sizeof(resolution->name),_Resolution.c_str());
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+     	printf("%s _VPortType:%d  resolution::%s \n",__FUNCTION__,_VPortType,resolution->name);
 	IARM_BUS_Unlock(lock);
 	
 	return IARM_RESULT_SUCCESS;

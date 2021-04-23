@@ -49,6 +49,8 @@
 #include "dsVideoPortSettings.h"
 #include "dsVideoResolutionSettings.h"
 
+#include "safec_lib.h"
+
 static int m_isInitialized = 0;
 static int m_isPlatInitialized = 0;
 static pthread_mutex_t dsLock = PTHREAD_MUTEX_INITIALIZER;
@@ -169,6 +171,7 @@ IARM_Result_t _dsGetEDIDBytes(void *arg)
 #warning   "RDK_DSHAL_NAME is not defined"
 #define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
 #endif
+    errno_t rc = -1;
     _DEBUG_ENTER();
 
     IARM_BUS_Lock(lock);
@@ -202,8 +205,12 @@ IARM_Result_t _dsGetEDIDBytes(void *arg)
         dsError_t ret = func(param->handle, &edid, &length);
         if (ret == dsERR_NONE && length <= 1024) {
             printf("dsSRV ::getEDIDBytes returns %d bytes\r\n", length);
-            memcpy(param->bytes, edid, length);
-            param->length = length;
+            rc = memcpy_s(param->bytes,sizeof(param->bytes),edid,length);
+            if(rc!=EOK)
+            {
+                    ERR_CHK(rc);
+            }
+     	    param->length = length;
             free(edid);
         }
         param->result = ret;
@@ -287,6 +294,7 @@ void _dsDisplayEventCallback(int handle, dsDisplayEvent_t event, void *eventData
 
 static void filterEDIDResolution(int handle, dsDisplayEDID_t *edid)
 {
+    errno_t rc = -1;
     dsVideoPortResolution_t *edidResn = NULL;
     dsVideoPortResolution_t *presolution = NULL;
     dsDisplayEDID_t edidData;
@@ -301,8 +309,11 @@ static void filterEDIDResolution(int handle, dsDisplayEDID_t *edid)
         /*Initialize the struct*/
         memset(&edidData,0,sizeof(edidData));
         /*Copy the content */
-        memcpy(&edidData,edid,sizeof(edidData));
-        
+        rc = memcpy_s(&edidData,sizeof(edidData),edid,sizeof(edidData));
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
         printf("[DsMgr] Total Resolution Count from HAL: %d\r\n",edid->numOfSupportedResolution);
         edid->numOfSupportedResolution = 0;
         for (size_t i = 0; i < iCount; i++)

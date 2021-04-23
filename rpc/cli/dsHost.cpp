@@ -38,6 +38,8 @@
 #include "libIBus.h"
 #include "dsHost.h"
 
+#include "safec_lib.h"
+
 dsError_t dsSetPreferredSleepMode(dsSleepMode_t mode)
 {
     _DEBUG_ENTER();
@@ -159,6 +161,7 @@ dsError_t dsSetVersion(uint32_t versionNumber)
 
 dsError_t dsGetSocIDFromSDK(char *socID)
 {
+    errno_t rc = -1;
     _DEBUG_ENTER();
 
     dsGetSocIDFromSDKParam_t param;
@@ -176,9 +179,11 @@ dsError_t dsGetSocIDFromSDK(char *socID)
    {
       return dsERR_GENERAL ;
    }
-
-   strcpy(socID,param.socID);
-
+   rc = strcpy_s(socID,sizeof(param.socID),param.socID);
+   if(rc!=EOK)
+   {
+           ERR_CHK(rc);
+   }
    return dsERR_NONE;
 
 }

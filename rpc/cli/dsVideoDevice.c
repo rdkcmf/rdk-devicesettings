@@ -41,6 +41,7 @@
 #include "libIARM.h"
 #include "dsTypes.h"
 
+#include "safec_lib.h"
 
 dsError_t dsVideoDeviceInit()
 {
@@ -285,8 +286,12 @@ dsError_t dsSetDisplayframerate(int handle, char *framerate)
 {
         dsFramerateParam_t param = {0};
         param.handle = handle;
-        strcpy(param.framerate , framerate);
-
+        errno_t rc = -1;
+	rc = strcpy_s(param.framerate ,sizeof(param.framerate), framerate);
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
         IARM_Result_t rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                         (char *) IARM_BUS_DSMGR_API_dsSetDisplayframerate,
                         (void *) &param,
@@ -301,6 +306,7 @@ dsError_t dsSetDisplayframerate(int handle, char *framerate)
 
 dsError_t dsGetCurrentDisplayframerate(int handle, char *framerate)
 {
+	errno_t rc = -1;
         dsFramerateParam_t param ={0};
         param.handle = handle;
 
@@ -311,8 +317,13 @@ dsError_t dsGetCurrentDisplayframerate(int handle, char *framerate)
 
         if (IARM_RESULT_SUCCESS == rpcRet)
         {
-                strcpy(framerate , param.framerate);
-                return dsERR_NONE;
+		errno_t rc = -1;
+		rc = strcpy_s(framerate ,sizeof(param.framerate), param.framerate);
+		if(rc!=EOK)
+		{
+			ERR_CHK(rc);
+		}
+      		return dsERR_NONE;
         }
         return dsERR_GENERAL ;
 }

@@ -43,6 +43,9 @@
 #include <iostream>
 #include <sstream>
 #include <string.h>
+
+#include "safec_lib.h"
+
 /**
  * @file videoDevice.cpp
  * @brief Video Device is also called "Decoder".
@@ -313,7 +316,12 @@ int VideoDevice::setDisplayframerate(const char *framerate) const
 {
         dsError_t ret;
         char buf[20] = {0};
-        strcpy(buf, framerate);
+	errno_t rc = -1;
+	rc = strcpy_s(buf,sizeof(buf), framerate);
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
         ret = dsSetDisplayframerate(_handle, buf);
         return 0;
 }
@@ -323,8 +331,13 @@ int VideoDevice::getCurrentDisframerate(char *framerate) const
         dsError_t ret;
         char getframerate[20];
         ret = dsGetCurrentDisplayframerate(_handle, getframerate);
-        strcpy(framerate ,getframerate);
-        return 0;
+        errno_t rc = -1;
+	rc = strcpy_s(framerate ,sizeof(getframerate) ,getframerate);
+	if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+     	return 0;
 }
 
 }

@@ -42,6 +42,8 @@
 #include "dsclientlogger.h"
 #include <string.h> 
 
+#include "safec_lib.h"
+
 dsError_t dsAudioPortInit()
 {
     IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
@@ -328,8 +330,12 @@ dsError_t  dsEnableAudioPort(int handle, bool enabled, const char* portName)
     param.handle = handle;
     param.enabled = enabled;
     memset(param.portName, '\0', sizeof(param.portName));
-    strcpy (param.portName, portName);
-
+    errno_t rc = -1;
+    rc = strcpy_s (param.portName,sizeof(param.portName), portName);
+    if(rc!=EOK)
+    {
+            ERR_CHK(rc);
+    }
     IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
 
 	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
@@ -354,8 +360,12 @@ dsError_t dsGetEnablePersist(int handle, const char* portName, bool *enabled)
     /*By default all port values are true*/
 	param.enabled = true;
     memset(param.portName, '\0', sizeof(param.portName));
-    strcpy (param.portName, portName);
-
+    errno_t rc = -1;
+    rc = strcpy_s (param.portName,sizeof(param.portName), portName);
+    if(rc!=EOK)
+    {
+            ERR_CHK(rc);
+    }
 	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                             (char *)IARM_BUS_DSMGR_API_dsGetEnablePersist,
                             (void *)&param,
@@ -379,8 +389,12 @@ dsError_t dsSetEnablePersist(int handle, const char* portName, bool enabled)
     param.handle = handle;
     param.enabled = enabled;
     memset(param.portName, '\0', sizeof(param.portName));
-    strcpy (param.portName, portName);
-
+    errno_t rc = -1;
+    rc = strcpy_s (param.portName,sizeof(param.portName), portName);
+    if(rc!=EOK)
+    {
+            ERR_CHK(rc);
+    }
     IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
 
 	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
@@ -1214,8 +1228,13 @@ dsError_t  dsSetMS12AudioProfile(int handle, const char* profile)
         param.handle = handle;
 
 	memset( param.profile, 0, sizeof(param.profile) );
-	strcpy(param.profile, profile);
-        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+        errno_t rc = -1;
+        rc = strcpy_s (param.profile,sizeof(param.profile), profile );
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+	rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                                                         (char *)IARM_BUS_DSMGR_API_dsSetMS12AudioProfile,
                                                         (void *)&param,
                                                         sizeof(param));

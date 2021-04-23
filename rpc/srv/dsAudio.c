@@ -49,6 +49,8 @@
 #include "dsserverlogger.h"
 #include "dsAudioSettings.h"
 
+#include "safec_lib.h"
+
 static int m_isInitialized = 0;
 static int m_isPlatInitialized = 0;
 
@@ -4576,6 +4578,7 @@ IARM_Result_t _dsGetMS12AudioProfile(void *arg)
 #warning   "RDK_DSHAL_NAME is not defined"
 #define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
 #endif
+    errno_t rc = -1;
     _DEBUG_ENTER();
     IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     IARM_BUS_Lock(lock);
@@ -4605,7 +4608,11 @@ IARM_Result_t _dsGetMS12AudioProfile(void *arg)
     {
         if (func(param->handle, m_profile) == dsERR_NONE)
         {
-            strcpy(param->profile, m_profile);
+            rc = strcpy_s(param->profile,sizeof(param->profile), m_profile);
+	    if(rc!=EOK)
+	    {
+		    ERR_CHK(rc);
+	    }
             result = IARM_RESULT_SUCCESS;
         }
     }

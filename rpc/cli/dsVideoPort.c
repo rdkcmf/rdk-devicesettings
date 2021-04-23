@@ -40,7 +40,7 @@
 #include "dsTypes.h"
 #include "dsclientlogger.h"
 
-
+#include "safec_lib.h"
 
 dsError_t dsVideoPortInit()
 {
@@ -454,6 +454,7 @@ dsError_t dsVideoPortTerm(void)
 
 dsError_t  dsEnableHDCP(int handle, bool contentProtect, char *hdcpKey, size_t keySize)
 {
+    errno_t rc = -1;
     _DEBUG_ENTER();
 
 //    if ((keySize <= 0) || (keySize > HDCP_KEY_MAX_SIZE) )
@@ -475,7 +476,11 @@ dsError_t  dsEnableHDCP(int handle, bool contentProtect, char *hdcpKey, size_t k
     param.rpcResult = dsERR_NONE;
 
     if (contentProtect && hdcpKey && keySize && keySize <= HDCP_KEY_MAX_SIZE) {
-        memcpy(param.hdcpKey, hdcpKey, keySize);
+            rc = memcpy_s(param.hdcpKey,sizeof(param.hdcpKey), hdcpKey, keySize);
+            if(rc!=EOK)
+            {
+                    ERR_CHK(rc);
+            }
     } 
     
     printf("IARM:CLI:dsEnableHDCP %d, %p, %d\r\n", contentProtect, hdcpKey, keySize);

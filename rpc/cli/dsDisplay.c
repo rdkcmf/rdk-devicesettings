@@ -41,7 +41,8 @@
 #include "libIBus.h"
 #include "dsTypes.h"
 #include "stdlib.h"
-	
+
+#include "safec_lib.h"
 
 dsError_t dsDisplayInit()
 {
@@ -131,9 +132,12 @@ dsError_t dsGetEDID(int handle, dsDisplayEDID_t *edid)
 							(char *)IARM_BUS_DSMGR_API_dsGetEDID,
 							(void *)&param,
 							sizeof(param));
-
-	memcpy(edid, &param.edid, sizeof(param.edid));
-
+        errno_t rc = -1;
+        rc = memcpy_s(edid,sizeof(dsDisplayEDID_t), &param.edid, sizeof(param.edid));
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
 	if (IARM_RESULT_SUCCESS == rpcRet)
 	{
 		 return dsERR_NONE;
@@ -144,6 +148,7 @@ dsError_t dsGetEDID(int handle, dsDisplayEDID_t *edid)
 
 dsError_t dsGetEDIDBytes(int handle, unsigned char **edid, int *length)
 {
+    errno_t rc = -1;
     IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
 
 	_DEBUG_ENTER();
@@ -165,8 +170,12 @@ dsError_t dsGetEDIDBytes(int handle, unsigned char **edid, int *length)
             printf("dsCLI ::getEDIDBytes returns %d bytes\r\n", param.length);
             *edid = (unsigned char *)malloc(param.length);
             if (*edid) {
-                memcpy(*edid, param.bytes, param.length);
-                *length = param.length;
+                rc = memcpy_s(*edid,param.length, param.bytes, param.length);
+                if(rc!=EOK)
+                {
+                        ERR_CHK(rc);
+                }
+     		*length = param.length;
                 return dsERR_NONE;
             }
             else {
