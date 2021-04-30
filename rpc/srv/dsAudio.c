@@ -56,6 +56,10 @@ static bool m_MS12DAPV2Enabled = 0;
 static bool m_MS12DEEnabled = 0;
 static bool m_LEEnabled = 0;
 static int m_volumeDuckingLevel = 0;
+static float m_volumeLevel = 0;
+static int m_MuteStatus = false;
+static int m_isDuckingInProgress = false;
+
 static pthread_mutex_t dsLock = PTHREAD_MUTEX_INITIALIZER;
 int _srv_AudioAuto  = 0;
 dsAudioStereoMode_t _srv_HDMI_Audiomode = dsAUDIO_STEREO_STEREO;
@@ -87,7 +91,7 @@ IARM_Result_t _dsGetEnablePersist(void *arg);
 IARM_Result_t _dsSetEnablePersist(void *arg);
 
 IARM_Result_t _dsEnableAudioPort(void *arg);
-IARM_Result_t _dsSetAudioDuckingLevel(void *arg);
+IARM_Result_t _dsSetAudioDucking(void *arg);
 IARM_Result_t _dsGetAudioLevel(void *arg);
 IARM_Result_t _dsSetAudioLevel(void *arg);
 IARM_Result_t _dsGetAudioGain(void *arg);
@@ -1163,7 +1167,7 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetStereoAuto,_dsGetStereoAuto);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioMute,_dsSetAudioMute);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioMute,_dsIsAudioMute);
-        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioDuckingLevel,_dsSetAudioDuckingLevel);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioDucking,_dsSetAudioDucking);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioLevel,_dsSetAudioLevel);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioLevel,_dsGetAudioLevel);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioGain,_dsSetAudioGain);
@@ -1513,21 +1517,79 @@ IARM_Result_t _dsSetStereoAuto(void *arg)
     return IARM_RESULT_SUCCESS;
 }
 
-IARM_Result_t _dsSetAudioDuckingLevel(void *arg)
+IARM_Result_t _dsSetAudioDucking(void *arg)
 {
     _DEBUG_ENTER();
 
     IARM_BUS_Lock(lock);
     int volume = 0;
-    dsAudioSetLevelParam_t *param = (dsAudioSetLevelParam_t *)arg;
+    dsAudioSetDuckingParam_t *param = (dsAudioSetDuckingParam_t *)arg;
     IARM_Bus_DSMgr_EventData_t eventData;
+    printf("%s action : %d type :%d val :%d m_volumeLevel:%f \n",__FUNCTION__,__FUNCTION__,param->action,param->type,param->level,m_volumeLevel );
+    if(m_MuteStatus)
+    {
+        printf("%s mute on so ignore the duckig request\n",__FUNCTION__);
+        IARM_BUS_Unlock(lock);
+        return IARM_RESULT_SUCCESS;
+    }
 
-    volume = param->level * 100;
+    if(param->action == dsAUDIO_DUCKINGACTION_START)
+    {
+        m_isDuckingInProgress = true;
+	if(param->type == dsAUDIO_DUCKINGTYPE_RELATIVE )
+	{
+             volume = (m_volumeLevel * param->level) / 100;
+	}
+	else
+	{
+           if(param->level > m_volumeLevel)
+           {
+		 volume =  m_volumeLevel;
+	   }
+           else
+	   {
+        	 volume = param->level;
+           }
+	}
+    }
+    else
+    {
+	m_isDuckingInProgress = false;
+	volume = m_volumeLevel;
+    }
+    printf(":%s adjusted volume volume :%d m_volumeDuckingLevel :%d\n",__FUNCTION__,volume,m_volumeDuckingLevel );
+
+    // apply volume to hal layer
+    dsAudioPortType_t _APortType = _GetAudioPortType(param->handle);
+
+    typedef dsError_t (*dsSetAudioLevel_t)(int handle, float level);
+    static dsSetAudioLevel_t func = 0;
+    if (func == 0)
+    {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetAudioLevel_t) dlsym(dllib, "dsSetAudioLevel");
+            if (func) {
+                printf("dsSetAudioLevel_t(int, float ) is defined and loadedØrØn");
+	    }
+            else {
+                printf("dsSetAudioLevel_t(int, float ) is not definedØrØn");
+	    }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME Æ%sÅ failedØrØn", RDK_DSHAL_NAME);
+	}
+    }
+    if (func != 0 )
+    {
+        func(param->handle, volume);
+    }
+
     if(volume != m_volumeDuckingLevel)
     {
         m_volumeDuckingLevel = volume;
 
-        dsAudioPortType_t _APortType = _GetAudioPortType(param->handle);
         dsAudioStereoMode_t mode = dsAUDIO_STEREO_STEREO;
         if (_APortType == dsAUDIOPORT_TYPE_SPDIF)
         {
@@ -1745,8 +1807,10 @@ IARM_Result_t _dsSetAudioLevel(void *arg)
 
     if (func != 0 && param != NULL)
     {
-        if (func(param->handle, param->level) == dsERR_NONE)
+	printf("_dsSetAudioLevel param->level :%f m_isDuckingInProgress :%d  \n",param->level,m_isDuckingInProgress);
+        if (m_isDuckingInProgress || func(param->handle, param->level) == dsERR_NONE)
         {
+		m_volumeLevel = (int) param->level;
 #ifdef DS_AUDIO_SETTINGS_PERSISTENCE
             std::string _AudioLevel = std::to_string(param->level);
             dsAudioPortType_t _APortType = _GetAudioPortType(param->handle);
@@ -1793,6 +1857,7 @@ IARM_Result_t _dsSetAudioMute(void *arg)
     dsAudioSetMutedParam_t *param = (dsAudioSetMutedParam_t *)arg;
     ret = dsSetAudioMute(param->handle, param->mute);
     if (ret == dsERR_NONE) {
+	    m_MuteStatus = param->mute;
 #ifdef DS_AUDIO_SETTINGS_PERSISTENCE
             std::string _mute = param->mute ? "TRUE" : "FALSE";
             dsAudioPortType_t _APortType = _GetAudioPortType(param->handle);

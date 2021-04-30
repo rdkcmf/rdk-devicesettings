@@ -204,6 +204,23 @@ typedef enum _dsAudioCompression_t{
     dsAUDIO_CMP_HEAVY,       /**< Heavy audio level compression.             */
     dsAUDIO_CMP_MAX          /**< Maximum index for audio compression types. */
 } dsAudioCompression_t;
+
+/**
+ * This enumeration defines the type of audio ducking action that can be used.
+ */
+typedef enum _dsAudioDuckingAction_t{
+    dsAUDIO_DUCKINGACTION_START,        /**< Audio ducking start.                      */
+    dsAUDIO_DUCKINGACTION_STOP,       /**< Audio ducking stop.             */
+} dsAudioDuckingAction_t;
+
+/**
+ * This enumeration defines the type of audio ducking type that can be used.
+ */
+typedef enum _dsAudioDuckingType_t{
+    dsAUDIO_DUCKINGTYPE_ABSOLUTE,        /**< Audio ducking absolute.                      */
+    dsAUDIO_DUCKINGTYPE_RELATIVE,       /**< Audio ducking relative.             */
+} dsAudioDuckingType_t;
+
 /**
  * This defines the type of audio compression that can be used.
  */

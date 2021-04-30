@@ -773,14 +773,16 @@ dsError_t  dsSetAudioDB(int handle, float db);
 dsError_t  dsSetAudioLevel(int handle, float level);
 
 /**
- * @brief This function sets the audio volume level to be used on the specified audio port based on the audio output mode.
+ * @brief This function sets the audio ducking level to be used on the specified audio port based on the audio output mode.
  *
  * @param [in] handle   Handle for the audio output port.
+ * @param [in] action   action type to start or stop ducking.
+ * @param [in] type     ducing type is absolute or relative to current volume level.
  * @param [in] level    The volume level to be used on the audio port if output mode is expoert mode this will mute the audio.
  * @return    Error Code.
  * @retval    ::dsError_t
  */
-dsError_t  dsSetAudioDuckingLevel(int handle, float level);
+dsError_t  dsSetAudioDucking(int handle, dsAudioDuckingAction_t action, dsAudioDuckingType_t, const unsigned char level);
 
 /**
  * @brief Set loop-through mode of an audio port.

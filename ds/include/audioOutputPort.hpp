@@ -184,7 +184,7 @@ public:
 	void setLevel(const float level);
 	void setLoopThru(const bool loopThru);
 	void setMuted(const bool mute);
-	void setAudioDuckingLevel(const float level);
+	void setAudioDucking(dsAudioDuckingAction_t action, dsAudioDuckingType_t, const unsigned char level);
         void getAudioCapabilities(int *capabilities);
         void getMS12Capabilities(int *capabilities);
 

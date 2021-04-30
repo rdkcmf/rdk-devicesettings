@@ -1530,26 +1530,28 @@ void AudioOutputPort::setLevel(const float newLevel)
 }
 
 /**
- * @fn void AudioOutputPort::setAudioDuckingLevel(const float newLevel)
+ * @fn void AudioOutputPort::setAudioDucking(dsAudioDuckingAction_t action, dsAudioDuckingType_t type, const unsigned char  level)
  * @brief This API is used to set the audio level to be used in a given audio port. If output mode is Passthrough/Expert this mutes the audio
  *
  * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
  * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
  *
- * @param[in] newLevel New Audio level for a given audio output port
+ * @param[in] action action type to start or stop ducking
+ * @param[in] type  ducking type is absolute or relative to current volume level.
+ * @param[in] level New Audio level for a given audio output port  range [0 - 100]
  *
  * @return None
  */
-void AudioOutputPort::setAudioDuckingLevel(const float newLevel)
+void AudioOutputPort::setAudioDucking(dsAudioDuckingAction_t action, dsAudioDuckingType_t type, const unsigned char level)
 {
     dsError_t ret = dsERR_NONE;
 
-    if (newLevel < 0) {
+    if (level > 100) {
         ret = dsERR_INVALID_PARAM;
     }
-    else if ( (ret = dsSetAudioDuckingLevel(_handle, newLevel)) == dsERR_NONE)
+    else if ( (ret = dsSetAudioDucking(_handle,action,type, level)) == dsERR_NONE)
     {
-        _level = newLevel;
+        _level = level;
     }
 
     if (ret != dsERR_NONE) throw Exception(ret);

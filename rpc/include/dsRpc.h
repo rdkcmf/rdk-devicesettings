@@ -73,7 +73,7 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsGetAudioDelayOffset      "dsGetAudioDelayOffset"
 #define  IARM_BUS_DSMGR_API_dsGetSinkDeviceAtmosCapability "dsGetSinkDeviceAtmosCapability"
 #define  IARM_BUS_DSMGR_API_dsSetAudioAtmosOutputMode "dsSetAudioAtmosOutputMode"
-#define  IARM_BUS_DSMGR_API_dsSetAudioDuckingLevel    "dsSetAudioDuckingLevel"
+#define  IARM_BUS_DSMGR_API_dsSetAudioDucking    "dsSetAudioDucking"
 #define  IARM_BUS_DSMGR_API_dsSetAudioLevel            "dsSetAudioLevel"
 #define  IARM_BUS_DSMGR_API_dsGetAudioLevel            "dsGetAudioLevel"
 #define  IARM_BUS_DSMGR_API_dsSetAudioGain            "dsSetAudioGain"
@@ -281,6 +281,13 @@ typedef struct _dsAudioSetLevelParam_t {
         int handle;
         float level;
 } dsAudioSetLevelParam_t;
+
+typedef struct _dsAudioSetDuckingParam_t {
+        int handle;
+        dsAudioDuckingAction_t action;
+        dsAudioDuckingType_t type;
+        unsigned char level;
+} dsAudioSetDuckingParam_t;
 
 typedef struct _dsAudioGainParam_t {
         int handle;
