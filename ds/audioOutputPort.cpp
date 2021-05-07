@@ -469,7 +469,10 @@ float AudioOutputPort::getLevel() const{
  * @retval 0 When output is not loop thru
  */
 bool AudioOutputPort::isLoopThru() const {
-	return _loopThru;
+       dsError_t ret = dsERR_OPERATION_NOT_SUPPORTED;
+
+       if (ret != dsERR_NONE) throw Exception(ret);
+
 }
 
 
@@ -1563,11 +1566,9 @@ void AudioOutputPort::setAudioDuckingLevel(const float newLevel)
  */
 void AudioOutputPort::setLoopThru(const bool loopThru)
 {
-	dsError_t ret = dsERR_NONE;
+	dsError_t ret = dsERR_OPERATION_NOT_SUPPORTED;
 
-	if  ( (ret = dsEnableLoopThru(_handle, loopThru)) == dsERR_NONE) {
-		_loopThru = loopThru;
-	}
+        if (ret != dsERR_NONE) throw Exception(ret);
 }
 
 
