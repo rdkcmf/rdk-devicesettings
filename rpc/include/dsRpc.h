@@ -368,7 +368,7 @@ typedef struct _dsIntelligentEqualizerModeParam_t {
 
 typedef struct _dsVolumeLevellerParam_t {
        int handle;
-       int level;
+       dsVolumeLeveller_t volLeveller;
 } dsVolumeLevellerParam_t;
 
 typedef struct _dsBassEnhancerParam_t {
@@ -388,7 +388,7 @@ typedef struct _dsDRCModeParam_t {
 
 typedef struct _dsSurroundVirtualizerParam_t {
        int handle;
-       int boost;
+       dsSurroundVirtualizer_t virtualizer;
 } dsSurroundVirtualizerParam_t;
 
 typedef struct _dsMISteeringParam_t {

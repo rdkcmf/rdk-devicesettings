@@ -55,19 +55,28 @@ int main(int argc, char *argv[])
     device::Manager::Initialize();
 
 
-    if (argc != 4) {
-        printf("%s : <Port Type - HDMI, SPEAKER> <Port Number-0, 1, 2...> <Level 0-10>\r\n", argv[0]);
+    if ((argc < 4) || (argc > 5)) {
+        printf("%s : <Port Type - HDMI, SPEAKER> <Port Number-0, 1, 2...> <Mode- 0 - Off, 1 - On, 2 - Auto> <Level 0-10 (required for On mode)>\r\n", argv[0]);
+	if((atoi((const char *)argv[3]) == 1) && (argc != 5)) {
+	    printf("%s: Level required for Mode = 1 - On \r\n",argv[0]);
+	    return 0;
+	}
         return 0;
     }
 
     char *portType = argv[1];
     char *portId = argv[2];
-    int level = atoi((const char *)argv[3]);
+    dsVolumeLeveller_t leveller;
+    leveller.mode = atoi((const char *)argv[3]);
+    leveller.level = 0;
+    if(leveller.mode == 1) {
+        leveller.level = atoi((const char *)argv[4]);
+    }
 
     try {
 		printf("Sample Application: set Volume leveller\r\n");
 		device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(std::string(portType).append(portId));
-		aPort.setVolumeLeveller(level);
+		aPort.setVolumeLeveller(leveller);
 		printf("Sample Application: set volume leveller\r\n");
     }
     catch (...) {

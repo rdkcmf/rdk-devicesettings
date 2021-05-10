@@ -677,21 +677,21 @@ void AudioOutputPort::setIntelligentEqualizerMode(const int mode)
 }
 
 /**
- * @fn AudioOutputPort::setVolumeLeveller(const int level)
- * @brief This API is used to set the volume leveller amount in a given audio port.
+ * @fn AudioOutputPort::setVolumeLeveller(const dsVolumeLeveller_t volLeveller)
+ * @brief This API is used to set the volume leveller mode & amount for a given audio port.
  *
  * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
  * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
  *
- * @param[in] volume leveller amount for the given audio Output port.
+ * @param[in] dsVolumeLeveller_t for the given audio Output port.
  *
  * @return None
  */
-void AudioOutputPort::setVolumeLeveller(const int level)
+void AudioOutputPort::setVolumeLeveller(const dsVolumeLeveller_t volLeveller)
 {
         dsError_t ret = dsERR_NONE;
 
-        if ( (ret = dsSetVolumeLeveller(_handle, level)) == dsERR_NONE) {
+        if ( (ret = dsSetVolumeLeveller(_handle, volLeveller)) == dsERR_NONE) {
         }
         else
         {
@@ -769,21 +769,21 @@ void AudioOutputPort::setDRCMode(const int mode)
 }
 
 /**
- * @fn AudioOutputPort::setSurroundVirtualizer(const int boost)
- * @brief This API is used to set the surround virtualizer boost value in a given audio port.
+ * @fn AudioOutputPort::setSurroundVirtualizer(const dsSurroundVirtualizer_t virtualizer)
+ * @brief This API is used to set the surround virtualizer mode and boost value for a given audio port.
  *
  * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
  * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
  *
- * @param[in] surround virtualizer boost value for the given audio Output port.
+ * @param[in] dsSurroundVirtualizer_t value for the given audio Output port.
  *
  * @return None
  */
-void AudioOutputPort::setSurroundVirtualizer(const int boost)
+void AudioOutputPort::setSurroundVirtualizer(const dsSurroundVirtualizer_t virtualizer)
 {
         dsError_t ret = dsERR_NONE;
 
-        if ( (ret = dsSetSurroundVirtualizer(_handle, boost)) == dsERR_NONE) {
+        if ( (ret = dsSetSurroundVirtualizer(_handle, virtualizer)) == dsERR_NONE) {
         }
         else
         {
@@ -896,18 +896,20 @@ int AudioOutputPort::getIntelligentEqualizerMode() const
 
 
 /**
- * @fn const int AudioOutputPort::getVolumeLeveller()
+ * @fn const dsVolumeLeveller_t AudioOutputPort::getVolumeLeveller()
  * @brief This API is used to get the current volume leveller value.
  *
- * @return Current audio volume leveller value 
+ * @return Current audio volume leveller settings 
  */
-int AudioOutputPort::getVolumeLeveller() const
+dsVolumeLeveller_t AudioOutputPort::getVolumeLeveller() const
 {
         dsError_t ret = dsERR_NONE;
-        int _level = 0;
-        if ((ret = dsGetVolumeLeveller(_handle, &_level)) == dsERR_NONE)
+	dsVolumeLeveller_t _volLeveller;
+        _volLeveller.mode = 0;
+	_volLeveller.level = 0;
+        if ((ret = dsGetVolumeLeveller(_handle, &_volLeveller)) == dsERR_NONE)
         {
-        return _level;
+        return _volLeveller;
         }
         else
         {
@@ -977,18 +979,20 @@ int AudioOutputPort::getDRCMode() const
 }
 
 /**
- * @fn const int AudioOutputPort::getSurroundVirtualizer()
+ * @fn const dsSurroundVirtualizer_t AudioOutputPort::getSurroundVirtualizer()
  * @brief This API is used to get the Surround Virtualizer Boost value
  *
- * @return Current Surround Virtualizer boost value
+ * @return Current Surround Virtualizer settings
  */
-int AudioOutputPort::getSurroundVirtualizer() const
+dsSurroundVirtualizer_t AudioOutputPort::getSurroundVirtualizer() const
 {
         dsError_t ret = dsERR_NONE;
-        int _boost = 0;
-        if ((ret = dsGetSurroundVirtualizer(_handle, &_boost)) == dsERR_NONE)
+        dsSurroundVirtualizer_t _virtualizer;
+	_virtualizer.mode = 0;
+	_virtualizer.boost = 0;
+        if ((ret = dsGetSurroundVirtualizer(_handle, &_virtualizer)) == dsERR_NONE)
         {
-        return _boost;
+        return _virtualizer;
         }
         else
         {

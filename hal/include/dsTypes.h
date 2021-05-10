@@ -341,6 +341,21 @@ typedef int dsDialogEnhancer_t;
  */
 typedef int dsIntelligentEqualizerMode_t;
 
+/**
+ * This defines the type of volume leveller param that can be used.
+ */
+typedef struct _dsVolumeLeveller_t {
+    int mode; // 0 = off, 1= on, 2= auto
+    int level;
+} dsVolumeLeveller_t;
+
+/**
+ * This defines the type of surround virtualizer param that can be used.
+ */
+typedef struct _dsSurroundVirtualizer_t {
+    int mode; // 0 = off, 1= on, 2= auto
+    int boost;
+} dsSurroundVirtualizer_t;
 
 /**
  * Audio compression type validation check.

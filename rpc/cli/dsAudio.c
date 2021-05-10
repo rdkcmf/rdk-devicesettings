@@ -867,13 +867,14 @@ dsError_t dsGetIntelligentEqualizerMode(int handle, int *mode)
         return dsERR_NONE;
 }
 
-dsError_t dsGetVolumeLeveller(int handle, int *level)
+dsError_t dsGetVolumeLeveller(int handle, dsVolumeLeveller_t *volLeveller)
 {
         IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
         dsVolumeLevellerParam_t param;
 
         param.handle = handle;
-        param.level = 0;
+	param.volLeveller.mode = 0;
+        param.volLeveller.level = 0;
 
         rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                                                 (char *)IARM_BUS_DSMGR_API_dsGetVolumeLeveller,
@@ -886,16 +887,18 @@ dsError_t dsGetVolumeLeveller(int handle, int *level)
                 return dsERR_GENERAL;
         }
 
-        *level = param.level;
+	volLeveller->mode = param.volLeveller.mode;
+        volLeveller->level = param.volLeveller.level;
         return dsERR_NONE;
 }
 
-dsError_t  dsSetVolumeLeveller(int handle, int level)
+dsError_t  dsSetVolumeLeveller(int handle, dsVolumeLeveller_t volLeveller)
 {
         IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
         dsVolumeLevellerParam_t param;
         param.handle = handle;
-        param.level = level;
+	param.volLeveller.mode = volLeveller.mode;
+        param.volLeveller.level = volLeveller.level;
 
         rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                                                         (char *)IARM_BUS_DSMGR_API_dsSetVolumeLeveller,
@@ -1031,13 +1034,14 @@ dsError_t  dsSetDRCMode(int handle, int mode)
         return dsERR_NONE;
 }
 
-dsError_t dsGetSurroundVirtualizer(int handle, int *boost)
+dsError_t dsGetSurroundVirtualizer(int handle, dsSurroundVirtualizer_t* virtualizer)
 {
         IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
         dsSurroundVirtualizerParam_t param;
 
         param.handle = handle;
-        param.boost = 0;
+	param.virtualizer.mode = 0;
+        param.virtualizer.boost = 0;
 
         rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                                                 (char *)IARM_BUS_DSMGR_API_dsGetSurroundVirtualizer,
@@ -1050,16 +1054,18 @@ dsError_t dsGetSurroundVirtualizer(int handle, int *boost)
                 return dsERR_GENERAL;
         }
 
-        *boost = param.boost;
+	virtualizer->mode = param.virtualizer.mode;
+        virtualizer->boost = param.virtualizer.boost;
         return dsERR_NONE;
 }
 
-dsError_t  dsSetSurroundVirtualizer(int handle, int boost)
+dsError_t  dsSetSurroundVirtualizer(int handle, dsSurroundVirtualizer_t virtualizer)
 {
         IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
         dsSurroundVirtualizerParam_t param;
         param.handle = handle;
-        param.boost = boost;
+	param.virtualizer.mode = virtualizer.mode;
+        param.virtualizer.boost = virtualizer.boost;
 
         rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
                                                         (char *)IARM_BUS_DSMGR_API_dsSetSurroundVirtualizer,

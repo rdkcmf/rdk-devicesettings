@@ -165,7 +165,8 @@ dsError_t  dsGetDolbyVolumeMode(int handle, bool *mode);
  * This function returns the Intelligent Equalizer Mode setting used in the specified audio port.
  *
  * @param[in] handle Handle for the audio port.
- * @param[out] .
+ * @param[out] *mode. Intelligent Equalizer mode: 0 = Off, 1 = Open, 2 = Rich, 3 = focused,
+ * 4 = balanced, 5 = warm, 6 = detailed
  *
  * @return Device Settings error code
  * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
@@ -178,11 +179,11 @@ dsError_t  dsGetIntelligentEqualizerMode(int handle, int *mode);
  * This function will get the Volume leveller value used in a given audio port
  *
  * @param [in] handle       Handle for the Output Audio port
- * @param [out] *level  Volume Leveller value
+ * @param [out] *volLeveller  Volume Leveller setting
  * @return dsError_t Error code.
  */
 
-dsError_t  dsGetVolumeLeveller(int handle, int* level);
+dsError_t  dsGetVolumeLeveller(int handle, dsVolumeLeveller_t* volLeveller);
 
 
 /**
@@ -230,11 +231,11 @@ dsError_t  dsGetDRCMode(int handle, int *mode);
  * This function will get the Surround Virtualizer level used in a given audio port
  *
  * @param [in] handle       Handle for the Output Audio port
- * @param [out] *boost    Surround virtualizer level
+ * @param [out] *virtualizer    Surround virtualizer setting
  * @return dsError_t Error code.
  */
 
-dsError_t  dsGetSurroundVirtualizer(int handle, int* boost);
+dsError_t  dsGetSurroundVirtualizer(int handle, dsSurroundVirtualizer_t *virtualizer);
 
 
 /**
@@ -622,11 +623,13 @@ dsError_t  dsSetDialogEnhancement(int handle, int level);
 dsError_t  dsSetDolbyVolumeMode(int handle, bool mode);
 
 /**
- * @brief Get the Intelligent Equalizer Mode.
+ * @brief Set the Intelligent Equalizer Mode.
  * 
  * This function returns the Intelligent Equalizer Mode setting used in the specified audio port.
  *
  * @param[in] handle Handle for the audio port.
+ * @param[in] mode. Intelligent Equalizer mode: 0 = Off, 1 = Open, 2 = Rich, 3 = focused,
+ * 4 = balanced, 5 = warm, 6 = detailed
  * @param[out] .
  *
  * @return Device Settings error code
@@ -640,11 +643,11 @@ dsError_t  dsSetIntelligentEqualizerMode(int handle, int mode);
  * This function will set the Volume leveller value used in a given audio port
  *
  * @param [in] handle       Handle for the Output Audio port
- * @param [in] level  Volume Leveller value
+ * @param [in] volLeveller  Volume Leveller setting
  * @return dsError_t Error code.
  */
 
-dsError_t  dsSetVolumeLeveller(int handle, int level);
+dsError_t  dsSetVolumeLeveller(int handle, dsVolumeLeveller_t volLeveller);
 
 
 /**
@@ -692,11 +695,11 @@ dsError_t  dsSetDRCMode(int handle, int mode);
  * This function will set the Surround Virtualizer level used in a given audio port
  *
  * @param [in] handle       Handle for the Output Audio port
- * @param [in] boost    Surround virtualizer level
+ * @param [in] virtualizer    Surround virtualizer setting
  * @return dsError_t Error code.
  */
 
-dsError_t  dsSetSurroundVirtualizer(int handle, int boost);
+dsError_t  dsSetSurroundVirtualizer(int handle, dsSurroundVirtualizer_t virtualizer);
 
 
 /**

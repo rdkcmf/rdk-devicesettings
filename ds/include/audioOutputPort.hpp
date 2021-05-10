@@ -113,11 +113,11 @@ public:
 	int getDialogEnhancement() const;
 	bool getDolbyVolumeMode() const;
 	int getIntelligentEqualizerMode() const;
-        int getVolumeLeveller() const;
+        dsVolumeLeveller_t getVolumeLeveller() const;
         int getBassEnhancer() const;
         bool isSurroundDecoderEnabled() const;
         int getDRCMode() const;
-        int getSurroundVirtualizer() const;
+        dsSurroundVirtualizer_t getSurroundVirtualizer() const;
         bool getMISteering() const;
 	int getGraphicEqualizerMode() const;
 	const std::string getMS12AudioProfile() const;
@@ -154,11 +154,11 @@ public:
 	void setDialogEnhancement(const int level);
 	void setDolbyVolumeMode(const bool mode);
 	void setIntelligentEqualizerMode(const int mode);
-        void setVolumeLeveller(const int level);
+        void setVolumeLeveller(const dsVolumeLeveller_t volLeveller);
         void setBassEnhancer(const int boost);
         void enableSurroundDecoder(const bool enable);
         void setDRCMode(const int mode);
-        void setSurroundVirtualizer(const int boost);
+        void setSurroundVirtualizer(const dsSurroundVirtualizer_t virtualizer);
         void setMISteering(const bool enable);
 	void setGraphicEqualizerMode(const int mode);
 	void setMS12AudioProfile(std::string profile);

@@ -830,31 +830,34 @@ void AudioConfigInit()
         printf(" audio.VolumeLeveller.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
 
         if(_profileOverride == "TRUE") {
-            typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, int level);
+            typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, dsVolumeLeveller_t volLeveller);
             static dsSetVolumeLeveller_t dsSetVolumeLevellerFunc = 0;
             if (dsSetVolumeLevellerFunc == 0) {
                 dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
                 if (dllib) {
                     dsSetVolumeLevellerFunc = (dsSetVolumeLeveller_t) dlsym(dllib, "dsSetVolumeLeveller");
                     if (dsSetVolumeLevellerFunc) {
-                        printf("dsSetVolumeLeveller_t(int, int) is defined and loaded\r\n");
-                        std::string _VolumeLeveller("0");
-                        int m_volumeLeveller = 0;
+                        printf("dsSetVolumeLeveller_t(int, dsVolumeLeveller_t) is defined and loaded\r\n");
+                        std::string _volLevellerMode("0");
+                        std::string _volLevellerLevel("0");
+                        dsVolumeLeveller_t m_volumeLeveller;
                         try {
-                            _VolumeLeveller = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller");
-                            m_volumeLeveller = atoi(_VolumeLeveller.c_str());
+                            _volLevellerMode = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller.mode");
+                            _volLevellerLevel = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller.level");
+                            m_volumeLeveller.mode = atoi(_volLevellerMode.c_str());
+			    m_volumeLeveller.level = atoi(_volLevellerLevel.c_str());
                 //SPEAKER init
                             handle = 0;
                             if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
                                 if (dsSetVolumeLevellerFunc(handle, m_volumeLeveller) == dsERR_NONE) {
-                                    printf("Port %s: Initialized Volume Leveller : %d\n","SPEAKER0", m_volumeLeveller);
+                                    printf("Port %s: Initialized Volume Leveller : Mode: %d, Level: %d\n","SPEAKER0", m_volumeLeveller.mode, m_volumeLeveller.level);
                                 }
                             }
                 //HDMI init
                             handle = 0;
                             if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
                                 if (dsSetVolumeLevellerFunc(handle, m_volumeLeveller) == dsERR_NONE) {
-                                    printf("Port %s: Initialized Volume Leveller : %d\n","HDMI0", m_volumeLeveller);
+                                    printf("Port %s: Initialized Volume Leveller : Mode: %d, Level: %d\n","HDMI0", m_volumeLeveller.mode, m_volumeLeveller.level);
                                 }
                             }
                         }
@@ -863,7 +866,7 @@ void AudioConfigInit()
                         }
                     }
                     else {
-                        printf("dsSetVolumeLeveller_t(int, int) is not defined\r\n");
+                        printf("dsSetVolumeLeveller_t(int, dsVolumeLeveller_t) is not defined\r\n");
                     }
                     dlclose(dllib);
                 }
@@ -1056,31 +1059,34 @@ void AudioConfigInit()
         printf(" audio.SurroundVirtualizer.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
 
         if(_profileOverride == "TRUE") {
-            typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, int boost);
+            typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, dsSurroundVirtualizer_t virtualizer);
             static dsSetSurroundVirtualizer_t dsSetSurroundVirtualizerFunc = 0;
             if (dsSetSurroundVirtualizerFunc == 0) {
                 dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
                 if (dllib) {
                     dsSetSurroundVirtualizerFunc = (dsSetSurroundVirtualizer_t) dlsym(dllib, "dsSetSurroundVirtualizer");
                     if (dsSetSurroundVirtualizerFunc) {
-                        printf("dsSetSurroundVirtualizer_t(int, int) is defined and loaded\r\n");
+                        printf("dsSetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t virtualizer) is defined and loaded\r\n");
+                        std::string _SVMode("0");
                         std::string _SVBoost("0");
-                        int m_SVBoost = 0;
+                        dsSurroundVirtualizer_t m_virtualizer;
                         try {
-                            _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer");
-                            m_SVBoost = atoi(_SVBoost.c_str());
+                            _SVMode = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.mode");
+                            _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.boost");
+                            m_virtualizer.mode = atoi(_SVMode.c_str());
+			    m_virtualizer.boost = atoi(_SVBoost.c_str());
                 //SPEAKER init
                             handle = 0;
                             if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                                if (dsSetSurroundVirtualizerFunc(handle, m_SVBoost) == dsERR_NONE) {
-                                    printf("Port %s: Initialized Surround Virtualizer Boost : %d\n","SPEAKER0", m_SVBoost);
+                                if (dsSetSurroundVirtualizerFunc(handle, m_virtualizer) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Surround Virtualizer : Mode: %d, Boost : %d\n","SPEAKER0", m_virtualizer.mode, m_virtualizer.boost);
                                 }
                             }
                 //HDMI init
                             handle = 0;
                             if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                                if (dsSetSurroundVirtualizerFunc(handle, m_SVBoost) == dsERR_NONE){
-                                    printf("Port %s: Initialized Surround Virtualizer Boost : %d\n","HDMI0", m_SVBoost);
+                                if (dsSetSurroundVirtualizerFunc(handle, m_virtualizer) == dsERR_NONE){
+                                    printf("Port %s: Initialized Surround Virtualizer : Mode: %d, Boost : %d\\n","HDMI0", m_virtualizer.mode, m_virtualizer.boost);
 				}
                             }
                         }
@@ -1089,7 +1095,7 @@ void AudioConfigInit()
                         }
                     }
                     else {
-                        printf("dsSetSurroundVirtualizer_t(int, int) is not defined\r\n");
+                        printf("dsSetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t) is not defined\r\n");
                     }
                     dlclose(dllib);
                 }
@@ -1421,46 +1427,51 @@ void AudioConfigInit()
                }
            }
 
-           typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, int level);
+           typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, dsVolumeLeveller_t volLeveller);
            static dsSetVolumeLeveller_t dsSetVolumeLevellerFunc = 0;
            if (dsSetVolumeLevellerFunc == 0) {
                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
                if (dllib) {
                    dsSetVolumeLevellerFunc = (dsSetVolumeLeveller_t) dlsym(dllib, "dsSetVolumeLeveller");
                    if (dsSetVolumeLevellerFunc) {
-                       printf("dsSetVolumeLeveller_t(int, int) is defined and loaded\r\n");
-                       std::string _VolumeLeveller("0");
-                       int m_volumeLeveller;
+                       printf("dsSetVolumeLeveller_t(int, dsVolumeLeveller_t) is defined and loaded\r\n");
+		       std::string _volLevellerMode("0");
+		       std::string _volLevellerLevel("0");
+                       dsVolumeLeveller_t m_volumeLeveller;
                        try {
-                           _VolumeLeveller = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller");
+                           _volLevellerMode = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller.mode");
+			   _volLevellerLevel = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller.level");
                        }
                        catch(...) {
                            try {
                                printf("audio.VolumeLeveller not found in persistence store. Try system default\n");
-                               _VolumeLeveller = device::HostPersistence::getInstance().getDefaultProperty("audio.VolumeLeveller");
+                               _volLevellerMode = device::HostPersistence::getInstance().getDefaultProperty("audio.VolumeLeveller.mode");
+                               _volLevellerLevel = device::HostPersistence::getInstance().getDefaultProperty("audio.VolumeLeveller.level");
                            }
                            catch(...) {
-                               _VolumeLeveller = "0";
+                               _volLevellerMode = "0";
+			       _volLevellerLevel = "0";
                            }
                        }
-                       m_volumeLeveller = atoi(_VolumeLeveller.c_str());
+                       m_volumeLeveller.mode = atoi(_volLevellerMode.c_str());
+		       m_volumeLeveller.level = atoi(_volLevellerLevel.c_str());
            //SPEAKER init
                        handle = 0;
                        if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
                            if (dsSetVolumeLevellerFunc(handle, m_volumeLeveller) == dsERR_NONE) {
-                               printf("Port %s: Initialized Volume Leveller : %d\n","SPEAKER0", m_volumeLeveller);
+                               printf("Port %s: Initialized Volume Leveller : Mode: %d, Level: %d\n","SPEAKER0", m_volumeLeveller.mode, m_volumeLeveller.level);
                            }
                        }
            //HDMI init
                        handle = 0;
                        if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
                            if (dsSetVolumeLevellerFunc(handle, m_volumeLeveller) == dsERR_NONE) {
-                               printf("Port %s: Initialized Volume Leveller : %d\n","HDMI0", m_volumeLeveller);
+                               printf("Port %s: Initialized Volume Leveller : Mode: %d, Level: %d\n","HDMI0", m_volumeLeveller.mode, m_volumeLeveller.level);
                            }
                        }
                    }
                    else {
-                       printf("dsSetVolumeLeveller_t(int, int) is not defined\r\n");
+                       printf("dsSetVolumeLeveller_t(int, dsVolumeLeveller_t) is not defined\r\n");
                    }
                    dlclose(dllib);
                }
@@ -1627,46 +1638,53 @@ void AudioConfigInit()
            }
 
 
-           typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, int boost);
+           typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, dsSurroundVirtualizer_t virtualizer);
            static dsSetSurroundVirtualizer_t dsSetSurroundVirtualizerFunc = 0;
            if (dsSetSurroundVirtualizerFunc == 0) {
                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
                if (dllib) {
                    dsSetSurroundVirtualizerFunc = (dsSetSurroundVirtualizer_t) dlsym(dllib, "dsSetSurroundVirtualizer");
                    if (dsSetSurroundVirtualizerFunc) {
-                       printf("dsSetSurroundVirtualizer_t(int, int) is defined and loaded\r\n");
-                       std::string _SVBoost("0");
-                       int m_SVBoost = 0;
+                       printf("dsSetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t) is defined and loaded\r\n");
+                        std::string _SVMode("0");
+                        std::string _SVBoost("0");
+                        dsSurroundVirtualizer_t m_virtualizer;		       
                        try {
-                           _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer");
+                            _SVMode = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.mode");
+                            _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.boost");
+                            m_virtualizer.mode = atoi(_SVMode.c_str());
+                            m_virtualizer.boost = atoi(_SVBoost.c_str());			       
                        }
                        catch(...) {
                            try {
                                printf("audio.SurroundVirtualizer.mode/audio.SurroundVirtualizer.boost not found in persistence store. Try system default\n");
-                               _SVBoost = device::HostPersistence::getInstance().getDefaultProperty("audio.SurroundVirtualizer");
+                               _SVMode = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.mode");
+			       _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.boost");
                            }
                            catch(...) {
+                               _SVMode = "0";
                                _SVBoost = "0";
                            }
                        }
-                       m_SVBoost = atoi(_SVBoost.c_str());
+                       m_virtualizer.mode = atoi(_SVMode.c_str());
+		       m_virtualizer.boost = atoi(_SVBoost.c_str());
            //SPEAKER init
                        handle = 0;
                        if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                           if (dsSetSurroundVirtualizerFunc(handle, m_SVBoost) == dsERR_NONE) {
-                               printf("Port %s: Initialized Surround Virtualizer Boost : %d\n","SPEAKER0", m_SVBoost);
+                           if (dsSetSurroundVirtualizerFunc(handle, m_virtualizer) == dsERR_NONE) {
+                               printf("Port %s: Initialized Surround Virtualizer : Mode: %d, Boost : %d\n","SPEAKER0", m_virtualizer.mode, m_virtualizer.boost);
                            }
                        }
            //HDMI init
                        handle = 0;
                        if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                           if (dsSetSurroundVirtualizerFunc(handle, m_SVBoost) == dsERR_NONE) {
-                               printf("Port %s: Initialized Surround Virtualizer Boost : %d\\n","HDMI0", m_SVBoost);
+                           if (dsSetSurroundVirtualizerFunc(handle, m_virtualizer) == dsERR_NONE) {
+                               printf("Port %s: Initialized Surround Virtualizer : Mode: %d, Boost : %d\\n","HDMI0", m_virtualizer.mode, m_virtualizer.boost);
                            }
                        }
                    }
                    else {
-                       printf("dsSetSurroundVirtualizer_t(int, int) is not defined\r\n");
+                       printf("dsSetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t) is not defined\r\n");
                    }
                    dlclose(dllib);
                }
@@ -3815,17 +3833,17 @@ IARM_Result_t _dsGetVolumeLeveller(void *arg)
     IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     IARM_BUS_Lock(lock);
 
-    typedef dsError_t (*dsGetVolumeLeveller_t)(int handle, int *level);
+    typedef dsError_t (*dsGetVolumeLeveller_t)(int handle, dsVolumeLeveller_t *volLeveller);
     static dsGetVolumeLeveller_t func = 0;
     if (func == 0) {
         void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
         if (dllib) {
             func = (dsGetVolumeLeveller_t) dlsym(dllib, "dsGetVolumeLeveller");
             if (func) {
-                printf("dsGetVolumeLeveller_t(int, int *) is defined and loaded\r\n");
+                printf("dsGetVolumeLeveller_t(int, dsVolumeLeveller_t *) is defined and loaded\r\n");
             }
             else {
-                printf("dsGetVolumeLeveller_t(int, int *) is not defined\r\n");
+                printf("dsGetVolumeLeveller_t(int, dsVolumeLeveller_t *) is not defined\r\n");
             }
             dlclose(dllib);
         }
@@ -3838,11 +3856,15 @@ IARM_Result_t _dsGetVolumeLeveller(void *arg)
 
     if (func != 0 && param != NULL)
     {
-        int  level = 0;
-        param->level = 0;
-        if (func(param->handle, &level) == dsERR_NONE)
+        dsVolumeLeveller_t volLeveller;
+	volLeveller.mode = 0;
+	volLeveller.level = 0;
+	param->volLeveller.mode = 0;
+        param->volLeveller.level = 0;
+        if (func(param->handle, &volLeveller) == dsERR_NONE)
         {
-            param->level = level;
+	    param->volLeveller.mode = volLeveller.mode;
+            param->volLeveller.level = volLeveller.level;
             result = IARM_RESULT_SUCCESS;
         }
     }
@@ -3862,17 +3884,17 @@ IARM_Result_t _dsSetVolumeLeveller(void *arg)
     IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     IARM_BUS_Lock(lock);
 
-    typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, int level);
+    typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, dsVolumeLeveller_t volLeveller);
     static dsSetVolumeLeveller_t func = 0;
     if (func == 0) {
         void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
         if (dllib) {
             func = (dsSetVolumeLeveller_t) dlsym(dllib, "dsSetVolumeLeveller");
             if (func) {
-                printf("dsSetVolumeLeveller_t(int, int) is defined and loaded\r\n");
+                printf("dsSetVolumeLeveller_t(int, dsVolumeLeveller_t) is defined and loaded\r\n");
             }
             else {
-                printf("dsSetVolumeLeveller_t(int, int) is not defined\r\n");
+                printf("dsSetVolumeLeveller_t(int, dsVolumeLeveller_t) is not defined\r\n");
             }
             dlclose(dllib);
         }
@@ -3885,12 +3907,19 @@ IARM_Result_t _dsSetVolumeLeveller(void *arg)
 
     if (func != 0 && param != NULL)
     {
-        if (func(param->handle, param->level) == dsERR_NONE)
+        if (func(param->handle, param->volLeveller) == dsERR_NONE)
         {
 #ifdef DS_AUDIO_SETTINGS_PERSISTENCE
-            std::string _VolumeLeveller = std::to_string(param->level);
-            printf("%s: persist volume leveller value: %d\n",__func__, param->level);
-            device::HostPersistence::getInstance().persistHostProperty("audio.VolumeLeveller",_VolumeLeveller);
+
+            std::string _mode = std::to_string(param->volLeveller.mode);
+            printf("%s: persist volume leveller mode: %d\n",__func__, param->volLeveller.mode);
+            device::HostPersistence::getInstance().persistHostProperty("audio.VolumeLeveller.mode",_mode);
+
+	    if((param->volLeveller.mode == 0) || (param->volLeveller.mode == 1)) {
+                std::string _level = std::to_string(param->volLeveller.level);
+                printf("%s: persist volume leveller value: %d\n",__func__, param->volLeveller.level);
+                device::HostPersistence::getInstance().persistHostProperty("audio.VolumeLeveller.level",_level);
+	    }
 #endif
             result = IARM_RESULT_SUCCESS;
         }
@@ -4195,17 +4224,17 @@ IARM_Result_t _dsGetSurroundVirtualizer(void *arg)
     IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     IARM_BUS_Lock(lock);
 
-    typedef dsError_t (*dsGetSurroundVirtualizer_t)(int handle, int *boost);
+    typedef dsError_t (*dsGetSurroundVirtualizer_t)(int handle, dsSurroundVirtualizer_t *virtualizer);
     static dsGetSurroundVirtualizer_t func = 0;
     if (func == 0) {
         void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
         if (dllib) {
             func = (dsGetSurroundVirtualizer_t) dlsym(dllib, "dsGetSurroundVirtualizer");
             if (func) {
-                printf("dsGetSurroundVirtualizer_t(int, int *) is defined and loaded\r\n");
+                printf("dsGetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t *) is defined and loaded\r\n");
             }
             else {
-                printf("dsGetSurroundVirtualizer_t(int, int *) is not defined\r\n");
+                printf("dsGetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t *) is not defined\r\n");
             }
             dlclose(dllib);
         }
@@ -4218,11 +4247,15 @@ IARM_Result_t _dsGetSurroundVirtualizer(void *arg)
 
     if (func != 0 && param != NULL)
     {
-        int boost = 0;
-        param->boost = 0;
-        if (func(param->handle, &boost) == dsERR_NONE)
+        dsSurroundVirtualizer_t virtualizer;
+	virtualizer.mode = 0;
+	virtualizer.boost = 0;	
+        param->virtualizer.mode = 0;
+	param->virtualizer.boost = 0;
+        if (func(param->handle, &virtualizer) == dsERR_NONE)
         {
-            param->boost = boost;
+            param->virtualizer.mode = virtualizer.mode;
+	    param->virtualizer.boost = virtualizer.boost;
             result = IARM_RESULT_SUCCESS;
         }
     }
@@ -4242,17 +4275,17 @@ IARM_Result_t _dsSetSurroundVirtualizer(void *arg)
     IARM_Result_t result = IARM_RESULT_INVALID_STATE;
     IARM_BUS_Lock(lock);
 
-    typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, int boost);
+    typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, dsSurroundVirtualizer_t virtualizer);
     static dsSetSurroundVirtualizer_t func = 0;
     if (func == 0) {
         void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
         if (dllib) {
             func = (dsSetSurroundVirtualizer_t) dlsym(dllib, "dsSetSurroundVirtualizer");
             if (func) {
-                printf("dsSetSurroundVirtualizer_t(int, int) is defined and loaded\r\n");
+                printf("dsSetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t) is defined and loaded\r\n");
             }
             else {
-                printf("dsSetSurroundVirtualizer_t(int, int) is not defined\r\n");
+                printf("dsSetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t) is not defined\r\n");
             }
             dlclose(dllib);
         }
@@ -4265,12 +4298,18 @@ IARM_Result_t _dsSetSurroundVirtualizer(void *arg)
 
     if (func != 0 && param != NULL)
     {
-        if (func(param->handle, param->boost) == dsERR_NONE)
+        if (func(param->handle, param->virtualizer) == dsERR_NONE)
         {
 #ifdef DS_AUDIO_SETTINGS_PERSISTENCE
-            std::string _SurroundVirtualizer = std::to_string(param->boost);
-            printf("%s: persist surround virtualizer boost value: %d\n",__func__, param->boost);
-            device::HostPersistence::getInstance().persistHostProperty("audio.SurroundVirtualizer",_SurroundVirtualizer);
+            std::string _mode = std::to_string(param->virtualizer.mode);
+            printf("%s: persist surround virtualizer mode: %d\n",__func__, param->virtualizer.mode);
+            device::HostPersistence::getInstance().persistHostProperty("audio.SurroundVirtualizer.mode",_mode);
+
+            if((param->virtualizer.mode == 0) || (param->virtualizer.mode == 1)) {
+                std::string _boost = std::to_string(param->virtualizer.boost);
+                printf("%s: persist surround virtualizer boost value: %d\n",__func__, param->virtualizer.boost);
+                device::HostPersistence::getInstance().persistHostProperty("audio.SurroundVirtualizer.boost",_boost);
+            }
 #endif
             result = IARM_RESULT_SUCCESS;
         }

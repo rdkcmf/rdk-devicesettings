@@ -55,20 +55,28 @@ int main(int argc, char *argv[])
     device::Manager::Initialize();
 
 
-    if (argc != 4) {
-        printf("%s : <Port Type - HDMI, SPEAKER> <Port Number-0, 1, 2...> <Boost 0-96>\r\n", argv[0]);
+    if ((argc < 4) || (argc > 5)) {
+        printf("%s : <Port Type - HDMI, SPEAKER> <Port Number-0, 1, 2...> <Mode - 0 - Off, 1 - On, 2 - Auto> <Boost 0-96 (required for On mode)>\r\n", argv[0]);
+	if((atoi((const char *)argv[3]) == 1) && (argc != 5)) {
+	    printf("%s: Surround virtualizer boost value required for Mode : 1 - On \r\n", argv[0]);
+	}
         return 0;
     }
 
     char *portType = argv[1];
     char *portId = argv[2];
-    int boost = atoi((const char *)argv[3]);
+    dsSurroundVirtualizer_t virtualizer;
+    virtualizer.mode = atoi((const char *)argv[3]);
+    virtualizer.boost = 0;
+    if(virtualizer.mode == 1) {
+        virtualizer.boost = atoi((const char *)argv[4]);
+    }
 
     try {
-		printf("Sample Application: set Surround Virtualizer boost\r\n");
+		printf("Sample Application: set Surround Virtualizer\r\n");
 		device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(std::string(portType).append(portId));
-		aPort.setSurroundVirtualizer(boost);
-		printf("Sample Application: set Surround Virtualizer boost complete\r\n");
+		aPort.setSurroundVirtualizer(virtualizer);
+		printf("Sample Application: set Surround Virtualizer complete\r\n");
     }
     catch (...) {
     	printf("Exception Caught during [%s]\r\n", argv[0]);
