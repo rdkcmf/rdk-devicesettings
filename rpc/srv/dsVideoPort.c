@@ -736,6 +736,7 @@ IARM_Result_t _dsSetResolution(void *arg)
         if(!isConnected)
         {
             printf("Port _VPortType:%d  not connected..Ignoring Resolution Request------\r\n",_VPortType);
+            ret = dsERR_OPERATION_NOT_SUPPORTED;
             param->result = ret;
             IARM_BUS_Unlock(lock);
             return IARM_RESULT_SUCCESS;
