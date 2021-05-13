@@ -594,6 +594,40 @@ namespace device
        return isHDMIOutPort;
    }
 
+   std::string  Host::getDefaultVideoPortName()
+   {
+       std::string strDefaultVideoPortName = "HDMI0";
+       bool isDefaultPortfound = false;
+       List<VideoOutputPortType> vTypes = VideoOutputPortConfig::getInstance().getSupportedTypes();
+       for (size_t i = 0; i < vTypes.size(); i++) {
+           List<VideoOutputPort> vPorts = vTypes.at(i).getPorts();
+           for (size_t j = 0; j < vPorts.size(); j++) {
+               string portName  = vPorts.at(j).getName();
+               /*By default assign first port as default port*/
+               if (0==i && 0==j) {
+                   strDefaultVideoPortName.assign (portName);
+               }
+               /*If HDMI0 present assign HDMI0 as default video port*/
+               if (portName.find("HDMI0") != string::npos) {
+                   strDefaultVideoPortName.assign (portName);
+                   isDefaultPortfound = true;
+                   break;
+               }
+               /*If INTERNAL0 present assign INTERNAL0 as default video port*/
+               if (portName.find("INTERNAL0") != string::npos) {
+                   strDefaultVideoPortName.assign (portName);
+                   isDefaultPortfound = true;
+                   break;
+               }
+           }
+           if (isDefaultPortfound) {
+               break;
+           }
+       }
+
+       return strDefaultVideoPortName;
+   }
+
 }
 
 

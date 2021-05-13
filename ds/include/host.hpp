@@ -91,6 +91,7 @@ public:
     void getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCapability);
     void setAudioAtmosOutputMode(bool enable);
     bool isHDMIOutPortPresent();
+    std::string getDefaultVideoPortName();
 
 private:
 	Host();

@@ -281,7 +281,8 @@ IARM_Result_t _dsIsVideoPortActive(void *arg)
     
     dsVideoPortType_t _VPortType = _GetVideoPortType(param->handle);
 
-	if (_VPortType == dsVIDEOPORT_TYPE_HDMI)
+	if (_VPortType == dsVIDEOPORT_TYPE_HDMI ||
+         _VPortType == dsVIDEOPORT_TYPE_INTERNAL)
 	{
 		param->result = dsIsVideoPortActive(param->handle, &param->active);
 	}
@@ -668,7 +669,8 @@ IARM_Result_t _dsGetResolution(void *arg)
 
 	dsVideoPortType_t _VPortType = _GetVideoPortType(param->handle);
 
-	if (_VPortType == dsVIDEOPORT_TYPE_HDMI)
+	if (_VPortType == dsVIDEOPORT_TYPE_HDMI ||
+         _VPortType == dsVIDEOPORT_TYPE_INTERNAL)
 	{
 		if(param->toPersist)
 		{
@@ -1228,7 +1230,8 @@ static void persistResolution(dsVideoPortSetResolutionParam_t *param)
 	try
 	{
 		dsVideoPortType_t _VPortType = _GetVideoPortType(param->handle);
-		if (_VPortType == dsVIDEOPORT_TYPE_HDMI)
+		if (_VPortType == dsVIDEOPORT_TYPE_HDMI ||
+             _VPortType == dsVIDEOPORT_TYPE_INTERNAL)
 		{
 			if(param->toPersist){
 				device::HostPersistence::getInstance().persistHostProperty("HDMI0.resolution",resolutionName);

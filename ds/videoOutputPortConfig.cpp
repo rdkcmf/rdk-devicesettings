@@ -41,6 +41,7 @@
 #include "list.hpp"
 #include "videoResolution.hpp"
 #include "dslogger.h"
+#include "host.hpp"
 
 #include <iostream>
 #include <string.h>
@@ -142,8 +143,8 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions()
 	
 	_supportedResolutions.clear(); /*Clear the Vector */
 	try {
-
-		device::VideoOutputPort vPort = VideoOutputPortConfig::getInstance().getPort("HDMI0");
+                std::string strVideoPort = device::Host::getInstance().getDefaultVideoPortName();
+		device::VideoOutputPort vPort = VideoOutputPortConfig::getInstance().getPort(strVideoPort.c_str());
 		if (vPort.isDisplayConnected())
 		{
 			dsDisplayEDID_t edid;
