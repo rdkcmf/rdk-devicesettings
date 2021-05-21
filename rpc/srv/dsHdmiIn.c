@@ -103,6 +103,7 @@ IARM_Result_t _dsGetHDMISPDInfo (void *arg);
 void _dsHdmiInConnectCB(dsHdmiInPort_t port, bool isPortConnected);
 void _dsHdmiInSignalChangeCB(dsHdmiInPort_t port, dsHdmiInSignalStatus_t sigStatus);
 void _dsHdmiInStatusChangeCB(dsHdmiInStatus_t inputStatus);
+void _dsHdmiInVideoModeUpdateCB(dsHdmiInPort_t port, dsVideoPortResolution_t videoResolution);
 
 static dsHdmiInCap_t hdmiInCap_gs;
 
@@ -288,6 +289,26 @@ IARM_Result_t _dsHdmiInInit(void *arg)
 
         if(statusChangeCBFunc) {
              statusChangeCBFunc(_dsHdmiInStatusChangeCB);
+        }
+
+        typedef dsError_t (*dsHdmiInRegisterVideoModeUpdateCB_t)(dsHdmiInVideoModeUpdateCB_t CBFunc);
+        static dsHdmiInRegisterVideoModeUpdateCB_t videoModeUpdateCBFunc = 0;
+        if (videoModeUpdateCBFunc == 0) {
+            void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+            if (dllib) {
+                videoModeUpdateCBFunc = (dsHdmiInRegisterVideoModeUpdateCB_t) dlsym(dllib, "dsHdmiInRegisterVideoModeUpdateCB");
+                if(statusChangeCBFunc == 0) {
+                    printf("dsHdmiInRegisterStatusChangeCB(dsHdmiInStatusChangeCB_t) is not defined\r\n");
+                }
+                dlclose(dllib);
+            }
+            else {
+                printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+            }
+        }
+
+        if(videoModeUpdateCBFunc) {
+             videoModeUpdateCBFunc(_dsHdmiInVideoModeUpdateCB);
         }
 
 #endif
@@ -529,6 +550,25 @@ void _dsHdmiInStatusChangeCB(dsHdmiInStatus_t inputStatus)
                                 sizeof(hdmi_in_status_eventData));
 
 }
+
+void _dsHdmiInVideoModeUpdateCB(dsHdmiInPort_t port, dsVideoPortResolution_t videoResolution)
+{
+    IARM_Bus_DSMgr_EventData_t hdmi_in_videoMode_eventData;
+    __TIMESTAMP();
+    printf("%s:%d - HDMI In video mode info  update!!!!!! Port: %d, Pixel Resolution : %d, Interlaced : %d, Frame Rate: %d \r\n", __PRETTY_FUNCTION__,__LINE__,port, videoResolution.pixelResolution, videoResolution.frameRate, videoResolution.interlaced);
+    hdmi_in_videoMode_eventData.data.hdmi_in_video_mode.port = port;
+    hdmi_in_videoMode_eventData.data.hdmi_in_video_mode.resolution.pixelResolution = videoResolution.pixelResolution;
+    hdmi_in_videoMode_eventData.data.hdmi_in_video_mode.resolution.interlaced = videoResolution.interlaced;
+    hdmi_in_videoMode_eventData.data.hdmi_in_video_mode.resolution.frameRate = videoResolution.frameRate;
+
+
+    IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                                (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_HDMI_IN_VIDEO_MODE_UPDATE,
+                                (void *)&hdmi_in_videoMode_eventData,
+                                sizeof(hdmi_in_videoMode_eventData));
+
+}
+
 
 IARM_Result_t _dsGetEDIDBytesInfo (void *arg) {
     dsError_t eRet = dsERR_GENERAL;

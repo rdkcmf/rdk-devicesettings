@@ -253,6 +253,20 @@ typedef void (*dsHdmiInSignalChangeCB_t)(dsHdmiInPort_t port, dsHdmiInSignalStat
 typedef void (*dsHdmiInStatusChangeCB_t)(dsHdmiInStatus_t inputStatus);
 
 /**
+ * @brief Callback function used to notify applications of HDMI In video mode changes
+ *
+ * HAL Implementation should call this method to deliver updated HDMI In video mode info
+ * to the application
+ *
+ * @param port                HDMI Input port.
+ * @param videoResolution     dsVideoPortResolution_t of HDMI In Source
+ *
+ *
+ * @return None.
+ */
+typedef void (*dsHdmiInVideoModeUpdateCB_t)(dsHdmiInPort_t port, dsVideoPortResolution_t videoResolution);
+
+/**
  * @brief Register for the HDMI Input hot plug event.
  * 
  * This function is used to register for the HDMI Input hot plug event.
@@ -284,6 +298,17 @@ dsError_t dsHdmiInRegisterSignalChangeCB (dsHdmiInSignalChangeCB_t CBFunc);
  * @retval    ::dsError_t
  */
 dsError_t dsHdmiInRegisterStatusChangeCB (dsHdmiInStatusChangeCB_t CBFunc);
+
+/**
+ * @brief Register for the HDMI Input Video Mode change event
+ *
+ * This function is used to register for the HDMI Input video mode Change event.
+ *
+ * @param[in] CBFunc HDMI Input video mode change callback function.
+ * @return Device Settings error code
+ * @retval    ::dsError_t
+ */
+dsError_t dsHdmiInRegisterVideoModeUpdateCB(dsHdmiInVideoModeUpdateCB_t CBFunc);
 
 bool dsIsHdmiARCPort (int iPort);
 
