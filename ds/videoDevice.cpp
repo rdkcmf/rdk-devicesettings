@@ -42,7 +42,7 @@
 #include "dsUtl.h"
 #include <iostream>
 #include <sstream>
-
+#include <string.h>
 /**
  * @file videoDevice.cpp
  * @brief Video Device is also called "Decoder".
@@ -292,6 +292,41 @@ int VideoDevice::forceDisableHDRSupport(bool disable)
 	dsForceDisableHDRSupport(_handle, disable);
 	return 0;
 }
+
+int VideoDevice::setFRFMode(int frfmode) const
+{
+        dsError_t ret;
+        ret = dsSetFRFMode(_handle, frfmode);
+        return 0;
+}
+
+int VideoDevice::getFRFMode(int *frfmode) const
+{
+        dsError_t ret;
+        int frfmode1;
+        ret = dsGetFRFMode(_handle, &frfmode1);
+        *frfmode = frfmode1;
+        return 0;
+}
+
+int VideoDevice::setDisplayframerate(const char *framerate) const
+{
+        dsError_t ret;
+        char buf[20] = {0};
+        strcpy(buf, framerate);
+        ret = dsSetDisplayframerate(_handle, buf);
+        return 0;
+}
+
+int VideoDevice::getCurrentDisframerate(char *framerate) const
+{
+        dsError_t ret;
+        char getframerate[20];
+        ret = dsGetCurrentDisplayframerate(_handle, getframerate);
+        strcpy(framerate ,getframerate);
+        return 0;
+}
+
 }
 
 /** @} */

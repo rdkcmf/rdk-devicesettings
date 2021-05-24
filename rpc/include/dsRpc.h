@@ -133,7 +133,10 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsSetDFC					"dsSetDFC"
 #define IARM_BUS_DSMGR_API_dsGetDFC					"dsGetDFC"
 #define IARM_BUS_DSMGR_API_dsVideoDeviceTerm		"dsVideoDeviceTerm"
-
+#define IARM_BUS_DSMGR_API_dsSetFRFMode         "dsSetFRFMode"
+#define IARM_BUS_DSMGR_API_dsGetFRFMode         "dsGetFRFMode"
+#define IARM_BUS_DSMGR_API_dsGetCurrentDisframerate             "dsGetCurrentDisframerate"
+#define IARM_BUS_DSMGR_API_dsSetDisplayframerate                "dsSetDisplayframerate"
 /*
  * Declare RPC dsVideo Port API names 
  */
@@ -816,6 +819,18 @@ typedef struct _dsGetHDMISPDInfoParam_t
     int                     iHdmiPort;
     unsigned char           spdInfo [1024];
 }dsGetHDMISPDInfoParam_t;
+
+typedef struct
+{
+    int handle;
+    int frfmode;
+} dsFRFParam_t;
+
+typedef struct
+{
+    int handle;
+    char framerate[20];
+}dsFramerateParam_t;
 
 #ifdef __cplusplus
 }

@@ -242,5 +242,79 @@ dsError_t dsForceDisableHDRSupport(int handle, bool disable)
 
 	return dsERR_GENERAL ;
 }
+
+dsError_t dsGetFRFMode(int handle, int *frfmode)
+{
+        dsFRFParam_t param = {0};
+        param.handle = handle;
+
+        IARM_Result_t rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *) IARM_BUS_DSMGR_API_dsGetFRFMode,
+                        (void *) &param,
+                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                *frfmode = param.frfmode;
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
+}
+
+dsError_t dsSetFRFMode(int handle, int frfmode)
+{
+        dsFRFParam_t param = {0};
+        param.handle = handle;
+        param.frfmode = frfmode;
+
+        IARM_Result_t rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *) IARM_BUS_DSMGR_API_dsSetFRFMode,
+                        (void *) &param,
+                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                return dsERR_NONE;
+        }
+
+        return dsERR_GENERAL ;
+}
+
+dsError_t dsSetDisplayframerate(int handle, char *framerate)
+{
+        dsFramerateParam_t param = {0};
+        param.handle = handle;
+        strcpy(param.framerate , framerate);
+
+        IARM_Result_t rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *) IARM_BUS_DSMGR_API_dsSetDisplayframerate,
+                        (void *) &param,
+                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
+}
+
+dsError_t dsGetCurrentDisplayframerate(int handle, char *framerate)
+{
+        dsFramerateParam_t param ={0};
+        param.handle = handle;
+
+        IARM_Result_t rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *) IARM_BUS_DSMGR_API_dsGetCurrentDisframerate,
+                        (void *) &param,
+                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                strcpy(framerate , param.framerate);
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
+}
+
 /** @} */
 /** @} */

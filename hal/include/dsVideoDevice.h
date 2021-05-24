@@ -148,6 +148,10 @@ dsError_t dsForceDisableHDRSupport(int handle, bool disable);
 /**
  * @}
  */
+dsError_t dsSetFRFMode(int handle, int frfmode);
+dsError_t dsGetFRFMode(int handle, int *frfmode);
+dsError_t dsGetCurrentDisplayframerate(int handle, char *framerate);
+dsError_t dsSetDisplayframerate(int handle, char *framerate);
 
 #ifdef __cplusplus
 }

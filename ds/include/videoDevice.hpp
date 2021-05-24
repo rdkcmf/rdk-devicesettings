@@ -76,6 +76,10 @@ public:
 	unsigned int getSupportedVideoCodingFormats() const;
 	dsVideoCodecInfo_t getVideoCodecInfo(dsVideoCodingFormat_t format) const;
 	int forceDisableHDRSupport(bool disable);
+	int getFRFMode(int *frfmode) const;
+        int setFRFMode(int frfmode) const;
+        int getCurrentDisframerate(char *framerate) const;
+        int setDisplayframerate(const char *framerate) const;
 };
 
 }

@@ -69,6 +69,11 @@ IARM_Result_t _dsGetHDRCapabilities(void *arg);
 IARM_Result_t _dsGetSupportedVideoCodingFormats(void *arg);
 IARM_Result_t _dsGetVideoCodecInfo(void *arg);
 IARM_Result_t _dsForceDisableHDR(void *arg);
+
+IARM_Result_t _dsSetFRFMode(void *arg);
+IARM_Result_t _dsGetFRFMode(void *arg);
+IARM_Result_t _dsGetCurrentDisframerate(void *arg);
+IARM_Result_t _dsSetDisplayframerate(void *arg);
 static bool get_HDR_DV_RFC_config();
 
 IARM_Result_t dsVideoDeviceMgr_init()
@@ -146,6 +151,10 @@ IARM_Result_t _dsVideoDeviceInit(void *arg)
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetSupportedVideoCodingFormats, _dsGetSupportedVideoCodingFormats); 
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetVideoCodecInfo, _dsGetVideoCodecInfo); 
 		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetForceDisableHDR, _dsForceDisableHDR); 
+		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetFRFMode, _dsSetFRFMode);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetFRFMode, _dsGetFRFMode);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetCurrentDisframerate, _dsGetCurrentDisframerate);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetDisplayframerate, _dsSetDisplayframerate);
         m_isInitialized = 1;
     }
 
@@ -442,6 +451,139 @@ static bool get_HDR_DV_RFC_config()
     }
     printf("%s: the feature is %s.\n", __FUNCTION__, (true == is_enabled? "enabled" : "disabled"));
     return is_enabled;
+}
+
+IARM_Result_t _dsSetFRFMode(void *arg)
+{
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetFRFModeFunc_t)(int handle, int frfmode);
+    static dsSetFRFModeFunc_t func = 0;
+    if (func == 0) {
+            void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+            if (dllib) {
+                    func = (dsSetFRFModeFunc_t)dlsym(dllib, "dsSetFRFMode");
+                    if (func) {
+                            printf("dsSetFRFMode is defined and loaded\r\n");
+                    }
+                    else {
+                            printf("dsSetFRFMode is not defined\r\n");
+                    }
+                    dlclose(dllib);
+            }
+            else {
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+            }
+    }
+    dsFRFParam_t *param = (dsFRFParam_t *)arg;
+    if(0 != func) {
+            func(param->handle, param->frfmode);
+    }
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsGetFRFMode(void *arg)
+{
+        _DEBUG_ENTER();
+
+        IARM_BUS_Lock(lock);
+
+        typedef dsError_t (*dsGetFRFModeFunc_t)(int handle, int *frfmode);
+        static dsGetFRFModeFunc_t func = 0;
+        if (func == 0) {
+                void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                        func = (dsGetFRFModeFunc_t)dlsym(dllib, "dsGetFRFMode");
+                        if (func) {
+                                printf("dsGetFRFMode() is defined and loaded\r\n");
+                        }
+            else {
+                printf("dsGetFRFMode() is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+	dsFRFParam_t *param = (dsFRFParam_t *)arg;
+    if(0 != func) {
+        func(param->handle, &param->frfmode);
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsGetCurrentDisframerate(void *arg)
+{
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetCurrentDisframerateFunc_t)(int handle, char *framerate);
+    static dsGetCurrentDisframerateFunc_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetCurrentDisframerateFunc_t)dlsym(dllib, "dsGetCurrentDisplayframerate");
+            if (func) {
+                printf("dsGetCurrentDisframerate() is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetCurrentDisframerate() is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+    
+    dsFramerateParam_t *param = (dsFramerateParam_t *)arg;
+    if(0 != func) {
+        func(param->handle, param->framerate);
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsSetDisplayframerate(void *arg)
+{
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetDisplayframerateFunc_t)(int handle, char *frfmode);
+    static dsSetDisplayframerateFunc_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetDisplayframerateFunc_t)dlsym(dllib, "dsSetDisplayframerate");
+            if (func) {
+                printf("dsSetDisplayframerate() is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetDisplayframerate() is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+ 	
+    dsFramerateParam_t *param = (dsFramerateParam_t *)arg;
+    if(0 != func) {
+        func(param->handle, param->framerate);
+    }
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
 }
 
 /** @} */
