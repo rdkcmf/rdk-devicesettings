@@ -37,9 +37,11 @@ namespace device {
 
 class HostPersistence {
 	std::map <std::string, std::string> _properties;
+	std::map <std::string, std::string> _defaultProperties;
 	std::string filePath;
+	std::string defaultFilePath;
 	
-	void loadFromFile (const std::string &file);
+	void loadFromFile (const std::string &file, std::map <std::string, std::string> &map);
 	void writeToFile (const std::string &file);
 
 public:
@@ -50,6 +52,7 @@ public:
 	void load();
 	std::string getProperty(const std::string &key);
 	std::string getProperty(const std::string &key, const std::string &defValue);
+	std::string getDefaultProperty(const std::string &key);
 	void persistHostProperty(const std::string &key, const std::string &value);
 };
 

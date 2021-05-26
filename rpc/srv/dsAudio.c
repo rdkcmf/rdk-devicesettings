@@ -1083,19 +1083,46 @@ IARM_Result_t dsAudioMgr_init()
                     _AudioModeAuto = "TRUE";
                 }
             #endif
-          
-	    _AudioModeAuto = device::HostPersistence::getInstance().getProperty("HDMI0.AudioMode.AUTO",_AudioModeAuto);
-           std::string _ARCAudioModeAuto("FALSE");
-           _ARCAudioModeAuto = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.AudioMode.AUTO",_ARCAudioModeAuto);
-           if ((_AudioModeAuto.compare("TRUE") == 0) || (_ARCAudioModeAuto.compare("TRUE") == 0))	    
+
+            try {
+		_AudioModeAuto = device::HostPersistence::getInstance().getProperty("HDMI0.AudioMode.AUTO",_AudioModeAuto);
+	    }
+	    catch(...) {
+	        _AudioModeAuto = false;
+	    }
+           std::string _ARCAudioModeAuto("TRUE");
+	   std::string _SPDIFAudioModeAuto("FALSE");
+	   try {
+		_ARCAudioModeAuto = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.AudioMode.AUTO",_ARCAudioModeAuto);
+	   }
+	   catch(...) {
+	       _ARCAudioModeAuto = true;
+	   }
+
+           try {
+                _SPDIFAudioModeAuto = device::HostPersistence::getInstance().getProperty("SPDIF0.AudioMode.AUTO");
+           }
+           catch(...) {
+               try {
+                   printf("SPDIF0.AudioMode.AUTO not found in persistence store. Try system default\n");
+                   _SPDIFAudioModeAuto = device::HostPersistence::getInstance().getDefaultProperty("SPDIF0.AudioMode.AUTO");
+               }
+               catch(...) {
+                   _SPDIFAudioModeAuto = "FALSE";
+               }
+           }
+
+           if ((_AudioModeAuto.compare("TRUE") == 0) || (_ARCAudioModeAuto.compare("TRUE") == 0) || (_SPDIFAudioModeAuto.compare("TRUE") == 0))
 	    {
 	        _srv_AudioAuto = 1;
 	    }
-        else 
+        else
         {
 			_srv_AudioAuto = 0;
         }
 		__TIMESTAMP();printf("The HDMI Audio Auto Setting on startup  is %s \r\n",_AudioModeAuto.c_str());
+                __TIMESTAMP();printf("The HDMI ARC Audio Auto Setting on startup  is %s \r\n",_ARCAudioModeAuto.c_str());
+                __TIMESTAMP();printf("The SPDIF Audio Auto Setting on startup  is %s \r\n",_SPDIFAudioModeAuto.c_str());
 		
 		/* Get the AudioModesettings for SPDIF from Persistence */
 		std::string _SPDIFModeSettings("STEREO");
@@ -1483,13 +1510,29 @@ IARM_Result_t _dsSetStereoAuto(void *arg)
     {
 	printf("Param is  null\r\n");
     }
-    if (param->toPersist) {
-        device::HostPersistence::getInstance().persistHostProperty("HDMI0.AudioMode.AUTO", param->autoMode ? "TRUE" : "FALSE");
-        device::HostPersistence::getInstance().persistHostProperty("HDMI_ARC0.AudioMode.AUTO", param->autoMode ? "TRUE" : "FALSE");
-    }
 
     dsAudioPortType_t _APortType = _GetAudioPortType(param->handle);
-    if (_APortType == dsAUDIOPORT_TYPE_HDMI_ARC) {
+
+    if (param->toPersist) {
+	switch(_APortType) {
+	    case dsAUDIOPORT_TYPE_HDMI:
+	        device::HostPersistence::getInstance().persistHostProperty("HDMI0.AudioMode.AUTO", param->autoMode ? "TRUE" : "FALSE");
+		break;
+
+	    case dsAUDIOPORT_TYPE_HDMI_ARC:
+	        device::HostPersistence::getInstance().persistHostProperty("HDMI_ARC0.AudioMode.AUTO", param->autoMode ? "TRUE" : "FALSE");
+		break;
+
+	    case dsAUDIOPORT_TYPE_SPDIF:
+		device::HostPersistence::getInstance().persistHostProperty("SPDIF0.AudioMode.AUTO", param->autoMode ? "TRUE" : "FALSE");
+		break;
+
+	    default:
+		break;
+	}
+    }
+
+    if ((_APortType == dsAUDIOPORT_TYPE_HDMI_ARC) || (_APortType == dsAUDIOPORT_TYPE_SPDIF)) {
         typedef dsError_t (*dsSetStereoAuto_t)(int handle, int autoMode);
         static dsSetStereoAuto_t func = 0;
         if (func == 0) {

@@ -102,6 +102,7 @@ HostPersistence::HostPersistence() {
 		}
 		/*Default case*/
 	#endif
+		defaultFilePath = "/etc/hostDataDefault";
 
 
 }
@@ -132,17 +133,26 @@ HostPersistence::~HostPersistence() {
 void HostPersistence::load() {
     try
     {
-    	loadFromFile(filePath);
+       loadFromFile(filePath, _properties);
     }
     catch (exception& e)
     {
         cout << "Backup file is currupt or not available.." << endl;
         try {
-            loadFromFile(filePath + "tmpDB");
+            loadFromFile(filePath + "tmpDB", _properties);
         }
         catch (...) {
         	/* Remove all properties, and start with default values */
         }
+    }
+
+    try
+    {
+        loadFromFile(defaultFilePath, _defaultProperties);
+    }
+    catch (exception& e)
+    {
+        cout << "System file "<< defaultFilePath <<" is currupt or not available.." << endl;
     }
 
     return;
@@ -218,6 +228,38 @@ std::string HostPersistence::getProperty(const std::string &key, const std::stri
 }
 
 /**
+ * Provides a simple utility method for accessing host persisted values.
+ * Exception is thrown if the asked property is not available.
+ *
+ * @param key
+ *            property key
+ * @return {@link Integer#getInteger(String)} for the given <i>key</i>,
+ *         <i>defValue</i>
+ */
+std::string HostPersistence::getDefaultProperty(const string &key)
+{
+    /* Check the validness of the key */
+    if( key.empty())
+    {
+        cout << "The KEY is empty..." << endl;
+        throw IllegalArgumentException();
+    }
+
+    std::map <std::string, std::string> :: const_iterator eFound = _defaultProperties.find (key);
+    if (eFound == _defaultProperties.end())
+    {
+        cout << "The Item  IS NOT FOUND " << endl;
+
+        throw IllegalArgumentException();
+    }
+    else
+    {
+        cout << "The Item " << eFound->first << " is found & the value is " << eFound->second << endl;
+        return eFound->second;
+    }
+}
+
+/**
  * Provides a simple utility method for persist host values to a file.
  * Default value is returned if the asked property is not available.
  *
@@ -274,9 +316,12 @@ void HostPersistence::persistHostProperty(const std::string &key, const std::str
  *
  * @param filename
  *            property file name
+ *
+ * @param std::map <std::string, std::string> map
+ *            properties map
  * @return {@link Integer#getInteger(String)} 0 for Success and -1 for Failure
  */
-void HostPersistence::loadFromFile (const string &fileName)
+void HostPersistence::loadFromFile (const string &fileName, std::map <std::string, std::string> &map)
 {
     char keyValue[1024]  = "";
     char key[1024] = "";
@@ -294,7 +339,7 @@ void HostPersistence::loadFromFile (const string &fileName)
             else
             {
                 /* Check the TypeOfInput variable and then call the appropriate insert function */
-                _properties.insert ({key, keyValue });
+		map.insert ({key, keyValue });
             }
         }
         fclose (filePtr);
