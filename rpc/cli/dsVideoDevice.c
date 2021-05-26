@@ -204,6 +204,7 @@ dsError_t dsGetVideoCodecInfo(int handle, dsVideoCodingFormat_t format, dsVideoC
     _DEBUG_ENTER();
 
     dsGetVideoCodecInfoParam_t param;
+    memset(&param, 0, sizeof(param));
     param.handle = handle;
     param.format = format;
     info->num_entries = 0;
