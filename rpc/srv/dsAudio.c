@@ -268,6 +268,7 @@ void AudioConfigInit()
                     }
                     m_audioLevel = atof(_AudioLevel.c_str());
                     if (dsSetAudioLevelFunc(handle, m_audioLevel) == dsERR_NONE) {
+                        m_volumeLevel = m_audioLevel;
                         printf("Port %s: Initialized audio level : %f\n","SPEAKER0", m_audioLevel);
                     }
                 }
@@ -299,6 +300,7 @@ void AudioConfigInit()
                     m_audioLevel = atof(_AudioLevel.c_str());
                     if (dsSetAudioLevelFunc(handle, m_audioLevel) == dsERR_NONE) {
                         printf("Port %s: Initialized audio level : %f\n","HDMI0", m_audioLevel);
+                        m_volumeLevel = m_audioLevel;
                     }
                 }
             }
@@ -1575,7 +1577,7 @@ IARM_Result_t _dsSetAudioDucking(void *arg)
     int volume = 0;
     dsAudioSetDuckingParam_t *param = (dsAudioSetDuckingParam_t *)arg;
     IARM_Bus_DSMgr_EventData_t eventData;
-    printf("%s action : %d type :%d val :%d m_volumeLevel:%f \n",__FUNCTION__,__FUNCTION__,param->action,param->type,param->level,m_volumeLevel );
+    printf("%s action : %d type :%d val :%d m_volumeLevel:%f \n",__FUNCTION__,param->action,param->type,param->level,m_volumeLevel );
     if(m_MuteStatus)
     {
         printf("%s mute on so ignore the duckig request\n",__FUNCTION__);
@@ -1620,15 +1622,15 @@ IARM_Result_t _dsSetAudioDucking(void *arg)
         if (dllib) {
             func = (dsSetAudioLevel_t) dlsym(dllib, "dsSetAudioLevel");
             if (func) {
-                printf("dsSetAudioLevel_t(int, float ) is defined and loadedØrØn");
+                printf("dsSetAudioLevel_t(int, float ) is defined and loaded \r\n");
 	    }
             else {
-                printf("dsSetAudioLevel_t(int, float ) is not definedØrØn");
+                printf("dsSetAudioLevel_t(int, float ) is not defined \r\n");
 	    }
             dlclose(dllib);
         }
         else {
-            printf("Opening RDK_DSHAL_NAME Æ%sÅ failedØrØn", RDK_DSHAL_NAME);
+            printf("Opening RDK_DSHAL_NAME [%s] failed \r\n", RDK_DSHAL_NAME);
 	}
     }
     if (func != 0 )
