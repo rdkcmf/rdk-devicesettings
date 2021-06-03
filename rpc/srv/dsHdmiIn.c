@@ -558,6 +558,7 @@ IARM_Result_t _dsHdmiInScaleVideo(void *arg)
 IARM_Result_t _dsHdmiInSelectZoomMode(void *arg)
 {
     _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
     dsHdmiInSelectZoomModeParam_t *param = (dsHdmiInSelectZoomModeParam_t *)arg;
 
 #ifdef HAS_HDMI_IN_SUPPORT
