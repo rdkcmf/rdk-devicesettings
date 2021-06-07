@@ -210,8 +210,13 @@ void AudioConfigInit()
                         _AudioGain = device::HostPersistence::getInstance().getProperty("SPEAKER0.audio.Gain");
                     }
                     catch(...) {
-                        printf("Port %s: Exception in Getting the Audio Gain settings on Startup..... \r\n","SPEAKER0");
-                        _AudioGain = "0";
+                            try {
+                                printf("SPEAKER0.audio.Gain not found in persistence store. Try system default\n");
+                                _AudioGain = device::HostPersistence::getInstance().getDefaultProperty("SPEAKER0.audio.Gain");
+                            }
+                            catch(...) {
+                                _AudioGain = "0";
+                            }
                     }
                     m_audioGain = atof(_AudioGain.c_str());
                     if (dsSetAudioGainFunc(handle, m_audioGain) == dsERR_NONE) {
@@ -225,8 +230,13 @@ void AudioConfigInit()
                         _AudioGain = device::HostPersistence::getInstance().getProperty("HDMI0.audio.Gain");
                     }
                     catch(...) {
-                        printf("Port %s: Exception in Getting the Audio Gain settings on Startup..... \r\n","HDMI0");
-                        _AudioGain = "0";
+                            try {
+                                printf("HDMI0.audio.Gain not found in persistence store. Try system default\n");
+                                _AudioGain = device::HostPersistence::getInstance().getDefaultProperty("HDMI0.audio.Gain");
+                            }
+                            catch(...) {
+                                _AudioGain = "0";
+                            }
                     }
                     m_audioGain = atof(_AudioGain.c_str());
                     if (dsSetAudioGainFunc(handle, m_audioGain) == dsERR_NONE) {
@@ -263,8 +273,13 @@ void AudioConfigInit()
                         _AudioLevel = device::HostPersistence::getInstance().getProperty("SPEAKER0.audio.Level");
                     }
                     catch(...) {
-                        printf("Port %s: Exception in Getting the Audio Level settings from persistence storage..... \r\n","SPEAKER0");
-                        _AudioLevel = "40";
+                            try {
+                                printf("SPEAKER0.audio.Level not found in persistence store. Try system default\n");
+                                _AudioLevel = device::HostPersistence::getInstance().getDefaultProperty("SPEAKER0.audio.Level");
+                            }
+                            catch(...) {
+                                _AudioLevel = "40";
+                            }
                     }
                     m_audioLevel = atof(_AudioLevel.c_str());
                     if (dsSetAudioLevelFunc(handle, m_audioLevel) == dsERR_NONE) {
@@ -279,8 +294,13 @@ void AudioConfigInit()
                         _AudioLevel = device::HostPersistence::getInstance().getProperty("HEADPHONE0.audio.Level");
                     }
                     catch(...) {
-                        printf("Port %s: Exception in Getting the Audio Level settings from persistence storage..... \r\n","HEADPHONE0");
-                        _AudioLevel = "40";
+                            try {
+                                printf("HEADPHONE0.audio.Level not found in persistence store. Try system default\n");
+                                _AudioLevel = device::HostPersistence::getInstance().getDefaultProperty("HEADPHONE0.audio.Level");
+                            }
+                            catch(...) {
+                                _AudioLevel = "40";
+                            }
                     }
                     m_audioLevel = atof(_AudioLevel.c_str());
                     if (dsSetAudioLevelFunc(handle, m_audioLevel) == dsERR_NONE) {
@@ -294,8 +314,13 @@ void AudioConfigInit()
                         _AudioLevel = device::HostPersistence::getInstance().getProperty("HDMI0.audio.Level");
                     }
                     catch(...) {
-                        printf("Port %s: Exception in Getting the Audio Level settings from persistence storage..... \r\n","HDMI0");
-                        _AudioLevel = "40";
+                            try {
+                                printf("HDMI0.audio.Level not found in persistence store. Try system default\n");
+                                _AudioLevel = device::HostPersistence::getInstance().getDefaultProperty("HDMI0.audio.Level");
+                            }
+                            catch(...) {
+                                _AudioLevel = "40";
+                            }
                     }
                     m_audioLevel = atof(_AudioLevel.c_str());
                     if (dsSetAudioLevelFunc(handle, m_audioLevel) == dsERR_NONE) {
@@ -332,8 +357,13 @@ void AudioConfigInit()
                         _AudioDelay = device::HostPersistence::getInstance().getProperty("SPEAKER0.audio.Delay");
                     }
                     catch(...) {
-                        printf("Port %s: Exception in Getting the Audio Delay settings on Startup..... \r\n","SPEAKER0");
-                        _AudioDelay = "0";
+                            try {
+                                printf("SPEAKER0.audio.Delay not found in persistence store. Try system default\n");
+                                _AudioDelay = device::HostPersistence::getInstance().getDefaultProperty("SPEAKER0.audio.Delay");
+                            }
+                            catch(...) {
+                                _AudioDelay = "0";
+                            }
                     }
                     m_audioDelay = atoi(_AudioDelay.c_str());
                     if (dsSetAudioDelayFunc(handle, m_audioDelay) == dsERR_NONE) {
@@ -347,8 +377,13 @@ void AudioConfigInit()
                         _AudioDelay = device::HostPersistence::getInstance().getProperty("HDMI0.audio.Delay");
                     }
                     catch(...) {
-                        printf("Port %s: Exception in Getting the Audio Delay settings on Startup..... \r\n","HDMI0");
-                        _AudioDelay = "0";
+                            try {
+                                printf("HDMI0.audio.Delay not found in persistence store. Try system default\n");
+                                _AudioDelay = device::HostPersistence::getInstance().getDefaultProperty("HDMI0.audio.Delay");
+                            }
+                            catch(...) {
+                                _AudioDelay = "0";
+                            }
                     }
                     m_audioDelay = atoi(_AudioDelay.c_str());
                     if (dsSetAudioDelayFunc(handle, m_audioDelay) == dsERR_NONE) {
@@ -385,8 +420,13 @@ void AudioConfigInit()
                         _AudioDelayOffset = device::HostPersistence::getInstance().getProperty("SPEAKER0.audio.DelayOffset");
                     }
                     catch(...) {
-                        printf("Port %s: Exception in Getting the Audio Delay Offset settings on Startup..... \r\n","SPEAKER0");
-                        _AudioDelayOffset = "0";
+                            try {
+                                printf("SPEAKER0.audio.DelayOffset not found in persistence store. Try system default\n");
+                                _AudioDelayOffset = device::HostPersistence::getInstance().getDefaultProperty("SPEAKER0.audio.DelayOffset");
+                            }
+                            catch(...) {
+                                _AudioDelayOffset = "0";
+                            }
                     }
                     m_audioDelayOffset = atoi(_AudioDelayOffset.c_str());
                     if (dsSetAudioDelayOffsetFunc(handle, m_audioDelayOffset) == dsERR_NONE) {
@@ -400,8 +440,13 @@ void AudioConfigInit()
                         _AudioDelayOffset = device::HostPersistence::getInstance().getProperty("HDMI0.audio.DelayOffset");
                     }
                     catch(...) {
-                        printf("Port %s: Exception in Getting the Audio Delay Offset settings on Startup..... \r\n","HDMI0");
-                        _AudioDelayOffset = "0";
+                            try {
+                                printf("HDMI0.audio.DelayOffset not found in persistence store. Try system default\n");
+                                _AudioDelayOffset = device::HostPersistence::getInstance().getDefaultProperty("HDMI0.audio.DelayOffset");
+                            }
+                            catch(...) {
+                                _AudioDelayOffset = "0";
+                            }
                     }
                     m_audioDelayOffset = atoi(_AudioDelayOffset.c_str());
                     if (dsSetAudioDelayOffsetFunc(handle, m_audioDelayOffset) == dsERR_NONE) {
@@ -434,8 +479,13 @@ void AudioConfigInit()
                     _AudioAtmosOutputMode = device::HostPersistence::getInstance().getProperty("audio.AtmosOutputMode");
                 }
                 catch(...) {
-                    printf("Exception in Getting the Audio Atmos Output Mode settings from persistence storagr..... \r\n");
-                    _AudioAtmosOutputMode = "FALSE";
+                    try {
+                        printf("audio.AtmosOutputMode not found in persistence store. Try system default\n");
+                        _AudioAtmosOutputMode = device::HostPersistence::getInstance().getDefaultProperty("audio.AtmosOutputMode");
+                    }
+                    catch(...) {
+                        _AudioAtmosOutputMode = "FALSE";
+                    }
                 }
                 if (_AudioAtmosOutputMode == "TRUE") { 
                     m_audioAtmosOutputMode = true;
@@ -468,582 +518,1270 @@ void AudioConfigInit()
         }
     }
 
-
-#ifndef LLAMA_AUDIO_MODES_INIT
-    typedef dsError_t (*dsSetAudioCompression_t)(int handle, int compressionLevel);
-    static dsSetAudioCompression_t dsSetAudioCompressionFunc = 0;
-    if (dsSetAudioCompressionFunc == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetAudioCompressionFunc = (dsSetAudioCompression_t) dlsym(dllib, "dsSetAudioCompression");
-            if (dsSetAudioCompressionFunc) {
-                printf("dsSetAudioCompression_t(int, int ) is defined and loaded\r\n");
-                std::string _AudioCompression("0");
-                int m_audioCompression = 0;
-                try {
-                    _AudioCompression = device::HostPersistence::getInstance().getProperty("audio.Compression");
-                }
-                catch(...) {
-                    _AudioCompression = "0";
-                    printf("Exception in Getting the Audio Compression settings from persistence storage..... \r\n");
-                }
-                m_audioCompression = atoi(_AudioCompression.c_str());
-//SPEAKER init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsSetAudioCompressionFunc(handle, m_audioCompression) == dsERR_NONE) {
-                        printf("Port %s: Initialized audio compression : %d\n","SPEAKER0", m_audioCompression);
-                    }
-                }
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetAudioCompressionFunc(handle, m_audioCompression) == dsERR_NONE) {
-                        printf("Port %s: Initialized audio compression : %d\n","HDMI0", m_audioCompression);
-                    }
-                }
-            }
-            else {
-                printf("dsSetAudioCompression_t(int, int) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
+    std::string _AProfileSupport("FALSE");
+    std::string _AProfile("Off");
+    try {
+        _AProfileSupport = device::HostPersistence::getInstance().getDefaultProperty("audio.MS12Profile.supported");
     }
-
-
-    typedef dsError_t (*dsSetDialogEnhancement_t)(int handle, int enhancerLevel);
-    static dsSetDialogEnhancement_t dsSetDialogEnhancementFunc = 0;
-    if (dsSetDialogEnhancementFunc == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetDialogEnhancementFunc = (dsSetDialogEnhancement_t) dlsym(dllib, "dsSetDialogEnhancement");
-            if (dsSetDialogEnhancementFunc) {
-                printf("dsSetDialogEnhancement_t(int, int) is defined and loaded\r\n");
-                std::string _EnhancerLevel("0");
-                int m_enhancerLevel = 0;
-                try {
-                    _EnhancerLevel = device::HostPersistence::getInstance().getProperty("audio.EnhancerLevel");
-                }
-                catch(...) {
-                    _EnhancerLevel = "0";
-                    printf("Exception in Getting the Dialog Enhancement settings from persistence storage..... \r\n");
-                }
-                m_enhancerLevel = atoi(_EnhancerLevel.c_str());
-//SPEAKER init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsSetDialogEnhancementFunc(handle, m_enhancerLevel) == dsERR_NONE) {
-                        printf("Port %s: Initialized dialog enhancement level : %d\n","SPEAKER0", m_enhancerLevel);
-                    }
-                }
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetDialogEnhancementFunc(handle, m_enhancerLevel) == dsERR_NONE) {
-                        printf("Port %s: Initialized dialog enhancement level : %d\n","HDMI0", m_enhancerLevel);
-                    }
-                }
-            }
-            else {
-                printf("dsSetDialogEnhancement_t(int, int ) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
+    catch(...) {
+        _AProfileSupport = "FALSE";
+        printf("audio.MS12Profile.supported setting not found in hostDataDeafult \r\n");
     }
+    printf(" audio.MS12Profile.supported = %s ..... \r\n",_AProfileSupport.c_str());
 
 
-    typedef dsError_t (*dsSetDolbyVolumeMode_t)(int handle, bool enable);
-    static dsSetDolbyVolumeMode_t dsSetDolbyVolumeModeFunc = 0;
-    if (dsSetDolbyVolumeModeFunc == 0) {
-        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetDolbyVolumeModeFunc = (dsSetDolbyVolumeMode_t) dlsym(dllib, "dsSetDolbyVolumeMode");
-            if (dsSetDolbyVolumeModeFunc) {
-                printf("dsSetDolbyVolumeMode_t(int, bool) is defined and loaded\r\n");
-                std::string _DolbyVolumeMode("FALSE");
-                bool m_dolbyVolumeMode = false;
-                try {
-                    _DolbyVolumeMode = device::HostPersistence::getInstance().getProperty("audio.DolbyVolumeMode");
-                }
-                catch(...) {
-                    printf("Exception in Getting the Dolby Volume Mode from persistence storage..... \r\n");
-                    _DolbyVolumeMode = "FALSE";
-                }
-                if (_DolbyVolumeMode == "TRUE") {
-                    m_dolbyVolumeMode = true;
+    if(_AProfileSupport == "TRUE") {
+        typedef dsError_t (*dsSetMS12AudioProfile_t)(int handle, const char* profile);
+        static dsSetMS12AudioProfile_t dsSetMS12AudioProfileFunc = 0;
+        if (dsSetMS12AudioProfileFunc == 0) {
+            dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+            if (dllib) {
+                dsSetMS12AudioProfileFunc = (dsSetMS12AudioProfile_t) dlsym(dllib, "dsSetMS12AudioProfile");
+                if (dsSetMS12AudioProfileFunc) {
+                    printf("dsSetMS12AudioProfile_t(int, const char*) is defined and loaded\r\n");
+                    handle = 0;
+                    dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
+
+                    try {
+                        _AProfile = device::HostPersistence::getInstance().getProperty("audio.MS12Profile");
+                    }
+                    catch(...) {
+                            try {
+                                printf("audio.MS12Profile not found in persistence store. Try system default\n");
+                                _AProfile = device::HostPersistence::getInstance().getDefaultProperty("audio.MS12Profile");
+                            }
+                            catch(...) {
+                                _AProfile = "Off";
+                            }
+                    }
+        #ifdef LLAMA_AUDIO_MODES_INIT  //TODO: Remove hardcoding once AQ tuning is done
+                    _AProfile = "Entertainment";
+        #endif
+        //SPEAKER init
+                    handle = 0;
+                    if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                        if (dsSetMS12AudioProfileFunc(handle, _AProfile.c_str()) == dsERR_NONE) {
+                            printf("Port %s: Initialized MS12 Audio Profile : %s\n","SPEAKER0", _AProfile.c_str());
+                        }
+                       else {
+                            printf("Port %s: Initialization failed !!!  MS12 Audio Profile : %s\n","SPEAKER0", _AProfile.c_str());
+                       }
+                    }
+    #if 0 // No Audio Profile support for STB devices
+        //HDMI init
+                    handle = 0;
+                    if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                        if (dsSetMS12AudioProfileFunc(handle, _AProfile.c_str()) == dsERR_NONE) {
+                            printf("Port %s: Initialized MS12 Audio Profile  : %d\n","HDMI0", _AProfile.c_str());
+                        }
+                    }
+    #endif
                 }
                 else {
-                    m_dolbyVolumeMode = false;
+                    printf("dsSetMS12AudioProfile_t(int, const char*) is not defined\r\n");
                 }
-
-//SPEAKER init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsSetDolbyVolumeModeFunc(handle, m_dolbyVolumeMode) == dsERR_NONE) {
-                        printf("Port %s: Initialized Dolby Volume Mode : %d\n","SPEAKER0", m_dolbyVolumeMode);
-                    }
-                }
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetDolbyVolumeModeFunc(handle, m_dolbyVolumeMode) == dsERR_NONE) {
-                        printf("Port %s: Initialized Dolby Volume Mode : %d\n","HDMI0", m_dolbyVolumeMode);
-                    }
-                }
+                dlclose(dllib);
             }
             else {
-                printf("dsSetDolbyVolumeMode_t(int, bool) is not defined\r\n");
+                printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
             }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
         }
     }
 
-
-    typedef dsError_t (*dsSetIntelligentEqualizerMode_t)(int handle, int mode);
-    static dsSetIntelligentEqualizerMode_t dsSetIntelligentEqualizerModeFunc = 0;
-    if (dsSetIntelligentEqualizerModeFunc == 0) {
-        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetIntelligentEqualizerModeFunc = (dsSetIntelligentEqualizerMode_t) dlsym(dllib, "dsSetIntelligentEqualizerMode");
-            if (dsSetIntelligentEqualizerModeFunc) {
-                printf("dsSetIntelligentEqualizerMode_t(int, int) is defined and loaded\r\n");
-                std::string _IEQMode("0");
-                int m_IEQMode = 0;
-                handle = 0;
-                dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
-                try {
-                    _IEQMode = device::HostPersistence::getInstance().getProperty("audio.IntelligentEQ");
-                }
-                catch(...) {
-                    _IEQMode = "0";
-                    printf("Exception in Getting the Intelligent EQ mode settings from persistence storage..... \r\n");
-                }
-                m_IEQMode = atoi(_IEQMode.c_str());
-
-//SPEAKER init 
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsSetIntelligentEqualizerModeFunc(handle, m_IEQMode) == dsERR_NONE) {
-                        printf("Port %s: Initialized Intelligent Equalizer mode : %d\n","SPEAKER0", m_IEQMode);
-                    }
-                }
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetIntelligentEqualizerModeFunc(handle, m_IEQMode) == dsERR_NONE) {
-                        printf("Port %s: Initialized Intelligent Equalizer mode : %d\n","HDMI0", m_IEQMode);
-                    }
-                }
-            }
-            else {
-                printf("dsSetIntelligentEqualizerMode_t(int, int) is not defined\r\n");
-            }
-            dlclose(dllib);
+//All MS12 Settings can be initialised through MS12 audio profiles
+//User setting persistence override available for any individual setting on top of profiles
+//All MS12 settings can be turned off (DAP Off Mode) by configuring Audio Profile to Off
+    if((_AProfileSupport == "TRUE") && (_AProfile != "Off")) {
+        std::string _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.Compression.ms12ProfileOverride");
         }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.Compression.ms12ProfileOverride settings not found in system default ..... \r\n");
         }
-    }
+        printf(" audio.Compression.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
 
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsSetAudioCompression_t)(int handle, int compressionLevel);
+            static dsSetAudioCompression_t dsSetAudioCompressionFunc = 0;
+            if (dsSetAudioCompressionFunc == 0) {
+                void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsSetAudioCompressionFunc = (dsSetAudioCompression_t) dlsym(dllib, "dsSetAudioCompression");
+                    if (dsSetAudioCompressionFunc) {
+                        printf("dsSetAudioCompression_t(int, int ) is defined and loaded\r\n");
+                        std::string _AudioCompression("0");
+                        int m_audioCompression = 0;
+                        try {
+                            _AudioCompression = device::HostPersistence::getInstance().getProperty("audio.Compression");
+                            m_audioCompression = atoi(_AudioCompression.c_str());
+            //SPEAKER init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                                if (dsSetAudioCompressionFunc(handle, m_audioCompression) == dsERR_NONE) {
+                                    printf("Port %s: Initialized audio compression : %d\n","SPEAKER0", m_audioCompression);
+                                }
+                            }
+            //HDMI init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsSetAudioCompressionFunc(handle, m_audioCompression) == dsERR_NONE) {
+                                    printf("Port %s: Initialized audio compression : %d\n","HDMI0", m_audioCompression);
+                                }
+                            }
 
-    typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, int level);
-    static dsSetVolumeLeveller_t dsSetVolumeLevellerFunc = 0;
-    if (dsSetVolumeLevellerFunc == 0) {
-        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetVolumeLevellerFunc = (dsSetVolumeLeveller_t) dlsym(dllib, "dsSetVolumeLeveller");
-            if (dsSetVolumeLevellerFunc) {
-                printf("dsSetVolumeLeveller_t(int, int) is defined and loaded\r\n");
-                std::string _VolumeLeveller("0");
-                int m_volumeLeveller = 0;
-                try {
-                    _VolumeLeveller = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller");
-                }
-                catch(...) {
-                    _VolumeLeveller = "0";
-                    printf("Exception in Getting the Volume Leveller settings from persistence storage..... \r\n");
-                }
-                m_volumeLeveller = atoi(_VolumeLeveller.c_str());
-//SPEAKER init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsSetVolumeLevellerFunc(handle, m_volumeLeveller) == dsERR_NONE) {
-                        printf("Port %s: Initialized Volume Leveller : %d\n","SPEAKER0", m_volumeLeveller);
+                        }
+                        catch(...) {
+                            printf("audio.Compression not found in persistence store. System Default configured through profiles\n");
+                        }
                     }
-                }
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetVolumeLevellerFunc(handle, m_volumeLeveller) == dsERR_NONE) {
-                        printf("Port %s: Initialized Volume Leveller : %d\n","HDMI0", m_volumeLeveller);
+                    else {
+                        printf("dsSetAudioCompression_t(int, int) is not defined\r\n");
                     }
-                }
-            }
-            else {
-                printf("dsSetVolumeLeveller_t(int, int) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-
-    typedef dsError_t (*dsSetBassEnhancer_t)(int handle, int boost);
-    static dsSetBassEnhancer_t dsSetBassEnhancerFunc = 0;
-    if (func == 0) {
-        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetBassEnhancerFunc = (dsSetBassEnhancer_t) dlsym(dllib, "dsSetBassEnhancer");
-            if (dsSetBassEnhancerFunc) {
-                printf("dsSetBassEnhancer_t(int, int) is defined and loaded\r\n");
-                std::string _BassBoost("0");
-                int m_bassBoost = 0;
-                try {
-                    _BassBoost = device::HostPersistence::getInstance().getProperty("audio.BassBoost");
-                }
-                catch(...) {
-                    _BassBoost = "50";
-                    printf("Exception in Getting the Bass Boost settings from persistence storage..... \r\n");
-                }
-                m_bassBoost = atoi(_BassBoost.c_str());
-//SPEAKER init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsSetBassEnhancerFunc(handle, m_bassBoost) == dsERR_NONE) {
-                        printf("Port %s: Initialized Bass Boost : %d\n","SPEAKER0", m_bassBoost);
-                    }
-                }
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetBassEnhancerFunc(handle, m_bassBoost) == dsERR_NONE) {
-                        printf("Port %s: Initialized Bass Boost : %d\n","HDMI0", m_bassBoost);
-                    }
-                }
-            }
-            else {
-                printf("dsSetBassEnhancer_t(int, int) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-
-    typedef dsError_t (*dsEnableSurroundDecoder_t)(int handle, bool enabled);
-    static dsEnableSurroundDecoder_t dsEnableSurroundDecoderFunc = 0;
-    if (dsEnableSurroundDecoderFunc == 0) {
-        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsEnableSurroundDecoderFunc = (dsEnableSurroundDecoder_t) dlsym(dllib, "dsEnableSurroundDecoder");
-            if (dsEnableSurroundDecoderFunc) {
-                printf("dsEnableSurroundDecoder_t(int, bool) is defined and loaded\r\n");
-                std::string _SurroundDecoder("FALSE");
-                bool m_surroundDecoder = false;
-                try {
-                    _SurroundDecoder = device::HostPersistence::getInstance().getProperty("audio.SurroundDecoderEnabled");
-                }
-                catch(...) {
-                    printf("Exception in Getting the surround decoder settings from persistence storage..... \r\n");
-                    _SurroundDecoder = "FALSE";
-                }
-                if (_SurroundDecoder == "TRUE") {
-                    m_surroundDecoder = true;
+                    dlclose(dllib);
                 }
                 else {
-                    m_surroundDecoder = false;
-                }
-//SPEAKER init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsEnableSurroundDecoderFunc(handle, m_surroundDecoder) == dsERR_NONE) {
-                        printf("Port %s: Initialized Surroudn Decoder : %d\n","SPEAKER0", m_surroundDecoder);
-                    }
-                }
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsEnableSurroundDecoderFunc(handle, m_surroundDecoder) == dsERR_NONE) {
-                        printf("Port %s: Initialized Surroudn Decoder : %d\n","HDMI0", m_surroundDecoder);
-                    }
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
                 }
             }
-            else {
-                printf("dsEnableSurroundDecoder_t(int, bool) is not defined\r\n");
-            }
-            dlclose(dllib);
         }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+
+        _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.DialogEnhancer.ms12ProfileOverride");
         }
-    }
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.DialogEnhancer.ms12ProfileOverride settings not found in system default ..... \r\n");
+        }
+        printf(" audio.DialogEnhancer.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
 
-
-    typedef dsError_t (*dsSetDRCMode_t)(int handle, int mode);
-    static dsSetDRCMode_t dsSetDRCModeFunc = 0;
-    if (dsSetDRCModeFunc == 0) {
-        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetDRCModeFunc = (dsSetDRCMode_t) dlsym(dllib, "dsSetDRCMode");
-            if (dsSetDRCModeFunc) {
-                printf("dsSetDRCMode_t(int, int) is defined and loaded\r\n");
-                std::string _DRCMode("Line");
-                int m_DRCMode = 0;
-                try {
-                    _DRCMode = device::HostPersistence::getInstance().getProperty("audio.DRCMode");
-                }
-                catch(...) {
-                    printf("Exception in Getting the DRC Mode settings from persistence storage..... \r\n");
-                    _DRCMode = "Line";
-                }
-                if (_DRCMode == "RF") {
-                    m_DRCMode = 1;
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsSetDialogEnhancement_t)(int handle, int enhancerLevel);
+            static dsSetDialogEnhancement_t dsSetDialogEnhancementFunc = 0;
+            if (dsSetDialogEnhancementFunc == 0) {
+                void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsSetDialogEnhancementFunc = (dsSetDialogEnhancement_t) dlsym(dllib, "dsSetDialogEnhancement");
+                    if (dsSetDialogEnhancementFunc) {
+                        printf("dsSetDialogEnhancement_t(int, int) is defined and loaded\r\n");
+                        std::string _EnhancerLevel("0");
+                        int m_enhancerLevel = 0;
+                        try {
+                            _EnhancerLevel = device::HostPersistence::getInstance().getProperty("audio.EnhancerLevel");
+                            m_enhancerLevel = atoi(_EnhancerLevel.c_str());
+            //SPEAKER init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                                if (dsSetDialogEnhancementFunc(handle, m_enhancerLevel) == dsERR_NONE) {
+                                    printf("Port %s: Initialized dialog enhancement level : %d\n","SPEAKER0", m_enhancerLevel);
+                                }
+                            }
+            //HDMI init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsSetDialogEnhancementFunc(handle, m_enhancerLevel) == dsERR_NONE) {
+                                    printf("Port %s: Initialized dialog enhancement level : %d\n","HDMI0", m_enhancerLevel);
+                                }
+                            }
+                        }
+                        catch(...) {
+                            printf("audio.EnhancerLevel not found in persistence store. System Default configured through profiles\n");
+                        }
+                    }
+                    else {
+                        printf("dsSetDialogEnhancement_t(int, int ) is not defined\r\n");
+                    }
+                    dlclose(dllib);
                 }
                 else {
-                    m_DRCMode = 0;
-                }
-//SPEAKER init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsSetDRCModeFunc(handle, m_DRCMode) == dsERR_NONE) {
-                        printf("Port %s: Initialized DRCMode : %d\n","SPEAKER0", m_DRCMode);
-                    }
-                }
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetDRCModeFunc(handle, m_DRCMode) == dsERR_NONE) {
-                        printf("Port %s: Initialized DRCMode : %d\n","HDMI0", m_DRCMode);
-                    }
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
                 }
             }
-            else {
-                printf("dsSetDRCMode_t(int, int) is not defined\r\n");
-            }
-            dlclose(dllib);
         }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+
+        _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.DolbyVolumeMode.ms12ProfileOverride");
         }
-    }
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.DolbyVolumeMode.ms12ProfileOverride settings not found in system default ..... \r\n");
+        }
+        printf(" audio.DolbyVolumeMode.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
 
-
-    typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, int boost);
-    static dsSetSurroundVirtualizer_t dsSetSurroundVirtualizerFunc = 0;
-    if (dsSetSurroundVirtualizerFunc == 0) {
-        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetSurroundVirtualizerFunc = (dsSetSurroundVirtualizer_t) dlsym(dllib, "dsSetSurroundVirtualizer");
-            if (dsSetSurroundVirtualizerFunc) {
-                printf("dsSetSurroundVirtualizer_t(int, int) is defined and loaded\r\n");
-                std::string _SVBoost("0");
-                int m_SVBoost = 0;
-                try {
-                    _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer");
-                }
-                catch(...) {
-                    _SVBoost = "0";
-                    printf("Exception in Getting the Surround Virtualizer Boost settings from persistence storage..... \r\n");
-                }
-                m_SVBoost = atoi(_SVBoost.c_str());
-//SPEAKER init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsSetSurroundVirtualizerFunc(handle, m_SVBoost) == dsERR_NONE) {
-                        printf("Port %s: Initialized Surround Virtualizer Boost : %d\n","SPEAKER0", m_SVBoost);
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsSetDolbyVolumeMode_t)(int handle, bool enable);
+            static dsSetDolbyVolumeMode_t dsSetDolbyVolumeModeFunc = 0;
+            if (dsSetDolbyVolumeModeFunc == 0) {
+                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsSetDolbyVolumeModeFunc = (dsSetDolbyVolumeMode_t) dlsym(dllib, "dsSetDolbyVolumeMode");
+                    if (dsSetDolbyVolumeModeFunc) {
+                        printf("dsSetDolbyVolumeMode_t(int, bool) is defined and loaded\r\n");
+                        std::string _DolbyVolumeMode("FALSE");
+                        bool m_dolbyVolumeMode = false;
+                        try {
+                            _DolbyVolumeMode = device::HostPersistence::getInstance().getProperty("audio.DolbyVolumeMode");
+                            if (_DolbyVolumeMode == "TRUE") {
+                                m_dolbyVolumeMode = true;
+                            }
+                            else {
+                                m_dolbyVolumeMode = false;
+                            }
+            //SPEAKER init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                                if (dsSetDolbyVolumeModeFunc(handle, m_dolbyVolumeMode) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Dolby Volume Mode : %d\n","SPEAKER0", m_dolbyVolumeMode);
+                                }
+                            }
+            //HDMI init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsSetDolbyVolumeModeFunc(handle, m_dolbyVolumeMode) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Dolby Volume Mode : %d\n","HDMI0", m_dolbyVolumeMode);
+                                }
+                            }
+                        }
+                        catch(...) {
+                            printf("audio.DolbyVolumeMode not found in persistence store. System Default configured through profiles\n");
+                        }
                     }
-                }
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetSurroundVirtualizerFunc(handle, m_SVBoost) == dsERR_NONE) {
-                        printf("Port %s: Initialized Surround Virtualizer Boost : %d\n","HDMI0", m_SVBoost);
+                    else {
+                        printf("dsSetDolbyVolumeMode_t(int, bool) is not defined\r\n");
                     }
-                }
-            }
-            else {
-                printf("dsSetSurroundVirtualizer_t(int, int) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-
-    typedef dsError_t (*dsSetMISteering_t)(int handle, bool enabled);
-    static dsSetMISteering_t dsSetMISteeringFunc = 0;
-    if (dsSetMISteeringFunc == 0) {
-        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetMISteeringFunc = (dsSetMISteering_t) dlsym(dllib, "dsSetMISteering");
-            if (dsSetMISteeringFunc) {
-                printf("dsSetMISteering_t(int, bool) is defined and loaded\r\n");
-                std::string _MISteering("Disabled");
-                bool m_MISteering = false;
-                try {
-                    _MISteering = device::HostPersistence::getInstance().getProperty("audio.MISteering");
-                }
-                catch(...) {
-                    printf("Exception in Getting the MI Steering settings from persistence storage..... \r\n");
-                    _MISteering = "Disabled";
-                }
-                if (_MISteering == "Enabled") {
-                    m_MISteering = true;
+                    dlclose(dllib);
                 }
                 else {
-                    m_MISteering = false;
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
                 }
+            }
+        }
 
-//SPEAKER init
-                handle = 0;
-                dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
-                if (dsSetMISteeringFunc(handle, m_MISteering) == dsERR_NONE) {
-                    printf("Port %s: Initialized MI Steering : %d\n","SPEAKER0", m_MISteering);
-                }
-//HDMI init
-                handle = 0;
-                if (dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetMISteeringFunc(handle, m_MISteering) == dsERR_NONE) {
-                        printf("Port %s: Initialized MI Steering : %d\n","HDMI0", m_MISteering);
+        _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.IntelligentEQ.ms12ProfileOverride");
+        }
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.IntelligentEQ.ms12ProfileOverride settings not found in system default ..... \r\n");
+        }
+        printf(" audio.IntelligentEQ.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
+
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsSetIntelligentEqualizerMode_t)(int handle, int mode);
+            static dsSetIntelligentEqualizerMode_t dsSetIntelligentEqualizerModeFunc = 0;
+            if (dsSetIntelligentEqualizerModeFunc == 0) {
+                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsSetIntelligentEqualizerModeFunc = (dsSetIntelligentEqualizerMode_t) dlsym(dllib, "dsSetIntelligentEqualizerMode");
+                    if (dsSetIntelligentEqualizerModeFunc) {
+                        printf("dsSetIntelligentEqualizerMode_t(int, int) is defined and loaded\r\n");
+                        std::string _IEQMode("0");
+                        int m_IEQMode = 0;
+                        handle = 0;
+                        dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
+                        try {
+                            _IEQMode = device::HostPersistence::getInstance().getProperty("audio.IntelligentEQ");
+                            m_IEQMode = atoi(_IEQMode.c_str());
+            //SPEAKER init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                                if (dsSetIntelligentEqualizerModeFunc(handle, m_IEQMode) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Intelligent Equalizer mode : %d\n","SPEAKER0", m_IEQMode);
+                                }
+                            }
+            //HDMI init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsSetIntelligentEqualizerModeFunc(handle, m_IEQMode) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Intelligent Equalizer mode : %d\n","HDMI0", m_IEQMode);
+                                }
+                            }
+                        }
+                        catch(...) {
+                            printf("audio.IntelligentEQ not found in persistence store. System Default configured through profiles\n");
+                        }
                     }
+                    else {
+                        printf("dsSetIntelligentEqualizerMode_t(int, int) is not defined\r\n");
+                    }
+                    dlclose(dllib);
                 }
                 else {
-                    printf("Port %s: Initialization MI Steering : %d failed. Port not available\n","HDMI0", m_MISteering);
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
                 }
             }
-            else {
-                printf("dsSetMISteering_t(int, bool) is not defined\r\n");
+        }
+
+        _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.VolumeLeveller.ms12ProfileOverride");
+        }
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.VolumeLeveller.ms12ProfileOverride settings not found in system default ..... \r\n");
+        }
+        printf(" audio.VolumeLeveller.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
+
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, int level);
+            static dsSetVolumeLeveller_t dsSetVolumeLevellerFunc = 0;
+            if (dsSetVolumeLevellerFunc == 0) {
+                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsSetVolumeLevellerFunc = (dsSetVolumeLeveller_t) dlsym(dllib, "dsSetVolumeLeveller");
+                    if (dsSetVolumeLevellerFunc) {
+                        printf("dsSetVolumeLeveller_t(int, int) is defined and loaded\r\n");
+                        std::string _VolumeLeveller("0");
+                        int m_volumeLeveller = 0;
+                        try {
+                            _VolumeLeveller = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller");
+                            m_volumeLeveller = atoi(_VolumeLeveller.c_str());
+                //SPEAKER init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                                if (dsSetVolumeLevellerFunc(handle, m_volumeLeveller) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Volume Leveller : %d\n","SPEAKER0", m_volumeLeveller);
+                                }
+                            }
+                //HDMI init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsSetVolumeLevellerFunc(handle, m_volumeLeveller) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Volume Leveller : %d\n","HDMI0", m_volumeLeveller);
+                                }
+                            }
+                        }
+                        catch(...) {
+                            printf("audio.VolumeLeveller not found in persistence store. System Default configured through profiles\n");
+                        }
+                    }
+                    else {
+                        printf("dsSetVolumeLeveller_t(int, int) is not defined\r\n");
+                    }
+                    dlclose(dllib);
+                }
+                else {
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+                }
             }
-            dlclose(dllib);
         }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+
+        _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.BassBoost.ms12ProfileOverride");
         }
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.BassBoost.ms12ProfileOverride settings not found in system default ..... \r\n");
+        }
+        printf(" audio.BassBoost.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
+
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsSetBassEnhancer_t)(int handle, int boost);
+            static dsSetBassEnhancer_t dsSetBassEnhancerFunc = 0;
+            if (func == 0) {
+                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsSetBassEnhancerFunc = (dsSetBassEnhancer_t) dlsym(dllib, "dsSetBassEnhancer");
+                    if (dsSetBassEnhancerFunc) {
+                        printf("dsSetBassEnhancer_t(int, int) is defined and loaded\r\n");
+                        std::string _BassBoost("0");
+                        int m_bassBoost = 0;
+                        try {
+                            _BassBoost = device::HostPersistence::getInstance().getProperty("audio.BassBoost");
+                            m_bassBoost = atoi(_BassBoost.c_str());
+            //SPEAKER init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                                if (dsSetBassEnhancerFunc(handle, m_bassBoost) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Bass Boost : %d\n","SPEAKER0", m_bassBoost);
+                                }
+                            }
+            //HDMI init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsSetBassEnhancerFunc(handle, m_bassBoost) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Bass Boost : %d\n","HDMI0", m_bassBoost);
+                                }
+                            }
+                        }
+                        catch(...) {
+                            printf("audio.BassBoost not found in persistence store. System Default configured through profiles\n");
+                        }
+                    }
+                    else {
+                        printf("dsSetBassEnhancer_t(int, int) is not defined\r\n");
+                    }
+                    dlclose(dllib);
+                }
+                else {
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+                }
+            }
+        }
+
+        _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.SurroundDecoder.ms12ProfileOverride");
+        }
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.SurroundDecoder.ms12ProfileOverride settings not found in system default ..... \r\n");
+        }
+        printf(" audio.SurroundDecoder.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
+
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsEnableSurroundDecoder_t)(int handle, bool enabled);
+            static dsEnableSurroundDecoder_t dsEnableSurroundDecoderFunc = 0;
+            if (dsEnableSurroundDecoderFunc == 0) {
+                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsEnableSurroundDecoderFunc = (dsEnableSurroundDecoder_t) dlsym(dllib, "dsEnableSurroundDecoder");
+                    if (dsEnableSurroundDecoderFunc) {
+                        printf("dsEnableSurroundDecoder_t(int, bool) is defined and loaded\r\n");
+                        std::string _SurroundDecoder("FALSE");
+                        bool m_surroundDecoder = false;
+                        try {
+                            _SurroundDecoder = device::HostPersistence::getInstance().getProperty("audio.SurroundDecoderEnabled");
+                            if (_SurroundDecoder == "TRUE") {
+                                m_surroundDecoder = true;
+                            }
+                            else {
+                                m_surroundDecoder = false;
+                            }
+            //SPEAKER init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                                if (dsEnableSurroundDecoderFunc(handle, m_surroundDecoder) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Surroudn Decoder : %d\n","SPEAKER0", m_surroundDecoder);
+                                }
+                            }
+            //HDMI init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsEnableSurroundDecoderFunc(handle, m_surroundDecoder) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Surroudn Decoder : %d\n","HDMI0", m_surroundDecoder);
+                                }
+                            }
+                        }
+                        catch(...) {
+                            printf("audio.SurroundDecoderEnabled not found in persistence store. System Default configured through profiles\n");
+                        }
+                    }
+                    else {
+                        printf("dsEnableSurroundDecoder_t(int, bool) is not defined\r\n");
+                    }
+                    dlclose(dllib);
+                }
+                else {
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+                }
+            }
+	    }
+
+        _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.DRCMode.ms12ProfileOverride");
+        }
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.DRCMode.ms12ProfileOverride settings not found in system default ..... \r\n");
+        }
+        printf(" audio.DRCMode.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
+
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsSetDRCMode_t)(int handle, int mode);
+            static dsSetDRCMode_t dsSetDRCModeFunc = 0;
+            if (dsSetDRCModeFunc == 0) {
+                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsSetDRCModeFunc = (dsSetDRCMode_t) dlsym(dllib, "dsSetDRCMode");
+                    if (dsSetDRCModeFunc) {
+                        printf("dsSetDRCMode_t(int, int) is defined and loaded\r\n");
+                        std::string _DRCMode("Line");
+                        int m_DRCMode = 0;
+                        try {
+                            _DRCMode = device::HostPersistence::getInstance().getProperty("audio.DRCMode");
+                            if (_DRCMode == "RF") {
+                                m_DRCMode = 1;
+                            }
+                            else {
+                                m_DRCMode = 0;
+                            }
+                //SPEAKER init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                                if (dsSetDRCModeFunc(handle, m_DRCMode) == dsERR_NONE) {
+                                    printf("Port %s: Initialized DRCMode : %d\n","SPEAKER0", m_DRCMode);
+                                }
+                            }
+                //HDMI init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsSetDRCModeFunc(handle, m_DRCMode) == dsERR_NONE) {
+                                    printf("Port %s: Initialized DRCMode : %d\n","HDMI0", m_DRCMode);
+                                }
+                            }
+                        }
+                        catch(...) {
+                            printf("audio.DRCMode not found in persistence store. System Default configured through profiles\n");
+                        }
+                    }
+                    else {
+                        printf("dsSetDRCMode_t(int, int) is not defined\r\n");
+                    }
+                    dlclose(dllib);
+                }
+                else {
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+                }
+            }
+        }
+
+        _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.SurroundVirtualizer.ms12ProfileOverride");
+        }
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.SurroundVirtualizer.ms12ProfileOverride settings not found in system default ..... \r\n");
+        }
+        printf(" audio.SurroundVirtualizer.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
+
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, int boost);
+            static dsSetSurroundVirtualizer_t dsSetSurroundVirtualizerFunc = 0;
+            if (dsSetSurroundVirtualizerFunc == 0) {
+                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsSetSurroundVirtualizerFunc = (dsSetSurroundVirtualizer_t) dlsym(dllib, "dsSetSurroundVirtualizer");
+                    if (dsSetSurroundVirtualizerFunc) {
+                        printf("dsSetSurroundVirtualizer_t(int, int) is defined and loaded\r\n");
+                        std::string _SVBoost("0");
+                        int m_SVBoost = 0;
+                        try {
+                            _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer");
+                            m_SVBoost = atoi(_SVBoost.c_str());
+                //SPEAKER init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                                if (dsSetSurroundVirtualizerFunc(handle, m_SVBoost) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Surround Virtualizer Boost : %d\n","SPEAKER0", m_SVBoost);
+                                }
+                            }
+                //HDMI init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsSetSurroundVirtualizerFunc(handle, m_SVBoost) == dsERR_NONE){
+                                    printf("Port %s: Initialized Surround Virtualizer Boost : %d\n","HDMI0", m_SVBoost);
+				}
+                            }
+                        }
+                        catch(...) {
+                            printf("audio.SurroundVirtualizer not found in persistence store. System Default configured through profiles \n");
+                        }
+                    }
+                    else {
+                        printf("dsSetSurroundVirtualizer_t(int, int) is not defined\r\n");
+                    }
+                    dlclose(dllib);
+                }
+                else {
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+                }
+            }
+        }
+
+        _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.MISteering.ms12ProfileOverride");
+        }
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.MISteering.ms12ProfileOverride settings not found in system default ..... \r\n");
+        }
+        printf(" audio.MISteering.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
+
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsSetMISteering_t)(int handle, bool enabled);
+            static dsSetMISteering_t dsSetMISteeringFunc = 0;
+            if (dsSetMISteeringFunc == 0) {
+                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsSetMISteeringFunc = (dsSetMISteering_t) dlsym(dllib, "dsSetMISteering");
+                    if (dsSetMISteeringFunc) {
+                        printf("dsSetMISteering_t(int, bool) is defined and loaded\r\n");
+                        std::string _MISteering("Disabled");
+                        bool m_MISteering = false;
+                        try {
+                            _MISteering = device::HostPersistence::getInstance().getProperty("audio.MISteering");
+                            if (_MISteering == "Enabled") {
+                                m_MISteering = true;
+                            }
+                            else {
+                                m_MISteering = false;
+                            }
+                //SPEAKER init
+                            handle = 0;
+                            dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
+                            if (dsSetMISteeringFunc(handle, m_MISteering) == dsERR_NONE) {
+                                printf("Port %s: Initialized MI Steering : %d\n","SPEAKER0", m_MISteering);
+                            }
+                //HDMI init
+                            handle = 0;
+                            if (dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsSetMISteeringFunc(handle, m_MISteering) == dsERR_NONE) {
+                                    printf("Port %s: Initialized MI Steering : %d\n","HDMI0", m_MISteering);
+                                }
+                            }
+                            else {
+                                printf("Port %s: Initialization MI Steering : %d failed. Port not available\n","HDMI0", m_MISteering);
+                            }
+                        }
+                        catch(...) {
+                            printf("audio.MISteering not found in persistence store. System Default configured through profiles\n");
+                        }
+                    }
+                    else {
+                        printf("dsSetMISteering_t(int, bool) is not defined\r\n");
+                    }
+                    dlclose(dllib);
+                }
+                else {
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+                }
+            }
+        }
+
+        _profileOverride = "FALSE";
+        try {
+            _profileOverride = device::HostPersistence::getInstance().getDefaultProperty("audio.GraphicEQ.ms12ProfileOverride");
+        }
+        catch(...) {
+            _profileOverride = "FALSE";
+            printf(" audio.GraphicEQ.ms12ProfileOverride settings not found in system default ..... \r\n");
+        }
+        printf(" audio.GraphicEQ.ms12ProfileOverride = %s ..... \r\n",_profileOverride.c_str());
+
+        if(_profileOverride == "TRUE") {
+            typedef dsError_t (*dsSetGraphicEqualizerMode_t)(int handle, int mode);
+            static dsSetGraphicEqualizerMode_t dsSetGraphicEqualizerModeFunc = 0;
+            if (dsSetGraphicEqualizerModeFunc == 0) {
+                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                if (dllib) {
+                    dsSetGraphicEqualizerModeFunc = (dsSetGraphicEqualizerMode_t) dlsym(dllib, "dsSetGraphicEqualizerMode");
+                    if (dsSetGraphicEqualizerModeFunc) {
+                        printf("dsSetGraphicEqualizerMode_t(int, int) is defined and loaded\r\n");
+                        std::string _GEQMode("0");
+                        int m_GEQMode = 0;
+                        handle = 0;
+                        dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
+                        try {
+                            _GEQMode = device::HostPersistence::getInstance().getProperty("audio.GraphicEQ");
+                            m_GEQMode = atoi(_GEQMode.c_str());
+                //SPEAKER init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                                if (dsSetGraphicEqualizerModeFunc(handle, m_GEQMode) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Graphic Equalizer mode : %d\n","SPEAKER0", m_GEQMode);
+                                }
+                            }
+                //HDMI init
+                            handle = 0;
+                            if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                                if (dsSetGraphicEqualizerModeFunc(handle, m_GEQMode) == dsERR_NONE) {
+                                    printf("Port %s: Initialized Graphic Equalizer mode : %d\n","HDMI0", m_GEQMode);
+                                }
+                            }
+                        }
+                        catch(...) {
+                            printf("audio.GraphicEQ not found in persistence store. System Default configured through profiles\n");
+                        }
+                    }
+                    else {
+                        printf("dsSetGraphicEqualizerMode_t(int, int) is not defined\r\n");
+                    }
+                    dlclose(dllib);
+                }
+                else {
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+                }
+            }
+	}
     }
-
-
-    typedef dsError_t (*dsSetGraphicEqualizerMode_t)(int handle, int mode);
-    static dsSetGraphicEqualizerMode_t dsSetGraphicEqualizerModeFunc = 0;
-    if (dsSetGraphicEqualizerModeFunc == 0) {
-        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetGraphicEqualizerModeFunc = (dsSetGraphicEqualizerMode_t) dlsym(dllib, "dsSetGraphicEqualizerMode");
-            if (dsSetGraphicEqualizerModeFunc) {
-                printf("dsSetGraphicEqualizerMode_t(int, int) is defined and loaded\r\n");
-                std::string _GEQMode("0");
-                int m_GEQMode = 0;
-                handle = 0;
-                dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
-                try {
-                    _GEQMode = device::HostPersistence::getInstance().getProperty("audio.GraphicEQ");
-                }
-                catch(...) {
-                    _GEQMode = "0";
-                    printf("Exception in Getting the Graphic EQ mode settings from persistence storage..... \r\n");
-                }
-                m_GEQMode = atoi(_GEQMode.c_str());
-
-//SPEAKER init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsSetGraphicEqualizerModeFunc(handle, m_GEQMode) == dsERR_NONE) {
-                        printf("Port %s: Initialized Graphic Equalizer mode : %d\n","SPEAKER0", m_GEQMode);
-                    }
-                }
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetGraphicEqualizerModeFunc(handle, m_GEQMode) == dsERR_NONE) {
-                        printf("Port %s: Initialized Graphic Equalizer mode : %d\n","HDMI0", m_GEQMode);
-                    }
-                }
-            }
-            else {
-                printf("dsSetGraphicEqualizerMode_t(int, int) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
-    }
-
-#endif
-
-    typedef dsError_t (*dsSetMS12AudioProfile_t)(int handle, const char* profile);
-    static dsSetMS12AudioProfile_t dsSetMS12AudioProfileFunc = 0;
-    if (dsSetMS12AudioProfileFunc == 0) {
-        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetMS12AudioProfileFunc = (dsSetMS12AudioProfile_t) dlsym(dllib, "dsSetMS12AudioProfile");
-            if (dsSetMS12AudioProfileFunc) {
-                printf("dsSetMS12AudioProfile_t(int, const char*) is defined and loaded\r\n");
-	#ifdef LLAMA_AUDIO_MODES_INIT
-		std::string _AProfile("Entertainment");
-	#else
-		//Platco and Hisense
-                std::string _AProfile("User");
-	#endif
-                handle = 0;
-                dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
-	#ifndef LLAMA_AUDIO_MODES_INIT
-		//Platco and Hisense use case. user - MS12 settings system default.  Off - MS12 settings turned off
-                try {
-                    _AProfile = device::HostPersistence::getInstance().getProperty("audio.MS12Profile");
-		    if((_AProfile != "User") && (_AProfile != "Off")) {
-                        _AProfile = "User";
-                    }
-                }
-                catch(...) {
-                    _AProfile = "User";
-                    printf("Exception in Getting the Audio Profile setting from persistence storage..... \r\n");
-                }
-	#endif
-
-//SPEAKER init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
-                    if (dsSetMS12AudioProfileFunc(handle, _AProfile.c_str()) == dsERR_NONE) {
-                        printf("Port %s: Initialized MS12 Audio Profile : %s\n","SPEAKER0", _AProfile.c_str());
-                    }
-                   else {
-                        printf("Port %s: Initialization failed !!!  MS12 Audio Profile : %s\n","SPEAKER0", _AProfile.c_str());
+//MS12 Audio Profile not there
+//Initialize individual settings from persistence store / system default if persistence store empty
+    else if(_AProfileSupport == "FALSE") {
+           typedef dsError_t (*dsSetAudioCompression_t)(int handle, int compressionLevel);
+           static dsSetAudioCompression_t dsSetAudioCompressionFunc = 0;
+           if (dsSetAudioCompressionFunc == 0) {
+               void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsSetAudioCompressionFunc = (dsSetAudioCompression_t) dlsym(dllib, "dsSetAudioCompression");
+                   if (dsSetAudioCompressionFunc) {
+                       printf("dsSetAudioCompression_t(int, int ) is defined and loaded\r\n");
+                       std::string _AudioCompression("0");
+                       int m_audioCompression = 0;
+                       try {
+                           _AudioCompression = device::HostPersistence::getInstance().getProperty("audio.Compression");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.Compression not found in persistence store. Try system default\n");
+                               _AudioCompression = device::HostPersistence::getInstance().getDefaultProperty("audio.Compression");
+                           }
+                           catch(...) {
+                               _AudioCompression = "0";
+                           }
+                       }
+                       m_audioCompression = atoi(_AudioCompression.c_str());
+           //SPEAKER init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                           if (dsSetAudioCompressionFunc(handle, m_audioCompression) == dsERR_NONE) {
+                               printf("Port %s: Initialized audio compression : %d\n","SPEAKER0", m_audioCompression);
+                           }
+                       }
+           //HDMI init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsSetAudioCompressionFunc(handle, m_audioCompression) == dsERR_NONE) {
+                               printf("Port %s: Initialized audio compression : %d\n","HDMI0", m_audioCompression);
+                           }
+                       }
                    }
-                }
-#if 0
-//HDMI init
-                handle = 0;
-                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
-                    if (dsSetMS12AudioProfileFunc(handle, _AProfile.c_str()) == dsERR_NONE) {
-                        printf("Port %s: Initialized MS12 Audio Profile  : %d\n","HDMI0", _AProfile.c_str());
-                    }
-                }
-#endif
-            }
-            else {
-                printf("dsSetMS12AudioProfile_t(int, const char*) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
+                   else {
+                       printf("dsSetAudioCompression_t(int, int) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
+
+
+           typedef dsError_t (*dsSetDialogEnhancement_t)(int handle, int enhancerLevel);
+           static dsSetDialogEnhancement_t dsSetDialogEnhancementFunc = 0;
+           if (dsSetDialogEnhancementFunc == 0) {
+               void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsSetDialogEnhancementFunc = (dsSetDialogEnhancement_t) dlsym(dllib, "dsSetDialogEnhancement");
+                   if (dsSetDialogEnhancementFunc) {
+                       printf("dsSetDialogEnhancement_t(int, int) is defined and loaded\r\n");
+                       std::string _EnhancerLevel("0");
+                       int m_enhancerLevel = 0;
+                       try {
+                           _EnhancerLevel = device::HostPersistence::getInstance().getProperty("audio.EnhancerLevel");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.EnhancerLevel not found in persistence store. Try system default\n");
+                               _EnhancerLevel = device::HostPersistence::getInstance().getDefaultProperty("audio.EnhancerLevel");
+                           }
+                           catch(...) {
+                               _EnhancerLevel = "0";
+                           }
+                       }
+                       m_enhancerLevel = atoi(_EnhancerLevel.c_str());
+           //SPEAKER init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                           if (dsSetDialogEnhancementFunc(handle, m_enhancerLevel) == dsERR_NONE) {
+                               printf("Port %s: Initialized dialog enhancement level : %d\n","SPEAKER0", m_enhancerLevel);
+                           }
+                       }
+           //HDMI init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsSetDialogEnhancementFunc(handle, m_enhancerLevel) == dsERR_NONE) {
+                               printf("Port %s: Initialized dialog enhancement level : %d\n","HDMI0", m_enhancerLevel);
+                           }
+                       }
+                   }
+                   else {
+                       printf("dsSetDialogEnhancement_t(int, int ) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
+
+
+           typedef dsError_t (*dsSetDolbyVolumeMode_t)(int handle, bool enable);
+           static dsSetDolbyVolumeMode_t dsSetDolbyVolumeModeFunc = 0;
+           if (dsSetDolbyVolumeModeFunc == 0) {
+               dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsSetDolbyVolumeModeFunc = (dsSetDolbyVolumeMode_t) dlsym(dllib, "dsSetDolbyVolumeMode");
+                   if (dsSetDolbyVolumeModeFunc) {
+                       printf("dsSetDolbyVolumeMode_t(int, bool) is defined and loaded\r\n");
+                       std::string _DolbyVolumeMode("FALSE");
+                       bool m_dolbyVolumeMode = false;
+                       try {
+                           _DolbyVolumeMode = device::HostPersistence::getInstance().getProperty("audio.DolbyVolumeMode");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.DolbyVolumeMode not found in persistence store. Try system default\n");
+                               _DolbyVolumeMode = device::HostPersistence::getInstance().getDefaultProperty("audio.DolbyVolumeMode");
+                           }
+                           catch(...) {
+                               _DolbyVolumeMode = "FALSE";
+                           }
+                       }
+                       if (_DolbyVolumeMode == "TRUE") {
+                           m_dolbyVolumeMode = true;
+                       }
+                       else {
+                           m_dolbyVolumeMode = false;
+                       }
+           //SPEAKER init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                           if (dsSetDolbyVolumeModeFunc(handle, m_dolbyVolumeMode) == dsERR_NONE) {
+                               printf("Port %s: Initialized Dolby Volume Mode : %d\n","SPEAKER0", m_dolbyVolumeMode);
+                           }
+                       }
+           //HDMI init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsSetDolbyVolumeModeFunc(handle, m_dolbyVolumeMode) == dsERR_NONE) {
+                               printf("Port %s: Initialized Dolby Volume Mode : %d\n","HDMI0", m_dolbyVolumeMode);
+                           }
+                       }
+                   }
+                   else {
+                       printf("dsSetDolbyVolumeMode_t(int, bool) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
+
+           typedef dsError_t (*dsSetIntelligentEqualizerMode_t)(int handle, int mode);
+           static dsSetIntelligentEqualizerMode_t dsSetIntelligentEqualizerModeFunc = 0;
+           if (dsSetIntelligentEqualizerModeFunc == 0) {
+               dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsSetIntelligentEqualizerModeFunc = (dsSetIntelligentEqualizerMode_t) dlsym(dllib, "dsSetIntelligentEqualizerMode");
+                   if (dsSetIntelligentEqualizerModeFunc) {
+                       printf("dsSetIntelligentEqualizerMode_t(int, int) is defined and loaded\r\n");
+                       std::string _IEQMode("0");
+                       int m_IEQMode = 0;
+                       handle = 0;
+                       dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
+                       try {
+                           _IEQMode = device::HostPersistence::getInstance().getProperty("audio.IntelligentEQ");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.IntelligentEQ not found in persistence store. Try system default\n");
+                               _IEQMode = device::HostPersistence::getInstance().getDefaultProperty("audio.IntelligentEQ");
+                           }
+                           catch(...) {
+                               _IEQMode = "0";
+                           }
+                       }
+                       m_IEQMode = atoi(_IEQMode.c_str());
+
+           //SPEAKER init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                           if (dsSetIntelligentEqualizerModeFunc(handle, m_IEQMode) == dsERR_NONE) {
+                               printf("Port %s: Initialized Intelligent Equalizer mode : %d\n","SPEAKER0", m_IEQMode);
+                           }
+                       }
+           //HDMI init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsSetIntelligentEqualizerModeFunc(handle, m_IEQMode) == dsERR_NONE) {
+                               printf("Port %s: Initialized Intelligent Equalizer mode : %d\n","HDMI0", m_IEQMode);
+                           }
+                       }
+                   }
+                   else {
+                       printf("dsSetIntelligentEqualizerMode_t(int, int) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
+
+           typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, int level);
+           static dsSetVolumeLeveller_t dsSetVolumeLevellerFunc = 0;
+           if (dsSetVolumeLevellerFunc == 0) {
+               dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsSetVolumeLevellerFunc = (dsSetVolumeLeveller_t) dlsym(dllib, "dsSetVolumeLeveller");
+                   if (dsSetVolumeLevellerFunc) {
+                       printf("dsSetVolumeLeveller_t(int, int) is defined and loaded\r\n");
+                       std::string _VolumeLeveller("0");
+                       int m_volumeLeveller;
+                       try {
+                           _VolumeLeveller = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.VolumeLeveller not found in persistence store. Try system default\n");
+                               _VolumeLeveller = device::HostPersistence::getInstance().getDefaultProperty("audio.VolumeLeveller");
+                           }
+                           catch(...) {
+                               _VolumeLeveller = "0";
+                           }
+                       }
+                       m_volumeLeveller = atoi(_VolumeLeveller.c_str());
+           //SPEAKER init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                           if (dsSetVolumeLevellerFunc(handle, m_volumeLeveller) == dsERR_NONE) {
+                               printf("Port %s: Initialized Volume Leveller : %d\n","SPEAKER0", m_volumeLeveller);
+                           }
+                       }
+           //HDMI init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsSetVolumeLevellerFunc(handle, m_volumeLeveller) == dsERR_NONE) {
+                               printf("Port %s: Initialized Volume Leveller : %d\n","HDMI0", m_volumeLeveller);
+                           }
+                       }
+                   }
+                   else {
+                       printf("dsSetVolumeLeveller_t(int, int) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
+
+
+           typedef dsError_t (*dsSetBassEnhancer_t)(int handle, int boost);
+           static dsSetBassEnhancer_t dsSetBassEnhancerFunc = 0;
+           if (func == 0) {
+               dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsSetBassEnhancerFunc = (dsSetBassEnhancer_t) dlsym(dllib, "dsSetBassEnhancer");
+                   if (dsSetBassEnhancerFunc) {
+                       printf("dsSetBassEnhancer_t(int, int) is defined and loaded\r\n");
+                       std::string _BassBoost("0");
+                       int m_bassBoost = 0;
+                       try {
+                           _BassBoost = device::HostPersistence::getInstance().getProperty("audio.BassBoost");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.BassBoost not found in persistence store. Try system default\n");
+                               _BassBoost = device::HostPersistence::getInstance().getDefaultProperty("audio.BassBoost");
+                           }
+                           catch(...) {
+                               _BassBoost = "0";
+                           }
+                       }
+                       m_bassBoost = atoi(_BassBoost.c_str());
+           //SPEAKER init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                           if (dsSetBassEnhancerFunc(handle, m_bassBoost) == dsERR_NONE) {
+                               printf("Port %s: Initialized Bass Boost : %d\n","SPEAKER0", m_bassBoost);
+                           }
+                       }
+           //HDMI init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsSetBassEnhancerFunc(handle, m_bassBoost) == dsERR_NONE) {
+                               printf("Port %s: Initialized Bass Boost : %d\n","HDMI0", m_bassBoost);
+                           }
+                       }
+                   }
+                   else {
+                       printf("dsSetBassEnhancer_t(int, int) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
+
+
+           typedef dsError_t (*dsEnableSurroundDecoder_t)(int handle, bool enabled);
+           static dsEnableSurroundDecoder_t dsEnableSurroundDecoderFunc = 0;
+           if (dsEnableSurroundDecoderFunc == 0) {
+               dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsEnableSurroundDecoderFunc = (dsEnableSurroundDecoder_t) dlsym(dllib, "dsEnableSurroundDecoder");
+                   if (dsEnableSurroundDecoderFunc) {
+                       printf("dsEnableSurroundDecoder_t(int, bool) is defined and loaded\r\n");
+                       std::string _SurroundDecoder("FALSE");
+                       bool m_surroundDecoder = false;
+                       try {
+                           _SurroundDecoder = device::HostPersistence::getInstance().getProperty("audio.SurroundDecoderEnabled");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.SurroundDecoderEnabled not found in persistence store. Try system default\n");
+                               _SurroundDecoder = device::HostPersistence::getInstance().getDefaultProperty("audio.SurroundDecoderEnabled");
+                           }
+                           catch(...) {
+                               _SurroundDecoder = "FALSE";
+                           }
+                       }
+                       if (_SurroundDecoder == "TRUE") {
+                           m_surroundDecoder = true;
+                       }
+                       else {
+                           m_surroundDecoder = false;
+                       }
+           //SPEAKER init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                           if (dsEnableSurroundDecoderFunc(handle, m_surroundDecoder) == dsERR_NONE) {
+                               printf("Port %s: Initialized Surroudn Decoder : %d\n","SPEAKER0", m_surroundDecoder);
+                           }
+                       }
+           //HDMI init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsEnableSurroundDecoderFunc(handle, m_surroundDecoder) == dsERR_NONE) {
+                               printf("Port %s: Initialized Surroudn Decoder : %d\n","HDMI0", m_surroundDecoder);
+                           }
+                       }
+                   }
+                   else {
+                       printf("dsEnableSurroundDecoder_t(int, bool) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
+
+
+           typedef dsError_t (*dsSetDRCMode_t)(int handle, int mode);
+           static dsSetDRCMode_t dsSetDRCModeFunc = 0;
+           if (dsSetDRCModeFunc == 0) {
+               dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsSetDRCModeFunc = (dsSetDRCMode_t) dlsym(dllib, "dsSetDRCMode");
+                   if (dsSetDRCModeFunc) {
+                       printf("dsSetDRCMode_t(int, int) is defined and loaded\r\n");
+                       std::string _DRCMode("Line");
+                       int m_DRCMode = 0;
+                       try {
+                           _DRCMode = device::HostPersistence::getInstance().getProperty("audio.DRCMode");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.DRCMode not found in persistence store. Try system default\n");
+                               _DRCMode = device::HostPersistence::getInstance().getDefaultProperty("audio.DRCMode");
+                           }
+                           catch(...) {
+                               _DRCMode = "Line";
+                           }
+                       }
+                       if (_DRCMode == "RF") {
+                           m_DRCMode = 1;
+                       }
+                       else {
+                           m_DRCMode = 0;
+                       }
+           //SPEAKER init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                           if (dsSetDRCModeFunc(handle, m_DRCMode) == dsERR_NONE) {
+                               printf("Port %s: Initialized DRCMode : %d\n","SPEAKER0", m_DRCMode);
+                           }
+                       }
+           //HDMI init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsSetDRCModeFunc(handle, m_DRCMode) == dsERR_NONE) {
+                               printf("Port %s: Initialized DRCMode : %d\n","HDMI0", m_DRCMode);
+                           }
+                       }
+                   }
+                   else {
+                       printf("dsSetDRCMode_t(int, int) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
+
+
+           typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, int boost);
+           static dsSetSurroundVirtualizer_t dsSetSurroundVirtualizerFunc = 0;
+           if (dsSetSurroundVirtualizerFunc == 0) {
+               dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsSetSurroundVirtualizerFunc = (dsSetSurroundVirtualizer_t) dlsym(dllib, "dsSetSurroundVirtualizer");
+                   if (dsSetSurroundVirtualizerFunc) {
+                       printf("dsSetSurroundVirtualizer_t(int, int) is defined and loaded\r\n");
+                       std::string _SVBoost("0");
+                       int m_SVBoost = 0;
+                       try {
+                           _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.SurroundVirtualizer.mode/audio.SurroundVirtualizer.boost not found in persistence store. Try system default\n");
+                               _SVBoost = device::HostPersistence::getInstance().getDefaultProperty("audio.SurroundVirtualizer");
+                           }
+                           catch(...) {
+                               _SVBoost = "0";
+                           }
+                       }
+                       m_SVBoost = atoi(_SVBoost.c_str());
+           //SPEAKER init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                           if (dsSetSurroundVirtualizerFunc(handle, m_SVBoost) == dsERR_NONE) {
+                               printf("Port %s: Initialized Surround Virtualizer Boost : %d\n","SPEAKER0", m_SVBoost);
+                           }
+                       }
+           //HDMI init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsSetSurroundVirtualizerFunc(handle, m_SVBoost) == dsERR_NONE) {
+                               printf("Port %s: Initialized Surround Virtualizer Boost : %d\\n","HDMI0", m_SVBoost);
+                           }
+                       }
+                   }
+                   else {
+                       printf("dsSetSurroundVirtualizer_t(int, int) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
+
+
+           typedef dsError_t (*dsSetMISteering_t)(int handle, bool enabled);
+           static dsSetMISteering_t dsSetMISteeringFunc = 0;
+           if (dsSetMISteeringFunc == 0) {
+               dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsSetMISteeringFunc = (dsSetMISteering_t) dlsym(dllib, "dsSetMISteering");
+                   if (dsSetMISteeringFunc) {
+                       printf("dsSetMISteering_t(int, bool) is defined and loaded\r\n");
+                       std::string _MISteering("Disabled");
+                       bool m_MISteering = false;
+                       try {
+                           _MISteering = device::HostPersistence::getInstance().getProperty("audio.MISteering");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.MISteering not found in persistence store. Try system default\n");
+                               _MISteering = device::HostPersistence::getInstance().getDefaultProperty("audio.MISteering");
+                           }
+                           catch(...) {
+                               _MISteering = "Disabled";
+                           }
+                       }
+                       if (_MISteering == "Enabled") {
+                           m_MISteering = true;
+                       }
+                       else {
+                           m_MISteering = false;
+                       }
+
+           //SPEAKER init
+                       handle = 0;
+                       dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
+                       if (dsSetMISteeringFunc(handle, m_MISteering) == dsERR_NONE) {
+                           printf("Port %s: Initialized MI Steering : %d\n","SPEAKER0", m_MISteering);
+                       }
+           //HDMI init
+                       handle = 0;
+                       if (dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsSetMISteeringFunc(handle, m_MISteering) == dsERR_NONE) {
+                               printf("Port %s: Initialized MI Steering : %d\n","HDMI0", m_MISteering);
+                           }
+                       }
+                       else {
+                           printf("Port %s: Initialization MI Steering : %d failed. Port not available\n","HDMI0", m_MISteering);
+                       }
+                   }
+                   else {
+                       printf("dsSetMISteering_t(int, bool) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
+
+
+           typedef dsError_t (*dsSetGraphicEqualizerMode_t)(int handle, int mode);
+           static dsSetGraphicEqualizerMode_t dsSetGraphicEqualizerModeFunc = 0;
+           if (dsSetGraphicEqualizerModeFunc == 0) {
+               dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+               if (dllib) {
+                   dsSetGraphicEqualizerModeFunc = (dsSetGraphicEqualizerMode_t) dlsym(dllib, "dsSetGraphicEqualizerMode");
+                   if (dsSetGraphicEqualizerModeFunc) {
+                       printf("dsSetGraphicEqualizerMode_t(int, int) is defined and loaded\r\n");
+                       std::string _GEQMode("0");
+                       int m_GEQMode = 0;
+                       handle = 0;
+                       dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle);
+                       try {
+                           _GEQMode = device::HostPersistence::getInstance().getProperty("audio.GraphicEQ");
+                       }
+                       catch(...) {
+                           try {
+                               printf("audio.GraphicEQ not found in persistence store. Try system default\n");
+                               _GEQMode = device::HostPersistence::getInstance().getDefaultProperty("audio.GraphicEQ");
+                           }
+                           catch(...) {
+                               _GEQMode = "0";
+                           }
+                       }
+                       m_GEQMode = atoi(_GEQMode.c_str());
+
+           //SPEAKER init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
+                           if (dsSetGraphicEqualizerModeFunc(handle, m_GEQMode) == dsERR_NONE) {
+                               printf("Port %s: Initialized Graphic Equalizer mode : %d\n","SPEAKER0", m_GEQMode);
+                           }
+                       }
+           //HDMI init
+                       handle = 0;
+                       if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI,0,&handle) == dsERR_NONE) {
+                           if (dsSetGraphicEqualizerModeFunc(handle, m_GEQMode) == dsERR_NONE) {
+                               printf("Port %s: Initialized Graphic Equalizer mode : %d\n","HDMI0", m_GEQMode);
+                           }
+                       }
+                   }
+                   else {
+                       printf("dsSetGraphicEqualizerMode_t(int, int) is not defined\r\n");
+                   }
+                   dlclose(dllib);
+               }
+               else {
+                   printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+               }
+           }
     }
+
 
 #endif //DS_AUDIO_SETTINGS_PERSISTENCE
 }
@@ -2086,9 +2824,14 @@ IARM_Result_t _dsGetEnablePersist(void *arg)
         _AudioPortEnable = device::HostPersistence::getInstance().getProperty(isEnabledAudioPortKey);
     }
     catch(...) {
-        printf("Init: %s : Exception in Getting the %s port enable settings from persistence storage..... \r\n", __FUNCTION__, isEnabledAudioPortKey.c_str());
-        /*By default enable all the ports*/
-        _AudioPortEnable = "TRUE";
+        try {
+            printf("Init: %s : %s port enable settings not found in persistence store. Try system default\n",__FUNCTION__, isEnabledAudioPortKey.c_str());
+            _AudioPortEnable = device::HostPersistence::getInstance().getDefaultProperty(isEnabledAudioPortKey);
+        }
+        catch(...) {
+            /*By default enable all the ports*/
+            _AudioPortEnable = "TRUE";
+        }
     }
     if ("FALSE" == _AudioPortEnable) { 
         printf("%s: persist dsEnableAudioPort value: _AudioPortEnable:%s:\n", __FUNCTION__, _AudioPortEnable.c_str());  
