@@ -553,6 +553,27 @@ void HdmiInput::getHDMISPDInfo (int iHdmiPort, std::vector<uint8_t> &data) {
 	
 }
 
+void HdmiInput::setEdidVersion (int iHdmiPort, int iEdidVersion) {
+    printf ("HdmiInput::setEdidVersion \r\n");
+    dsError_t ret = dsSetEdidVersion (iHdmiPort, iEdidVersion);
+    if (ret != dsERR_NONE)
+    {
+        throw Exception(ret);
+    }
+    printf ("%s:%d - Set EDID Version = %d\n", __PRETTY_FUNCTION__, __LINE__, iEdidVersion);
+}
+
+void HdmiInput::getEdidVersion (int iHdmiPort, int *iEdidVersion) {
+
+    printf ("HdmiInput::getEdidVersion \r\n");
+    dsError_t ret = dsGetEdidVersion (iHdmiPort, iEdidVersion);
+    if (ret != dsERR_NONE)
+    {
+        throw Exception(ret);
+    }
+    printf ("%s:%d - EDID Version = %d\n", __PRETTY_FUNCTION__, __LINE__, *iEdidVersion);
+}
+
 }
 
 

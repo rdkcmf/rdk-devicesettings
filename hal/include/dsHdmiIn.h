@@ -314,6 +314,8 @@ bool dsIsHdmiARCPort (int iPort);
 
 dsError_t dsGetEDIDBytesInfo (int iHdmiPort, unsigned char **edid, int *length);
 dsError_t dsGetHDMISPDInfo (int iHdmiPort, unsigned char **data);
+dsError_t dsSetEdidVersion (int iHdmiPort, int iEdidVersion);
+dsError_t dsGetEdidVersion (int iHdmiPort, int *iEdidVersion);
 
 /* End of DSHAL_HdmiIn_API doxygen group */
 /**

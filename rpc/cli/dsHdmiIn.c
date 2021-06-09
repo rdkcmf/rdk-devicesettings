@@ -344,5 +344,49 @@ dsError_t dsGetHDMISPDInfo (int iHdmiPort, unsigned char **spdInfo)
     return dsERR_GENERAL;
 }
 
+dsError_t dsSetEdidVersion (int iHdmiPort, int iEdidVersion)
+{
+    _DEBUG_ENTER();
+
+    dsEdidVersionParam_t param;
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+    param.iHdmiPort = iHdmiPort;
+    param.iEdidVersion = iEdidVersion;
+    rpcRet = IARM_Bus_Call (IARM_BUS_DSMGR_NAME,
+                            (char *)IARM_BUS_DSMGR_API_dsSetEdidVersion,
+                            (void *)&param,
+                            sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+        printf ("[cli] %s: dsSetEdidVersion eRet: %d \r\n", __FUNCTION__, param.result);
+        return param.result;
+    }
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
+    return dsERR_GENERAL;
+}
+
+dsError_t dsGetEdidVersion (int iHdmiPort, int *iEdidVersion)
+{
+    _DEBUG_ENTER();
+
+    dsEdidVersionParam_t param;
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+    param.iHdmiPort = iHdmiPort;
+    rpcRet = IARM_Bus_Call (IARM_BUS_DSMGR_NAME,
+                            (char *)IARM_BUS_DSMGR_API_dsGetEdidVersion,
+                            (void *)&param,
+                            sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+        *iEdidVersion =  param.iEdidVersion;
+        printf ("[cli] %s: dsGetEdidVersion EdidVersion: %d \r\n", __FUNCTION__, param.iEdidVersion);
+        return param.result;
+    }
+    printf("%s:%d - dsERR_GENERAL\n", __PRETTY_FUNCTION__,__LINE__);
+    return dsERR_GENERAL;
+}
+
 /** @} */
 /** @} */

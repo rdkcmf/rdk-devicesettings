@@ -86,6 +86,8 @@ public:
     std::string  getCurrentVideoMode () const;
     void getEDIDBytesInfo (int iHdmiPort, std::vector<uint8_t> &edid) const;
     void getHDMISPDInfo (int iHdmiPort, std::vector<uint8_t> &data);
+    void setEdidVersion (int iHdmiPort, int iEdidVersion);
+    void getEdidVersion (int iHdmiPort, int *iEdidVersion);
     
 private:
     HdmiInput ();           /* default constructor */

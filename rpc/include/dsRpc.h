@@ -216,6 +216,8 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsHdmiInGetCurrentVideoMode  "dsHdmiInGetCurrentVideoMode"
 #define IARM_BUS_DSMGR_API_dsGetEDIDBytesInfo             "dsGetEDIDBytesInfo"
 #define IARM_BUS_DSMGR_API_dsGetHDMISPDInfo             "dsGetHDMISPDInfo"
+#define IARM_BUS_DSMGR_API_dsSetEdidVersion             "dsSetEdidVersion"
+#define IARM_BUS_DSMGR_API_dsGetEdidVersion             "dsGetEdidVersion"
 
 /*
  * Declare RPC COMPOSITE INPUT API names
@@ -831,6 +833,13 @@ typedef struct
     int handle;
     char framerate[20];
 }dsFramerateParam_t;
+
+typedef struct _dsEdidVersionParam_t
+{
+    dsError_t               result;
+    int                     iHdmiPort;
+    int                     iEdidVersion;
+}dsEdidVersionParam_t;
 
 #ifdef __cplusplus
 }

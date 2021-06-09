@@ -80,6 +80,7 @@
 static int m_isInitialized = 0;
 static int m_isPlatInitialized=0;
 static pthread_mutex_t fpLock = PTHREAD_MUTEX_INITIALIZER;
+static int m_edidversion[dsHDMI_IN_PORT_MAX];
 
 IARM_Result_t dsHdmiInMgr_init();
 IARM_Result_t dsHdmiInMgr_term();
@@ -99,6 +100,8 @@ IARM_Result_t _dsHdmiInResumeAudio(void *arg);
 IARM_Result_t _dsHdmiInGetCurrentVideoMode(void *arg);
 IARM_Result_t _dsGetEDIDBytesInfo (void *arg);
 IARM_Result_t _dsGetHDMISPDInfo (void *arg);
+IARM_Result_t _dsSetEdidVersion (void *arg);
+IARM_Result_t _dsGetEdidVersion (void *arg);
 
 void _dsHdmiInConnectCB(dsHdmiInPort_t port, bool isPortConnected);
 void _dsHdmiInSignalChangeCB(dsHdmiInPort_t port, dsHdmiInSignalStatus_t sigStatus);
@@ -215,6 +218,87 @@ static dsError_t getHDMISPDInfo (int iHdmiPort, unsigned char **spd) {
     return eRet;
 }
 
+static dsError_t setEdidVersion (int iHdmiPort, int iEdidVersion) {
+    dsError_t eRet = dsERR_GENERAL;
+    typedef dsError_t (*dsSetEdidVersion_t)(int iHdmiPort, int iEdidVersion);
+    static dsSetEdidVersion_t dsSetEdidVersionFunc = 0;
+    char edidVer[2];
+    sprintf(edidVer,"%d\0",iEdidVersion);
+
+    if (dsSetEdidVersionFunc == 0) {
+       void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+       if (dllib) {
+            dsSetEdidVersionFunc = (dsSetEdidVersion_t) dlsym(dllib, "dsSetEdidVersion");
+            if(dsSetEdidVersionFunc == 0) {
+                printf("%s:%d dsSetEdidVersion (int) is not defined %s\r\n", __FUNCTION__, __LINE__, dlerror());
+            }
+            else {
+                printf("%s:%d dsSetEdidVersionFunc loaded\r\n", __FUNCTION__, __LINE__);
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("%s:%d dsSetEdidVersion  Opening RDK_DSHAL_NAME [%] failed %s\r\n",
+                   __FUNCTION__, __LINE__, RDK_DSHAL_NAME, dlerror());
+        }
+    }
+    if (0 != dsSetEdidVersionFunc) {
+        eRet = dsSetEdidVersionFunc (iHdmiPort, iEdidVersion);
+        if (eRet == dsERR_NONE) {
+            switch (iHdmiPort) {
+                case dsHDMI_IN_PORT_0:
+                    device::HostPersistence::getInstance().persistHostProperty("HDMI0.edidversion", edidVer);
+                    printf ("Port %s: Persist EDID Version: %d\n", "HDMI0", iEdidVersion);
+                    break;
+                case dsHDMI_IN_PORT_1:
+                    device::HostPersistence::getInstance().persistHostProperty("HDMI1.edidversion", edidVer);
+                    printf ("Port %s: Persist EDID Version: %d\n", "HDMI1", iEdidVersion);
+                    break;
+                case dsHDMI_IN_PORT_2:
+                    device::HostPersistence::getInstance().persistHostProperty("HDMI2.edidversion", edidVer);
+                    printf ("Port %s: Persist EDID Version: %d\n", "HDMI2", iEdidVersion);
+                    break;
+            }
+        }
+        printf("[srv] %s: dsSetEdidVersionFunc eRet: %d \r\n", __FUNCTION__, eRet);
+    }
+    else {
+        printf("%s:  dsSetEdidVersionFunc = %p\n", __FUNCTION__, dsSetEdidVersionFunc);
+    }
+    return eRet;
+}
+
+static dsError_t getEdidVersion (int iHdmiPort, int *iEdidVersion) {
+    dsError_t eRet = dsERR_GENERAL;
+    typedef dsError_t (*dsGetEdidVersion_t)(int iHdmiPort, int *iEdidVersion);
+    static dsGetEdidVersion_t dsGetEdidVersionFunc = 0;
+    if (dsGetEdidVersionFunc == 0) {
+       void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+       if (dllib) {
+            dsGetEdidVersionFunc = (dsGetEdidVersion_t) dlsym(dllib, "dsGetEdidVersion");
+            if(dsGetEdidVersionFunc == 0) {
+                printf("%s:%d dsGetEdidVersion (int) is not defined %s\r\n", __FUNCTION__, __LINE__, dlerror());
+            }
+            else {
+                printf("%s:%d dsGetEdidVersionFunc loaded\r\n", __FUNCTION__, __LINE__);
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("%s:%d dsGetEdidVersion  Opening RDK_DSHAL_NAME [%] failed %s\r\n",
+                   __FUNCTION__, __LINE__, RDK_DSHAL_NAME, dlerror());
+        }
+    }
+    if (0 != dsGetEdidVersionFunc) {
+        eRet = dsGetEdidVersionFunc (iHdmiPort, iEdidVersion);
+        printf("[srv] %s: dsGetEdidVersionFunc eRet: %d \r\n", __FUNCTION__, eRet);
+    }
+    else {
+        printf("%s:  dsGetEdidVersionFunc = %p\n", __FUNCTION__, dsGetEdidVersionFunc);
+    }
+    return eRet;
+}
+
 IARM_Result_t dsHdmiInMgr_init()
 {
     _dsHdmiInInit(NULL);
@@ -323,6 +407,8 @@ IARM_Result_t _dsHdmiInInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsHdmiInGetCurrentVideoMode,   _dsHdmiInGetCurrentVideoMode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetEDIDBytesInfo,              _dsGetEDIDBytesInfo);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetHDMISPDInfo,              _dsGetHDMISPDInfo);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetEdidVersion,              _dsSetEdidVersion);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetEdidVersion,              _dsGetEdidVersion);
 
         int itr = 0;
         bool isARCCapable = false;
@@ -330,6 +416,40 @@ IARM_Result_t _dsHdmiInInit(void *arg)
             isARCCapable = false;
             isHdmiARCPort (itr, &isARCCapable);
             hdmiInCap_gs.isPortArcCapable[itr] = isARCCapable; 
+        }
+
+        std::string _EdidVersion("1");
+        try {
+            _EdidVersion = device::HostPersistence::getInstance().getProperty("HDMI0.edidversion");
+            m_edidversion[dsHDMI_IN_PORT_0] = atoi (_EdidVersion.c_str());
+            printf ("Port %s: _EdidVersion: %s , m_edidversion: %d\n", "HDMI0", _EdidVersion.c_str(), m_edidversion[0]);
+        }
+        catch(...) {
+            printf ("Port %s: Exception in Getting the HDMI0 EDID version from persistence storage..... \r\n", "HDMI0");
+            m_edidversion[dsHDMI_IN_PORT_0] = HDMI_EDID_VER_20;
+        }
+        try {
+            _EdidVersion = device::HostPersistence::getInstance().getProperty("HDMI1.edidversion");
+            m_edidversion[dsHDMI_IN_PORT_1] = atoi (_EdidVersion.c_str());
+            printf ("Port %s: _EdidVersion: %s , m_edidversion: %d\n", "HDMI1", _EdidVersion.c_str(), m_edidversion[1]);
+        }
+        catch(...) {
+            printf ("Port %s: Exception in Getting the HDMI0 EDID version from persistence storage..... \r\n", "HDMI1");
+            m_edidversion[dsHDMI_IN_PORT_1] = HDMI_EDID_VER_20;
+        }
+        try {
+            _EdidVersion = device::HostPersistence::getInstance().getProperty("HDMI2.edidversion");
+            m_edidversion[dsHDMI_IN_PORT_2] = atoi (_EdidVersion.c_str());
+            printf ("Port %s: _EdidVersion: %s , m_edidversion: %d\n", "HDMI2", _EdidVersion.c_str(), m_edidversion[2]);
+        }
+        catch(...) {
+            printf ("Port %s: Exception in Getting the HDMI0 EDID version from persistence storage..... \r\n", "HDMI2");
+            m_edidversion[dsHDMI_IN_PORT_2] = HDMI_EDID_VER_20;
+        }
+        for (itr = 0; itr < dsHDMI_IN_PORT_MAX; itr++) {
+            if (setEdidVersion (itr, m_edidversion[itr]) >= 0) {
+                printf ("Port HDMI%d: Initialized EDID Version : %d\n", itr, m_edidversion[itr]);
+            }
         }
         m_isInitialized = 1;
     }
@@ -602,6 +722,32 @@ IARM_Result_t _dsGetHDMISPDInfo(void *arg)
 
     IARM_BUS_Unlock(lock);
 
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsSetEdidVersion (void *arg)
+{
+    _DEBUG_ENTER();
+
+    dsEdidVersionParam_t *param = (dsEdidVersionParam_t *) arg;
+    IARM_BUS_Lock(lock);
+    param->result = setEdidVersion (param->iHdmiPort, param->iEdidVersion);
+    printf("[srv] %s: dsSetEdidVersion Port: %d EDID: %d eRet: %d\r\n", __FUNCTION__, param->iHdmiPort,  param->iEdidVersion, param->result);
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+IARM_Result_t _dsGetEdidVersion (void *arg)
+{
+    int edidVer = -1;
+    _DEBUG_ENTER();
+
+    dsEdidVersionParam_t *param = (dsEdidVersionParam_t *) arg;
+    IARM_BUS_Lock(lock);
+    param->result = getEdidVersion (param->iHdmiPort, &edidVer);
+    param->iEdidVersion = edidVer;
+    printf("[srv] %s: dsGetEdidVersion edidVer: %d\r\n", __FUNCTION__, param->iEdidVersion);
+    IARM_BUS_Unlock(lock);
     return IARM_RESULT_SUCCESS;
 }
 

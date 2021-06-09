@@ -1034,6 +1034,12 @@ struct dsSpd_infoframe_st {
     uint8_t source_info;
 } ;
 
+typedef enum tv_hdmi_edid_version_e {
+    HDMI_EDID_VER_14 = 0,
+    HDMI_EDID_VER_20,
+    HDMI_EDID_VER_MAX,
+} tv_hdmi_edid_version_t;
+
   /** @addtogroup DSHAL_VERSION_TYPES Device Settings HAL VERSION Definitions
  *  @ingroup DSHAL_VERSION
  *  @{
