@@ -81,6 +81,7 @@ IARM_Result_t _dsSetAudioMute(void *arg);
 IARM_Result_t _dsIsAudioMute(void *arg);
 IARM_Result_t _dsAudioPortTerm(void *arg);
 IARM_Result_t _dsGetStereoMode(void *arg);
+IARM_Result_t _dsGetAudioFormat(void *arg);
 IARM_Result_t _dsGetEncoding(void *arg);
 IARM_Result_t _dsIsAudioMSDecode(void *arg);
 IARM_Result_t _dsIsAudioMS12Decode(void *arg);
@@ -140,6 +141,8 @@ static void _GetAudioModeFromPersistent(void *arg);
 static dsAudioPortType_t _GetAudioPortType(int handle);
 void _dsAudioOutPortConnectCB(dsAudioPortType_t portType, unsigned int uiPortNo, bool isPortConnected);
 static dsError_t _dsAudioOutRegisterConnectCB (dsAudioOutPortConnectCB_t cbFun);
+void _dsAudioFormatUpdateCB(dsAudioFormat_t audioFormat);
+static dsError_t _dsAudioFormatUpdateRegisterCB (dsAudioFormatUpdateCB_t cbFun);
 
 void AudioConfigInit()
 {
@@ -1942,6 +1945,7 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioLevel,_dsGetAudioLevel);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAudioGain,_dsSetAudioGain);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioGain,_dsGetAudioGain);
+	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioFormat,_dsGetAudioFormat);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetEncoding,_dsGetEncoding);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioMSDecode,_dsIsAudioMSDecode);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsIsAudioMS12Decode,_dsIsAudioMS12Decode);
@@ -1995,6 +1999,11 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         dsError_t eRet = _dsAudioOutRegisterConnectCB (_dsAudioOutPortConnectCB);
         if (dsERR_NONE != eRet) {
             printf ("%s: _dsAudioOutRegisterConnectCB eRet:%04x", __FUNCTION__, eRet);
+        }
+
+        eRet = _dsAudioFormatUpdateRegisterCB (_dsAudioFormatUpdateCB) ;
+        if (dsERR_NONE != eRet) {
+            printf ("%s: _dsAudioFormatUpdateRegisterCB eRet:%04x", __FUNCTION__, eRet);
         }
 
         m_isInitialized = 1;
@@ -2897,6 +2906,51 @@ IARM_Result_t _dsAudioPortTerm(void *arg)
 
     return IARM_RESULT_SUCCESS;
 }
+
+
+IARM_Result_t _dsGetAudioFormat(void *arg)
+{
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetAudioFormat_t)(int handle, dsAudioFormat_t *audioFormat);
+    static dsGetAudioFormat_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetAudioFormat_t) dlsym(dllib, "dsGetAudioFormat");
+            if (func) {
+                printf("dsGetAudioFormat_t(int, dsAudioFormat_t *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetAudioFormat_t(int, dsAudioFormat_t *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAudioFormatParam_t *param = (dsAudioFormatParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        dsAudioFormat_t aFormat = dsAUDIO_FORMAT_NONE;
+        param->audioFormat = dsAUDIO_FORMAT_NONE;
+
+        if (func(param->handle, &aFormat) == dsERR_NONE)
+        {
+           param->audioFormat = aFormat;
+           result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
 
 IARM_Result_t _dsGetEncoding(void *arg)
 {
@@ -5049,6 +5103,55 @@ IARM_Result_t _dsAudioOutIsConnected (void *arg) {
 
     IARM_BUS_Unlock(lock);
     return eIarmRet;
+}
+
+void _dsAudioFormatUpdateCB(dsAudioFormat_t audioFormat)
+{
+    IARM_Bus_DSMgr_EventData_t audio_format_event_data;
+    printf("%s: AudioOutPort format:%d \r\n", __FUNCTION__, audioFormat);
+    audio_format_event_data.data.AudioFormatInfo.audioFormat = audioFormat;
+
+    IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                           (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_FORMAT_UPDATE,
+                           (void *)&audio_format_event_data,
+                           sizeof(audio_format_event_data));
+}
+
+static dsError_t _dsAudioFormatUpdateRegisterCB (dsAudioFormatUpdateCB_t cbFun) {
+    dsError_t eRet = dsERR_GENERAL;
+    printf("%s: %d - Inside \n", __FUNCTION__, __LINE__);
+
+    typedef dsError_t (*dsAudioFormatUpdateRegisterCB_t)(dsAudioFormatUpdateCB_t cbFunArg);
+    static dsAudioFormatUpdateRegisterCB_t dsAudioFormatUpdateRegisterCBFun = 0;
+    if (dsAudioFormatUpdateRegisterCBFun == 0) {
+        printf("%s: %d - dlerror: %s\n", __FUNCTION__, __LINE__, dlerror());
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            dsAudioFormatUpdateRegisterCBFun = (dsAudioFormatUpdateRegisterCB_t) dlsym(dllib, "dsAudioFormatUpdateRegisterCB");
+            if(dsAudioFormatUpdateRegisterCBFun == 0) {
+                printf("%s: dsAudioFormatUpdateRegisterCB is not defined %s\r\n", __FUNCTION__, dlerror());
+                eRet = dsERR_GENERAL;
+            }
+            else {
+                printf("%s: dsAudioFormatUpdateRegisterCB is loaded\r\n", __FUNCTION__);
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("%s: Opening RDK_DSHAL_NAME [%s] failed %s\r\n",
+                   __FUNCTION__, RDK_DSHAL_NAME, dlerror());
+            eRet = dsERR_GENERAL;
+        }
+    }
+    if (0 != dsAudioFormatUpdateRegisterCBFun) {
+        eRet = dsAudioFormatUpdateRegisterCBFun (cbFun);
+        printf("%s: dsAudioFormatUpdateRegisterCBFun registered\r\n", __FUNCTION__);
+    }
+    else {
+        printf("%s: dsAudioFormatUpdateRegisterCBFun NULL\r\n", __FUNCTION__);
+    }
+
+    return eRet;
 }
 
 /** @} */

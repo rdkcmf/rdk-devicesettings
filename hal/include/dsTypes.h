@@ -205,6 +205,26 @@ typedef enum _dsAudioCompression_t{
     dsAUDIO_CMP_MAX          /**< Maximum index for audio compression types. */
 } dsAudioCompression_t;
 
+
+/**
+ * This enumeration defines the type of audio format
+ */
+typedef enum _dsAudioFormat_t {
+    dsAUDIO_FORMAT_NONE,
+    dsAUDIO_FORMAT_PCM,
+    dsAUDIO_FORMAT_DOLBY_AC3,
+    dsAUDIO_FORMAT_DOLBY_EAC3,
+    dsAUDIO_FORMAT_DOLBY_AC4,
+    dsAUDIO_FORMAT_DOLBY_MAT,
+    dsAUDIO_FORMAT_DOLBY_TRUEHD,
+    dsAUDIO_FORMAT_DOLBY_EAC3_ATMOS,
+    dsAUDIO_FORMAT_DOLBY_TRUEHD_ATMOS,
+    dsAUDIO_FORMAT_DOLBY_MAT_ATMOS,
+    dsAUDIO_FORMAT_DOLBY_AC4_ATMOS,
+    dsAUDIO_FORMAT_MAX     /**< Maximum . */
+}dsAudioFormat_t;
+
+
 /**
  * This enumeration defines the type of audio ducking action that can be used.
  */

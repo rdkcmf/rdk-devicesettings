@@ -61,6 +61,7 @@ typedef enum _DSMgr_EventId_t {
     IARM_BUS_DSMGR_EVENT_TIME_FORMAT_CHANGE,           /*!< Clock Time Format Change Event*/
     IARM_BUS_DSMGR_EVENT_AUDIO_LEVEL_CHANGED,           /*!< Audio Level Change Event*/
     IARM_BUS_DSMGR_EVENT_AUDIO_OUT_HOTPLUG,            /*!< AUDIO OUT HPD change event */
+    IARM_BUS_DSMGR_EVENT_AUDIO_FORMAT_UPDATE,  /*!< Audio Format change event */
 	IARM_BUS_DSMGR_EVENT_MAX,					       /*!< Max Event  */
 } IARM_Bus_DSMgr_EventId_t;
 
@@ -163,6 +164,11 @@ typedef struct _DSMgr_EventData_t {
             unsigned int      uiPortNo;
             bool           isPortConnected;
         }audio_out_connect;
+
+        struct _AUDIO_FORMAT_DATA
+	{
+	    dsAudioFormat_t audioFormat;
+	}AudioFormatInfo;
 
     } data;
 }IARM_Bus_DSMgr_EventData_t;

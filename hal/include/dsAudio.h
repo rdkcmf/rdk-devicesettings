@@ -44,6 +44,19 @@ extern "C" {
 
 typedef void (*dsAudioOutPortConnectCB_t)(dsAudioPortType_t portType, unsigned int uiPortNo, bool isPortCon);
 
+/**
+ * @brief Callback function used to notify applications of Audio Format change
+ *
+ * HAL Implementation should call this method to deliver updated Audio Format info
+ * to the application
+ *
+ * @param audioFormat     Current audio format of the content playing
+ *
+ *
+ * @return None.
+ */
+typedef void (*dsAudioFormatUpdateCB_t)(dsAudioFormat_t audioFormat);
+
 /** @addtogroup DSHAL_AUDIO_API Device Settings HAL Audio Public API
  *  @ingroup devicesettingshalapi
  *
@@ -93,6 +106,19 @@ dsError_t  dsGetAudioPort(dsAudioPortType_t type, int index, int *handle);
  * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates this call is not supported.
  */
 dsError_t  dsGetAudioEncoding(int handle, dsAudioEncoding_t *encoding);
+
+/**
+ * @brief Get the current audio format.
+ *
+ * This function returns the current audio format..
+ *
+ * @param[in] handle:  Handle for the audio port
+ * @param[out] audioFormat : Pointer to hold the audio format.
+ *
+ * @return Device Settings error code
+ * @retval dsERR_OPERATION_NOT_SUPPORTED Indicates dsGetAudioFormat call is not implemented.
+ */
+dsError_t  dsGetAudioFormat(int handle, dsAudioFormat_t *audioFormat);
 
 /**
  * @brief Get the audio compressionof an audio port.
@@ -870,6 +896,17 @@ dsError_t  dsAudioPortTerm();
 dsError_t dsAudioOutIsConnected(int handle, bool* pisCon);
 
 dsError_t dsAudioOutRegisterConnectCB(dsAudioOutPortConnectCB_t CBFunc);
+
+/**
+ * @brief Register for the Audio Format Update Event
+ *
+ * This function is used to register for the the Audio Format Update Event
+ *
+ * @param[in] cbFun Audio format update callback function.
+ * @return Device Settings error code
+ * @retval    ::dsError_t
+ */
+dsError_t dsAudioFormatUpdateRegisterCB (dsAudioFormatUpdateCB_t cbFun);
 
 /**
  * @brief To find the HDR capabilities of SoC

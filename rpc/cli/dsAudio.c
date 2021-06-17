@@ -116,6 +116,32 @@ dsError_t dsGetAudioEncoding(int handle, dsAudioEncoding_t *encoding)
 }
 
 
+dsError_t dsGetAudioFormat(int handle, dsAudioFormat_t *audioFormat)
+{
+    dsError_t ret = dsERR_GENERAL;
+    _DEBUG_ENTER();
+
+    dsAudioFormatParam_t param;
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+    param.handle = handle;
+    param.audioFormat = dsAUDIO_FORMAT_NONE;
+
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *)IARM_BUS_DSMGR_API_dsGetAudioFormat,
+                        (void *)&param,
+                        sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+            *audioFormat = param.audioFormat;
+            ret = dsERR_NONE;
+    }
+
+    return ret;
+}
+
+
 dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode, bool isPersist);
 dsError_t dsGetStereoMode(int handle, dsAudioStereoMode_t *stereoMode, bool isPersist)
 {

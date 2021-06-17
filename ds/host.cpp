@@ -536,6 +536,32 @@ namespace device
    }
 
    /**
+    * Host::getCurrentAudioFormat(dsAudioFormat_t &audioFormat)
+    * @brief
+    *
+    * @param[in/out] Audio format of currently playing content
+    *
+    * @return None
+    */
+   void Host::getCurrentAudioFormat(dsAudioFormat_t &audioFormat)
+   {
+       dsError_t ret = dsERR_NONE;
+       dsAudioFormat_t aFormat;
+
+       ret = dsGetAudioFormat(NULL, &aFormat);
+
+       if (ret == dsERR_NONE)
+       {
+           audioFormat = aFormat;
+       }
+       else
+       {
+           throw Exception(ret);
+       }
+   }
+
+
+   /**
     * Host::getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCapability)
     * @brief
     *

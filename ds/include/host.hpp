@@ -92,6 +92,7 @@ public:
     void setAudioAtmosOutputMode(bool enable);
     bool isHDMIOutPortPresent();
     std::string getDefaultVideoPortName();
+    void getCurrentAudioFormat(dsAudioFormat_t &audioFormat);
 
 private:
 	Host();

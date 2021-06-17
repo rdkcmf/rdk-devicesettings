@@ -49,6 +49,7 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsSetStereoAuto		"dsSetStereoAuto"
 #define  IARM_BUS_DSMGR_API_dsGetStereoAuto		"dsGetStereoAuto"
 #define IARM_BUS_DSMGR_API_dsGetEncoding                "dsGetEncoding"
+#define  IARM_BUS_DSMGR_API_dsGetAudioFormat            "dsGetAudioFormat"
 #define  IARM_BUS_DSMGR_API_dsSetAudioMute		"dsSetAudioMute"
 #define  IARM_BUS_DSMGR_API_dsIsAudioMute              "dsIsAudioMute"
 #define  IARM_BUS_DSMGR_API_dsIsAudioMSDecode    "dsIsAudioMSDecode"
@@ -299,6 +300,11 @@ typedef struct _dsAudioGainParam_t {
         int handle;
         float gain;
 } dsAudioGainParam_t;
+
+typedef struct _dsAudioFormatParam_t {
+	int handle;
+	dsAudioFormat_t audioFormat;
+} dsAudioFormatParam_t;
 
 typedef struct _dsAudioGetEncodingModeParam_t {
 	int handle;
