@@ -74,6 +74,9 @@ IARM_Result_t _dsSetFRFMode(void *arg);
 IARM_Result_t _dsGetFRFMode(void *arg);
 IARM_Result_t _dsGetCurrentDisframerate(void *arg);
 IARM_Result_t _dsSetDisplayframerate(void *arg);
+
+void _dsFramerateStatusPostChangeCB(unsigned int inputStatus);
+void _dsFramerateStatusPreChangeCB(unsigned int inputStatus);
 static bool get_HDR_DV_RFC_config();
 
 IARM_Result_t dsVideoDeviceMgr_init()
@@ -155,7 +158,48 @@ IARM_Result_t _dsVideoDeviceInit(void *arg)
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetFRFMode, _dsGetFRFMode);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetCurrentDisframerate, _dsGetCurrentDisframerate);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetDisplayframerate, _dsSetDisplayframerate);
-        m_isInitialized = 1;
+
+		typedef dsError_t (*_dsFramerateStatusPreChangeCB_t)(dsRegisterFrameratePreChangeCB_t CBFunc);
+                static _dsFramerateStatusPreChangeCB_t frameratePreChangeCB = 0;
+                if (frameratePreChangeCB  == 0) {
+                        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                        if (dllib) {
+                                frameratePreChangeCB = (_dsFramerateStatusPreChangeCB_t) dlsym(dllib, "dsRegisterFrameratePreChangeCB");
+                                if(frameratePreChangeCB == 0) {
+                                        printf("dsRegisterFrameratePreChangeCB(dsHdmiInStatusChangeCB_t) is not defined\r\n");
+                                }
+                                dlclose(dllib);
+                        }
+                        else {
+                                printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+                        }
+                }
+
+                if(frameratePreChangeCB) {
+                        frameratePreChangeCB(_dsFramerateStatusPreChangeCB);
+                }
+
+		typedef dsError_t (*dsRegisterFrameratePostChangeCB_t)(dsRegisterFrameratePostChangeCB_t CBFunc);
+                static dsRegisterFrameratePostChangeCB_t frameratePostChangeCB = 0;
+                if (frameratePostChangeCB == 0) {
+                        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+                        if (dllib) {
+                                frameratePostChangeCB = (dsRegisterFrameratePostChangeCB_t) dlsym(dllib, "dsRegisterFrameratePostChangeCB");
+                                if(frameratePostChangeCB == 0) {
+                                        printf("dsRegisterFrameratePostChangeCB(dsHdmiInStatusChangeCB_t) is not defined\r\n");
+                                }
+                                dlclose(dllib);
+                        }
+                        else {
+                                printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+                        }
+                }
+
+                if(frameratePostChangeCB) {
+                        frameratePostChangeCB(_dsFramerateStatusPostChangeCB);
+                }
+
+		m_isInitialized = 1;
     }
 
     if (!m_isPlatInitialized) {
@@ -584,6 +628,32 @@ IARM_Result_t _dsSetDisplayframerate(void *arg)
 
     IARM_BUS_Unlock(lock);
     return IARM_RESULT_SUCCESS;
+}
+
+void _dsFramerateStatusPreChangeCB(unsigned int inputStatus)
+{
+    IARM_Bus_DSMgr_EventData_t _eventData;
+    __TIMESTAMP();
+    printf("%s:%d - Framerate status prechange update!!!!!! \r\n", __PRETTY_FUNCTION__,__LINE__);
+
+    IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                                (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_DISPLAY_FRAMRATE_PRECHANGE,
+                                (void *)&_eventData,
+                                sizeof(_eventData));
+
+}
+
+void _dsFramerateStatusPostChangeCB(unsigned int inputStatus)
+{
+    IARM_Bus_DSMgr_EventData_t _eventData;
+    __TIMESTAMP();
+    printf("%s:%d - Framerate status changed update!!!!!! \r\n", __PRETTY_FUNCTION__,__LINE__);
+
+    IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                                (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_DISPLAY_FRAMRATE_POSTCHANGE,
+                                (void *)&_eventData,
+                                sizeof(_eventData));
+
 }
 
 /** @} */

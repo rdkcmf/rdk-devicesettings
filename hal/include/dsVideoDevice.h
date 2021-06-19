@@ -153,6 +153,11 @@ dsError_t dsGetFRFMode(int handle, int *frfmode);
 dsError_t dsGetCurrentDisplayframerate(int handle, char *framerate);
 dsError_t dsSetDisplayframerate(int handle, char *framerate);
 
+typedef void (*dsRegisterFrameratePreChangeCB_t)(unsigned int tSecond);
+dsError_t dsRegisterFrameratePreChangeCB(dsRegisterFrameratePreChangeCB_t CBFunc);
+
+typedef void (*dsRegisterFrameratePostChangeCB_t)(unsigned int tSecond);
+dsError_t dsRegisterFrameratePostChangeCB(dsRegisterFrameratePostChangeCB_t CBFunc);
 #ifdef __cplusplus
 }
 #endif
