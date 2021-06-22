@@ -125,6 +125,7 @@ public:
 	const AudioStereoMode &getStereoMode(bool usePersist = false);
 
     dsError_t setEnablePort(bool enabled);	
+    dsError_t reInitializeAudioOutputPort();
 	void enable();
 	void disable();
 

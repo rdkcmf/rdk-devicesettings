@@ -41,6 +41,7 @@
 #include <string>
 #include <string.h>
 #include <list>
+#include <unistd.h>
 #include "dsAudio.h"
 #include "dsError.h"
 #include "dslogger.h"
@@ -122,13 +123,13 @@ AudioOutputPort::AudioOutputPort(const int type, const int index, const int id) 
 								 _level(0.0), _loopThru(false), _muted(false), _audioDelayMs(0), _audioDelayOffsetMs(0)
 {
 	dsError_t ret = dsERR_NONE;
-	ret = dsGetAudioPort((dsAudioPortType_t)_type, _index, &_handle);
-	{
+        ret = dsGetAudioPort((dsAudioPortType_t)_type, _index, &_handle);
+        {
 		/* Construct Port Name as "Type+Index", such as "HDMI0" */
 		std::stringstream out;
 		out << getType().getName() << _index;
 		_name = out.str();
-	}
+        }  
         printf ("\nAudioOutputPort init: _type:%d _index:%d _handle:%d\n", _type, _index, _handle);
         if (dsERR_NONE == ret) {
 		//dsGetAudioCompression	(_handle, (dsAudioCompression_t *)&_compression);
@@ -159,6 +160,47 @@ AudioOutputPort::~AudioOutputPort()
 
 }
 
+/**
+* @fn AudioOutputPort::reInitializeAudioOutputPort()
+* @brief This API is used to reInitialize AudioOutputPort in case when 
+* Constructor miss out 
+* the Audio output port.
+*
+* @return None
+*/
+dsError_t AudioOutputPort::reInitializeAudioOutputPort()
+{
+   if( _handle == -1)
+   {
+       dsError_t ret = dsERR_NONE;
+       ret = dsGetAudioPort((dsAudioPortType_t)_type, _index, &_handle);
+       {
+          /* Construct Port Name as "Type+Index", such as "HDMI0" */
+          std::stringstream out;
+          out << getType().getName() << _index;
+          _name = out.str();
+       }
+     
+       printf ("\nAudioOutputPort init: _type:%d _index:%d _handle:%d\n", _type, _index, _handle);
+       if (dsERR_NONE == ret) {
+          //dsGetAudioCompression>(_handle, (dsAudioCompression_t *)&_compression);
+           dsGetAudioEncoding(_handle, (dsAudioEncoding_t *)&_encoding);
+           dsGetStereoMode(_handle, (dsAudioStereoMode_t *)&_stereoMode, false);
+           dsGetAudioGain(_handle, &_gain);
+           dsGetAudioLevel(_handle, &_level);
+           dsGetAudioOptimalLevel(_handle, &_optimalLevel);
+           dsGetAudioMaxDB(_handle, &_maxDb);
+           dsGetAudioMinDB(_handle, &_minDb);
+           dsGetAudioDB(_handle, &_db);
+           dsIsAudioLoopThru(_handle, &_loopThru);
+           dsIsAudioMute(_handle, &_muted);
+           dsGetAudioDelay(_handle, &_audioDelayMs);
+           dsGetAudioDelayOffset(_handle, &_audioDelayOffsetMs);
+       }
+ 
+ 
+    }
+}
 
 /**
  * @fn const AudioOutputPortType & AudioOutputPort::getType() const

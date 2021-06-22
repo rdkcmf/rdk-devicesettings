@@ -1082,6 +1082,13 @@ typedef enum tv_hdmi_edid_version_e {
     HDMI_EDID_VER_MAX,
 } tv_hdmi_edid_version_t;
 
+
+typedef enum _dsAudioPortState {
+   dsAUDIOPORT_STATE_UNINITIALIZED,
+   dsAUDIOPORT_STATE_INITIALIZED,
+   dsAUDIOPORT_STATE_MAX
+} dsAudioPortState_t;
+
   /** @addtogroup DSHAL_VERSION_TYPES Device Settings HAL VERSION Definitions
  *  @ingroup DSHAL_VERSION
  *  @{

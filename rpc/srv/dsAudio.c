@@ -1809,6 +1809,7 @@ void AudioConfigInit()
 
 IARM_Result_t dsAudioMgr_init()
 {
+   IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioPortInit, _dsAudioPortInit);
    IARM_BUS_Lock(lock);
    try
 	{
@@ -1928,10 +1929,18 @@ IARM_Result_t dsAudioMgr_init()
 	   	}
         /*coverity[missing_lock]  CID-19380 using Coverity Annotation to ignore error*/
         m_isPlatInitialized ++;
+        {
+           IARM_Bus_DSMgr_EventData_t audio_portstate_event_data;
+           audio_portstate_event_data.data.AudioPortStateInfo.audioPortState = dsAUDIOPORT_STATE_INITIALIZED;
+           printf("%s: AudioOutPort PortInitState:%d \r\n", __FUNCTION__, audio_portstate_event_data.data.AudioPortStateInfo.audioPortState);
+           IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                           (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_PORT_STATE,
+                           (void *)&audio_portstate_event_data,
+                           sizeof(audio_portstate_event_data));
+
+       }
 
         IARM_BUS_Unlock(lock);  //CID:136568 - Data race condition
-	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioPortInit, _dsAudioPortInit);
-	
     return IARM_RESULT_SUCCESS;
 }
 
@@ -2026,16 +2035,16 @@ IARM_Result_t _dsAudioPortInit(void *arg)
 
         m_isInitialized = 1;
     }
-
+    
     if (!m_isPlatInitialized) {
         /* Nexus init, if any here */
         dsAudioPortInit();
         AudioConfigInit();
-   }
-   m_isPlatInitialized++;
+    }
+    m_isPlatInitialized++;
+ 
 
-
-    IARM_BUS_Unlock(lock);
+ IARM_BUS_Unlock(lock);
 
  return IARM_RESULT_SUCCESS;
 
