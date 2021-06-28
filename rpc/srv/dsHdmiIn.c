@@ -179,9 +179,6 @@ static dsError_t getEDIDBytesInfo (int iHdmiPort, unsigned char **edid, int *len
         eRet = dsGetEDIDBytesInfoFunc (iHdmiPort, edid, length);
         printf("[srv] %s: dsGetEDIDBytesInfoFunc eRet: %d data len: %d \r\n", __FUNCTION__,eRet, *length);
     }
-    else {
-        printf("%s:  dsIsHdmiARCPortFunc = %p\n", __FUNCTION__, dsGetEDIDBytesInfoFunc);
-    }
     return eRet;
 }
 
@@ -698,8 +695,11 @@ IARM_Result_t _dsGetEDIDBytesInfo (void *arg) {
     unsigned char *edidArg = NULL;
     IARM_BUS_Lock(lock);
     eRet = getEDIDBytesInfo (param->iHdmiPort, (unsigned char **)(&edidArg), &(param->length));
-    memcpy(param->edid, edidArg, param->length);
     param->result = eRet;
+    printf("[srv] %s: getEDIDBytesInfo eRet: %d\r\n", __FUNCTION__, param->result);
+    if (edidArg != NULL) {
+        memcpy(param->edid, edidArg, param->length);
+    }
     IARM_BUS_Unlock(lock);
     return IARM_RESULT_SUCCESS;
 }
