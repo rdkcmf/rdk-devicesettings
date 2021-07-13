@@ -170,9 +170,9 @@ AudioOutputPort::~AudioOutputPort()
 */
 dsError_t AudioOutputPort::reInitializeAudioOutputPort()
 {
+   dsError_t ret = dsERR_NONE;
    if( _handle == -1)
    {
-       dsError_t ret = dsERR_NONE;
        ret = dsGetAudioPort((dsAudioPortType_t)_type, _index, &_handle);
        {
           /* Construct Port Name as "Type+Index", such as "HDMI0" */
@@ -199,7 +199,8 @@ dsError_t AudioOutputPort::reInitializeAudioOutputPort()
        }
  
  
-    }
+   }
+   return ret;
 }
 
 /**
