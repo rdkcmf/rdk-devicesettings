@@ -395,6 +395,27 @@ void AudioConfigInit()
                         printf("Port %s: Initialized audio delay : %d\n","HDMI0", m_audioDelay);
                     }
                 }
+//HDMI ARC init
+                handle = 0;
+                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI_ARC,0,&handle) == dsERR_NONE) {
+                    try {
+                        _AudioDelay = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.audio.Delay");
+                    }
+                    catch(...) {
+                            try {
+                                printf("HDMI_ARC0.audio.Delay not found in persistence store. Try system default\n");
+                                _AudioDelay = device::HostPersistence::getInstance().getDefaultProperty("HDMI_ARC0.audio.Delay");
+                            }
+                            catch(...) {
+                                _AudioDelay = "0";
+                            }
+                    }
+                    m_audioDelay = atoi(_AudioDelay.c_str());
+                    if (dsSetAudioDelayFunc(handle, m_audioDelay) == dsERR_NONE) {
+                        printf("Port %s: Initialized audio delay : %d\n","HDMI_ARC0", m_audioDelay);
+                    }
+                }
+
 
             }
             else {
@@ -3189,7 +3210,12 @@ IARM_Result_t _dsSetAudioDelay(void *arg)
                 printf("%s: port: %s , persist audio delay: %d\n",__func__,"SPEAKER0", param->audioDelayMs);
                 device::HostPersistence::getInstance().persistHostProperty("SPEAKER0.audio.Delay",_AudioDelay);
                 break;
+            case dsAUDIOPORT_TYPE_HDMI_ARC:
+                printf("%s: port: %s , persist audio delay: %d\n",__func__,"HDMI_ARC0", param->audioDelayMs);
+                device::HostPersistence::getInstance().persistHostProperty("HDMI_ARC0.audio.Delay",_AudioDelay);
+                break;
             default:
+                printf("%s: port: UNKNOWN , persist audio delay: %d : NOT SET\n",__func__, param->audioDelayMs);
                 break;
         }
 #endif
