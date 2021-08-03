@@ -138,6 +138,10 @@ IARM_Result_t _dsSetMS12AudioProfile(void *arg);
 IARM_Result_t _dsGetAudioCapabilities(void *arg);
 IARM_Result_t _dsGetMS12Capabilities(void *arg);
 IARM_Result_t _dsAudioOutIsConnected(void *arg);
+IARM_Result_t _dsResetBassEnhancer(void *arg);
+IARM_Result_t _dsResetSurroundVirtualizer(void *arg);
+IARM_Result_t _dsResetVolumeLeveller(void *arg);
+IARM_Result_t _dsResetDialogEnhancement(void *arg);
 
 static void _GetAudioModeFromPersistent(void *arg);
 static dsAudioPortType_t _GetAudioPortType(int handle);
@@ -145,6 +149,8 @@ void _dsAudioOutPortConnectCB(dsAudioPortType_t portType, unsigned int uiPortNo,
 static dsError_t _dsAudioOutRegisterConnectCB (dsAudioOutPortConnectCB_t cbFun);
 void _dsAudioFormatUpdateCB(dsAudioFormat_t audioFormat);
 static dsError_t _dsAudioFormatUpdateRegisterCB (dsAudioFormatUpdateCB_t cbFun);
+static std::string _dsGetCurrentProfileProperty(std::string property);
+static void _dsInitialisedMS12Setting(std::string _AProfile , std::string _AProfileSupport);
 
 void AudioConfigInit()
 {
@@ -608,6 +614,7 @@ void AudioConfigInit()
                     if(dsGetAudioPort(dsAUDIOPORT_TYPE_SPEAKER,0,&handle) == dsERR_NONE) {
                         if (dsSetMS12AudioProfileFunc(handle, _AProfile.c_str()) == dsERR_NONE) {
                             printf("Port %s: Initialized MS12 Audio Profile : %s\n","SPEAKER0", _AProfile.c_str());
+                            device::HostPersistence::getInstance().persistHostProperty("audio.MS12Profile",_AProfile.c_str());
                         }
                        else {
                             printf("Port %s: Initialization failed !!!  MS12 Audio Profile : %s\n","SPEAKER0", _AProfile.c_str());
@@ -633,7 +640,16 @@ void AudioConfigInit()
             }
         }
     }
+    _dsInitialisedMS12Setting(_AProfile,_AProfileSupport);
+#endif //DS_AUDIO_SETTINGS_PERSISTENCE
+}
 
+
+void _dsInitialisedMS12Setting(std::string _AProfile , std::string _AProfileSupport)
+{
+   int handle = 0;
+   void *dllib = NULL;
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
 //All MS12 Settings can be initialised through MS12 audio profiles
 //User setting persistence override available for any individual setting on top of profiles
 //All MS12 settings can be turned off (DAP Off Mode) by configuring Audio Profile to Off
@@ -714,8 +730,9 @@ void AudioConfigInit()
                         printf("dsSetDialogEnhancement_t(int, int) is defined and loaded\r\n");
                         std::string _EnhancerLevel("0");
                         int m_enhancerLevel = 0;
+                        std::string _Property = _dsGetCurrentProfileProperty("EnhancerLevel");
                         try {
-                            _EnhancerLevel = device::HostPersistence::getInstance().getProperty("audio.EnhancerLevel");
+                            _EnhancerLevel = device::HostPersistence::getInstance().getProperty(_Property);
                             m_enhancerLevel = atoi(_EnhancerLevel.c_str());
             //SPEAKER init
                             handle = 0;
@@ -884,9 +901,11 @@ void AudioConfigInit()
                         std::string _volLevellerMode("0");
                         std::string _volLevellerLevel("0");
                         dsVolumeLeveller_t m_volumeLeveller;
+                        std::string _PropertyMode = _dsGetCurrentProfileProperty("VolumeLeveller.mode");
+                        std::string _Propertylevel = _dsGetCurrentProfileProperty("VolumeLeveller.level"); 
                         try {
-                            _volLevellerMode = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller.mode");
-                            _volLevellerLevel = device::HostPersistence::getInstance().getProperty("audio.VolumeLeveller.level");
+                            _volLevellerMode = device::HostPersistence::getInstance().getProperty(_PropertyMode);
+                            _volLevellerLevel = device::HostPersistence::getInstance().getProperty(_PropertyMode);
                             m_volumeLeveller.mode = atoi(_volLevellerMode.c_str());
 			    m_volumeLeveller.level = atoi(_volLevellerLevel.c_str());
                 //SPEAKER init
@@ -932,7 +951,7 @@ void AudioConfigInit()
         if(_profileOverride == "TRUE") {
             typedef dsError_t (*dsSetBassEnhancer_t)(int handle, int boost);
             static dsSetBassEnhancer_t dsSetBassEnhancerFunc = 0;
-            if (func == 0) {
+            if (dsSetBassEnhancerFunc == 0) {
                 dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
                 if (dllib) {
                     dsSetBassEnhancerFunc = (dsSetBassEnhancer_t) dlsym(dllib, "dsSetBassEnhancer");
@@ -940,8 +959,9 @@ void AudioConfigInit()
                         printf("dsSetBassEnhancer_t(int, int) is defined and loaded\r\n");
                         std::string _BassBoost("0");
                         int m_bassBoost = 0;
+                        std::string _Property = _dsGetCurrentProfileProperty("BassBoost");
                         try {
-                            _BassBoost = device::HostPersistence::getInstance().getProperty("audio.BassBoost");
+                            _BassBoost = device::HostPersistence::getInstance().getProperty(_Property);
                             m_bassBoost = atoi(_BassBoost.c_str());
             //SPEAKER init
                             handle = 0;
@@ -1113,9 +1133,11 @@ void AudioConfigInit()
                         std::string _SVMode("0");
                         std::string _SVBoost("0");
                         dsSurroundVirtualizer_t m_virtualizer;
+                        std::string _PropertyMode = _dsGetCurrentProfileProperty("SurroundVirtualizer.mode");
+                        std::string _PropertyBoost = _dsGetCurrentProfileProperty("SurroundVirtualizer.boost");
                         try {
-                            _SVMode = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.mode");
-                            _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.boost");
+                            _SVMode = device::HostPersistence::getInstance().getProperty(_PropertyMode);
+                            _SVBoost = device::HostPersistence::getInstance().getProperty(_PropertyBoost);
                             m_virtualizer.mode = atoi(_SVMode.c_str());
 			    m_virtualizer.boost = atoi(_SVBoost.c_str());
                 //SPEAKER init
@@ -1526,7 +1548,7 @@ void AudioConfigInit()
 
            typedef dsError_t (*dsSetBassEnhancer_t)(int handle, int boost);
            static dsSetBassEnhancer_t dsSetBassEnhancerFunc = 0;
-           if (func == 0) {
+           if (dsSetBassEnhancerFunc == 0) {
                dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
                if (dllib) {
                    dsSetBassEnhancerFunc = (dsSetBassEnhancer_t) dlsym(dllib, "dsSetBassEnhancer");
@@ -1691,7 +1713,8 @@ void AudioConfigInit()
                        printf("dsSetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t) is defined and loaded\r\n");
                         std::string _SVMode("0");
                         std::string _SVBoost("0");
-                        dsSurroundVirtualizer_t m_virtualizer;		       
+                        dsSurroundVirtualizer_t m_virtualizer;		 
+
                        try {
                             _SVMode = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.mode");
                             _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.boost");
@@ -1702,7 +1725,7 @@ void AudioConfigInit()
                            try {
                                printf("audio.SurroundVirtualizer.mode/audio.SurroundVirtualizer.boost not found in persistence store. Try system default\n");
                                _SVMode = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.mode");
-			       _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.boost");
+                               _SVBoost = device::HostPersistence::getInstance().getProperty("audio.SurroundVirtualizer.boost"); 
                            }
                            catch(...) {
                                _SVMode = "0";
@@ -2065,6 +2088,11 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioCapabilities,_dsGetAudioCapabilities); 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMS12Capabilities,_dsGetMS12Capabilities); 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsAudioOutIsConnected, _dsAudioOutIsConnected); 
+
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsResetDialogEnhancement,_dsResetDialogEnhancement);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsResetBassEnhancer,_dsResetBassEnhancer);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsResetSurroundVirtualizer,_dsResetSurroundVirtualizer);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsResetVolumeLeveller,_dsResetVolumeLeveller);
 
         dsError_t eRet = _dsAudioOutRegisterConnectCB (_dsAudioOutPortConnectCB);
         if (dsERR_NONE != eRet) {
@@ -3630,7 +3658,7 @@ IARM_Result_t _dsSetDialogEnhancement(void *arg)
     }
 
     dsDialogEnhancementParam_t *param = (dsDialogEnhancementParam_t *)arg;
-
+    std::string _Property = _dsGetCurrentProfileProperty("EnhancerLevel");
     if (func != 0 && param != NULL)
     {
         if (func(param->handle, param->enhancerLevel) == dsERR_NONE)
@@ -3638,7 +3666,7 @@ IARM_Result_t _dsSetDialogEnhancement(void *arg)
 #ifdef DS_AUDIO_SETTINGS_PERSISTENCE
             std::string _EnhancerLevel = std::to_string(param->enhancerLevel);
             printf("%s: persist enhancer level: %d\n",__func__, param->enhancerLevel);
-            device::HostPersistence::getInstance().persistHostProperty("audio.EnhancerLevel",_EnhancerLevel);
+            device::HostPersistence::getInstance().persistHostProperty(_Property ,_EnhancerLevel);
 #endif
             result = IARM_RESULT_SUCCESS;
         }
@@ -3971,15 +3999,16 @@ IARM_Result_t _dsSetVolumeLeveller(void *arg)
         if (func(param->handle, param->volLeveller) == dsERR_NONE)
         {
 #ifdef DS_AUDIO_SETTINGS_PERSISTENCE
-
+            std::string _PropertyMode = _dsGetCurrentProfileProperty("VolumeLeveller.mode");
+            std::string _Propertylevel = _dsGetCurrentProfileProperty("VolumeLeveller.level");
             std::string _mode = std::to_string(param->volLeveller.mode);
             printf("%s: persist volume leveller mode: %d\n",__func__, param->volLeveller.mode);
-            device::HostPersistence::getInstance().persistHostProperty("audio.VolumeLeveller.mode",_mode);
+            device::HostPersistence::getInstance().persistHostProperty(_PropertyMode,_mode);
 
 	    if((param->volLeveller.mode == 0) || (param->volLeveller.mode == 1)) {
                 std::string _level = std::to_string(param->volLeveller.level);
                 printf("%s: persist volume leveller value: %d\n",__func__, param->volLeveller.level);
-                device::HostPersistence::getInstance().persistHostProperty("audio.VolumeLeveller.level",_level);
+                device::HostPersistence::getInstance().persistHostProperty(_Propertylevel,_level);
 	    }
 #endif
             result = IARM_RESULT_SUCCESS;
@@ -4075,7 +4104,8 @@ IARM_Result_t _dsSetBassEnhancer(void *arg)
 #ifdef DS_AUDIO_SETTINGS_PERSISTENCE
             std::string _BassBoost = std::to_string(param->boost);
             printf("%s: persist boost value: %d\n",__func__, param->boost);
-            device::HostPersistence::getInstance().persistHostProperty("audio.BassBoost",_BassBoost);
+            std::string _Property = _dsGetCurrentProfileProperty("BassBoost");
+            device::HostPersistence::getInstance().persistHostProperty(_Property,_BassBoost);
 #endif
             result = IARM_RESULT_SUCCESS;
         }
@@ -4364,12 +4394,14 @@ IARM_Result_t _dsSetSurroundVirtualizer(void *arg)
 #ifdef DS_AUDIO_SETTINGS_PERSISTENCE
             std::string _mode = std::to_string(param->virtualizer.mode);
             printf("%s: persist surround virtualizer mode: %d\n",__func__, param->virtualizer.mode);
-            device::HostPersistence::getInstance().persistHostProperty("audio.SurroundVirtualizer.mode",_mode);
+            std::string _PropertyMode = _dsGetCurrentProfileProperty("SurroundVirtualizer.mode");
+            std::string _Propertylevel = _dsGetCurrentProfileProperty("SurroundVirtualizer.boost"); 
+            device::HostPersistence::getInstance().persistHostProperty(_PropertyMode,_mode);
 
             if((param->virtualizer.mode == 0) || (param->virtualizer.mode == 1)) {
                 std::string _boost = std::to_string(param->virtualizer.boost);
                 printf("%s: persist surround virtualizer boost value: %d\n",__func__, param->virtualizer.boost);
-                device::HostPersistence::getInstance().persistHostProperty("audio.SurroundVirtualizer.boost",_boost);
+                device::HostPersistence::getInstance().persistHostProperty(_Propertylevel,_boost);
             }
 #endif
             result = IARM_RESULT_SUCCESS;
@@ -4714,7 +4746,19 @@ IARM_Result_t _dsSetMS12AudioProfile(void *arg)
             result = IARM_RESULT_SUCCESS;
         }
     }
+    
+    std::string _AProfileSupport("FALSE");
+    try {
+        _AProfileSupport = device::HostPersistence::getInstance().getDefaultProperty("audio.MS12Profile.supported");
+    }
+    catch(...) {
+        _AProfileSupport = "FALSE";
+        printf("audio.MS12Profile.supported setting not found in hostDataDeafult \r\n");
+    }
+    printf(" audio.MS12Profile.supported = %s ..... \r\n",_AProfileSupport.c_str());
 
+    _dsInitialisedMS12Setting(param->profile ,_AProfileSupport);
+   
     IARM_BUS_Unlock(lock);
     return result;
 }
@@ -5263,5 +5307,250 @@ static dsError_t _dsAudioFormatUpdateRegisterCB (dsAudioFormatUpdateCB_t cbFun) 
     return eRet;
 }
 
+IARM_Result_t _dsResetBassEnhancer(void *arg)
+{
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    int *handle = (int*)arg;
+
+    typedef dsError_t (*dsSetBassEnhancer_t)(int handle, int boost);
+    static dsSetBassEnhancer_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetBassEnhancer_t) dlsym(dllib, "dsSetBassEnhancer");
+            if (func) {
+                printf("dsSetBassEnhancer_t(int, int) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetBassEnhancer_t(int, int) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+    if (func != 0) {
+       std::string _Property = _dsGetCurrentProfileProperty("BassBoost");
+       std::string _BassBoost("0");
+       int m_bassBoost = 0;
+       try {
+            _BassBoost = device::HostPersistence::getInstance().getDefaultProperty(_Property);
+       }
+       catch(...) {
+            _BassBoost = "0";
+       }
+       m_bassBoost = atoi(_BassBoost.c_str());
+
+       if (func(*handle,m_bassBoost) == dsERR_NONE) {
+           printf("%s: Initialized Bass Boost : %d\n",_Property, m_bassBoost);
+           device::HostPersistence::getInstance().persistHostProperty(_Property ,_BassBoost);
+           result = IARM_RESULT_SUCCESS; 
+       }
+   }
+#endif   
+   IARM_BUS_Unlock(lock);
+   return result;
+
+}
+
+IARM_Result_t _dsResetVolumeLeveller(void *arg)
+{  
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+    int *handle = (int*)arg;
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+
+    typedef dsError_t (*dsSetVolumeLeveller_t)(int handle, dsVolumeLeveller_t volLeveller);
+    static dsSetVolumeLeveller_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetVolumeLeveller_t) dlsym(dllib, "dsSetVolumeLeveller");
+            if (func) {
+                printf("dsSetVolumeLeveller_t(int, dsVolumeLeveller_t) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetVolumeLeveller_t(int, dsVolumeLeveller_t) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+    if (func != 0) {
+       std::string _PropertyMode = _dsGetCurrentProfileProperty("VolumeLeveller.mode");
+       std::string _Propertylevel = _dsGetCurrentProfileProperty("VolumeLeveller.level");
+       std::string _volLevellerMode("0");
+       std::string _volLevellerLevel("0");
+       dsVolumeLeveller_t m_volumeLeveller;
+       try {
+           _volLevellerMode = device::HostPersistence::getInstance().getDefaultProperty(_PropertyMode);
+           _volLevellerLevel = device::HostPersistence::getInstance().getDefaultProperty(_Propertylevel);
+       }
+       catch(...) {
+           _volLevellerMode = "0";
+           _volLevellerLevel = "0";
+       }
+       m_volumeLeveller.mode = atoi(_volLevellerMode.c_str());
+       m_volumeLeveller.level = atoi(_volLevellerLevel.c_str());
+       if (func(*handle, m_volumeLeveller) == dsERR_NONE) {
+          printf("%s %s Default Volume Leveller : Mode: %d, Level: %d\n",_PropertyMode,_Propertylevel, m_volumeLeveller.mode, m_volumeLeveller.level);
+          device::HostPersistence::getInstance().persistHostProperty(_PropertyMode ,_volLevellerMode);
+          device::HostPersistence::getInstance().persistHostProperty(_Propertylevel ,_volLevellerLevel);
+          result = IARM_RESULT_SUCCESS;
+       }
+ 
+   }
+#endif
+   IARM_BUS_Unlock(lock);
+   return result;
+}
+
+IARM_Result_t _dsResetSurroundVirtualizer(void *arg)
+{
+   _DEBUG_ENTER();
+   IARM_BUS_Lock(lock);
+   int *handle = (int*)arg;
+   IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+
+   typedef dsError_t (*dsSetSurroundVirtualizer_t)(int handle, dsSurroundVirtualizer_t virtualizer);
+   static dsSetSurroundVirtualizer_t func = 0;
+   if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetSurroundVirtualizer_t) dlsym(dllib, "dsSetSurroundVirtualizer");
+            if (func) {
+                printf("dsSetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetSurroundVirtualizer_t(int, dsSurroundVirtualizer_t) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+  }
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+  if (func != 0) {
+       std::string _PropertyMode = _dsGetCurrentProfileProperty("SurroundVirtualizer.mode");
+       std::string _Propertylevel = _dsGetCurrentProfileProperty("SurroundVirtualizer.boost");
+       std::string _SVMode("0");
+       std::string _SVBoost("0");
+       dsSurroundVirtualizer_t m_virtualizer;
+       try {
+          _SVMode = device::HostPersistence::getInstance().getDefaultProperty(_PropertyMode);
+          _SVBoost = device::HostPersistence::getInstance().getDefaultProperty(_Propertylevel);
+       }
+       catch(...) {
+          _SVMode = "0";
+          _SVBoost = "0";
+       }
+       m_virtualizer.mode = atoi(_SVMode.c_str());
+       m_virtualizer.boost = atoi(_SVBoost.c_str());
+       if (func(*handle, m_virtualizer) == dsERR_NONE) {
+           printf("%s Default Surround Virtualizer : Mode: %d, Boost : %d\n",_Propertylevel, m_virtualizer.mode, m_virtualizer.boost);
+           device::HostPersistence::getInstance().persistHostProperty(_PropertyMode ,_SVMode);
+           device::HostPersistence::getInstance().persistHostProperty(_Propertylevel ,_SVBoost);
+           result = IARM_RESULT_SUCCESS;
+       }
+  }
+#endif
+  IARM_BUS_Unlock(lock);
+  return result;
+}
+
+IARM_Result_t _dsResetDialogEnhancement(void *arg)
+{
+  _DEBUG_ENTER();
+  IARM_BUS_Lock(lock);
+  IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+  int *handle = (int*)arg;
+
+  typedef dsError_t (*dsSetDialogEnhancement_t)(int handle, int enhancerLevel);
+  static dsSetDialogEnhancement_t func = 0;
+  if (func == 0) {
+     void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+     if (dllib) {
+        func = (dsSetDialogEnhancement_t) dlsym(dllib, "dsSetDialogEnhancement");
+        if (func) {
+           printf("dsSetDialogEnhancement_t(int, int) is defined and loaded\r\n");
+        }
+        else {
+           printf("dsSetDialogEnhancement_t(int, int ) is not defined\r\n");
+        }
+        dlclose(dllib);
+     }
+     else {
+        printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+     }
+  }
+
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+  std::string _Property = _dsGetCurrentProfileProperty("EnhancerLevel");
+  if (func) {
+     std::string _EnhancerLevel("0");
+     int m_enhancerLevel = 0;
+     try {
+         _EnhancerLevel = device::HostPersistence::getInstance().getDefaultProperty(_Property);
+     }
+     catch(...) {
+         _EnhancerLevel = "0";
+     }
+     m_enhancerLevel = atoi(_EnhancerLevel.c_str());
+     if (func(*handle, m_enhancerLevel) == dsERR_NONE) {
+         printf("Default dialog enhancement level : %d\n", m_enhancerLevel);
+         device::HostPersistence::getInstance().persistHostProperty(_Property ,_EnhancerLevel);
+         result = IARM_RESULT_SUCCESS;
+     }
+  }
+#endif
+  IARM_BUS_Unlock(lock);
+  return result;
+}
+
+std::string _dsGetCurrentProfileProperty(std::string property)
+{
+   std::string _AProfile("Off");
+   std::string _AProfileSupport("FALSE");
+   try {
+        _AProfileSupport = device::HostPersistence::getInstance().getDefaultProperty("audio.MS12Profile.supported");
+   }
+   catch(...) {
+        _AProfileSupport = "FALSE";
+        printf("audio.MS12Profile.supported setting not found in hostDataDeafult \r\n");
+   }
+   printf(" audio.MS12Profile.supported = %s ..... \r\n",_AProfileSupport.c_str());
+
+   if(_AProfileSupport == "TRUE") {
+      try {
+          _AProfile = device::HostPersistence::getInstance().getProperty("audio.MS12Profile");
+      }
+      catch(...) {
+         try {
+             printf("audio.MS12Profile not found in persistence store. Try system default\n");
+            _AProfile = device::HostPersistence::getInstance().getDefaultProperty("audio.MS12Profile");
+        }
+        catch(...) {
+            _AProfile = "Off";
+        }
+      }
+   }
+   std::string profileProperty("audio.");
+   if(_AProfileSupport == "TRUE") {
+      profileProperty.append (_AProfile);
+      profileProperty.append (".");
+   }
+   profileProperty.append (property);
+   return profileProperty;
+}
 /** @} */
 /** @} */

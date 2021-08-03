@@ -326,7 +326,7 @@ dsError_t  dsEnableAudioPort(int handle, bool enabled, const char* portName)
 {
     _DEBUG_ENTER();
 
-	dsAudioPortEnabledParam_t param;
+    dsAudioPortEnabledParam_t param;
     param.handle = handle;
     param.enabled = enabled;
     memset(param.portName, '\0', sizeof(param.portName));
@@ -1508,6 +1508,67 @@ dsError_t dsAudioOutIsConnected(int handle, bool* pisCon)
                 return dsERR_NONE;
         }
         return dsERR_GENERAL ;
+}
+
+dsError_t dsResetDialogEnhancement(int handle)
+{
+       IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+       rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *) IARM_BUS_DSMGR_API_dsResetDialogEnhancement,
+                            (void *)&handle,
+                            sizeof(int*));
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
+
+}
+
+
+dsError_t dsResetBassEnhancer(int handle)
+{
+       IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+       rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *) IARM_BUS_DSMGR_API_dsResetBassEnhancer,
+                            (void *)&handle,
+                            sizeof(int*));
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
+
+}
+
+dsError_t dsResetSurroundVirtualizer(int handle)
+{
+       IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+       rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *) IARM_BUS_DSMGR_API_dsResetSurroundVirtualizer,
+                            (void *)&handle,
+                            sizeof(int*));
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
+
+}
+
+dsError_t dsResetVolumeLeveller(int handle)
+{
+       IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+       rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *) IARM_BUS_DSMGR_API_dsResetVolumeLeveller,
+                            (void *)&handle,
+                            sizeof(int*));
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
+
 }
 
 /** @} */

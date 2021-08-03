@@ -1715,6 +1715,94 @@ void AudioOutputPort::getMS12Capabilities(int *capabilities)
         }
 }
 
+/**
+ * @fn AudioOutputPort::resetDialogEnhancement()
+ * @brief This API is used to reset the AudioOutput in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ *
+ * @return None
+ */
+void AudioOutputPort::resetDialogEnhancement()
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsResetDialogEnhancement(_handle)) == dsERR_NONE) {
+        }
+        else
+        {
+           throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::resetBassEnhancer()
+ * @brief This API is used to reset the AudioOutput in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ *
+ * @return None
+ */
+void AudioOutputPort::resetBassEnhancer()
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsResetBassEnhancer(_handle)) == dsERR_NONE) {
+        }
+        else
+        {
+           throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::resetSurroundVirtualizer()
+ * @brief This API is used to reset the AudioOutput in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ *
+ * @return None
+ */
+void AudioOutputPort::resetSurroundVirtualizer()
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsResetSurroundVirtualizer(_handle)) == dsERR_NONE) {
+        }
+        else
+        {
+           throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::resetVolumeLeveller()
+ * @brief This API is used to reset the AudioOutput in a given audio port.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ *
+ * @return None
+ */
+void AudioOutputPort::resetVolumeLeveller()
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsResetVolumeLeveller(_handle)) == dsERR_NONE) {
+        }
+        else
+        {
+           throw Exception(ret);
+        }
+}
+
 }
 
 /** @} */

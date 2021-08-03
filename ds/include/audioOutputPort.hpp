@@ -188,7 +188,10 @@ public:
 	void setAudioDucking(dsAudioDuckingAction_t action, dsAudioDuckingType_t, const unsigned char level);
         void getAudioCapabilities(int *capabilities);
         void getMS12Capabilities(int *capabilities);
-
+        void resetDialogEnhancement();
+        void resetBassEnhancer();
+        void resetSurroundVirtualizer();
+        void resetVolumeLeveller();
 };
 
 }

@@ -932,6 +932,46 @@ dsError_t dsGetAudioCapabilities(int handle, int *capabilities);
  * @return dsError_t Error code.
  */
 dsError_t dsGetMS12Capabilities(int handle, int *capabilities);
+
+/**
+ * @brief to reset the Dialog Enhancement 
+ *
+ * This function is used to reset the Dialog Enhancement
+ *
+ * @param [in] handle   Handle for the audio device (audio decoder)
+ * @return dsError_t Error code.
+ */
+dsError_t dsResetDialogEnhancement(int handle);
+
+/**
+ * @brief to reset the reset the audio Bass
+ *
+ * This function is used to reset reset the audio Bass
+ *
+ * @param [in] handle   Handle for the audio device (audio decoder)
+ * @return dsError_t Error code.
+ */
+dsError_t dsResetBassEnhancer(int handle);
+
+/**
+ * @brief to reset the audio Surround Virtualizer level
+ *
+ * This function is used to reset the audio Surround Virtualizer level
+ *
+ * @param [in] handle   Handle for the audio device (audio decoder)
+ * @return dsError_t Error code.
+ */
+dsError_t dsResetSurroundVirtualizer(int handle);
+
+/**
+ * @brief to reset the Dolby volume leveller
+ *
+ * This function is used to reset the Dolby volume leveller
+ *
+ * @param [in] handle   Handle for the audio device (audio decoder)
+ * @return dsError_t Error code.
+ */
+dsError_t dsResetVolumeLeveller(int handle);
 /**
  * @}
  */

@@ -244,6 +244,13 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsSetVersion				"dsSetVersion"
 #define IARM_BUS_DSMGR_API_dsGetSocIDFromSDK               "dsGetSocIDFromSDK"
 
+/*
+ * Declare Reset MS12 setting  Interface  API names
+ */
+#define IARM_BUS_DSMGR_API_dsResetDialogEnhancement    "dsResetDialogEnhancement"
+#define IARM_BUS_DSMGR_API_dsResetBassEnhancer         "dsResetBassEnhancer"
+#define IARM_BUS_DSMGR_API_dsResetSurroundVirtualizer  "dsResetSurroundVirtualizer"
+#define IARM_BUS_DSMGR_API_dsResetVolumeLeveller       "dsResetVolumeLeveller"
 
 typedef struct _dsAudioGetHandleParam_t {
 	dsAudioPortType_t type;
