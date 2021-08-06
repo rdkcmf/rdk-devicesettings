@@ -4989,6 +4989,10 @@ static void _GetAudioModeFromPersistent(void *arg)
             _AudioModeSettings = device::HostPersistence::getInstance().getProperty("HDMI0.AudioMode",_AudioModeSettings);
             __TIMESTAMP();printf("The HDMI Audio Mode Setting From Persistent is %s \r\n",_AudioModeSettings.c_str());
         }
+	else if (_APortType == dsAUDIOPORT_TYPE_HDMI_ARC){
+	    _AudioModeSettings = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.AudioMode",_AudioModeSettings);
+	    __TIMESTAMP();printf("The HDMI_ARC Audio Mode Setting From Persistent is %s \r\n",_AudioModeSettings.c_str());
+	}
 
         if (_AudioModeSettings.compare("SURROUND") == 0)
         {
