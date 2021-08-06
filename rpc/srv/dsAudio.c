@@ -479,6 +479,26 @@ void AudioConfigInit()
                         printf("Port %s: Initialized audio delay offset : %d\n","HDMI0", m_audioDelayOffset);
                     }
                 }
+//HDMI ARC init
+                handle = 0;
+                if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI_ARC,0,&handle) == dsERR_NONE) {
+                    try {
+                        _AudioDelayOffset = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.audio.DelayOffset");
+                    }
+                    catch(...) {
+                            try {
+                                printf("HDMI_ARC0.audio.DelayOffset not found in persistence store. Try system default\n");
+                                _AudioDelayOffset = device::HostPersistence::getInstance().getDefaultProperty("HDMI_ARC0.audio.DelayOffset");
+                            }
+                            catch(...) {
+                                _AudioDelayOffset = "0";
+                            }
+                    }
+                    m_audioDelayOffset = atoi(_AudioDelayOffset.c_str());
+                    if (dsSetAudioDelayFunc(handle, m_audioDelayOffset) == dsERR_NONE) {
+                        printf("Port %s: Initialized audio delay : %d\n","HDMI_ARC0", m_audioDelayOffset);
+                    }
+                }
             }
             else {
                 printf("dsSetAudioDelayOffset_t(int, uint32_t) is not defined\r\n");
@@ -3329,6 +3349,10 @@ IARM_Result_t _dsSetAudioDelayOffset(void *arg)
                 printf("%s: port: %s , persist audio delay offset ms: %d\n",__func__,"SPEAKER0", param->audioDelayOffsetMs);
                 device::HostPersistence::getInstance().persistHostProperty("SPEAKER0.audio.DelayOffset",_AudioDelayOffset);
                 break;
+	    case dsAUDIOPORT_TYPE_HDMI_ARC:
+                printf("%s: port: %s , persist audio delay: %d\n",__func__,"HDMI_ARC0", param->audioDelayOffsetMs);
+                device::HostPersistence::getInstance().persistHostProperty("HDMI_ARC0.audio.DelayOffset",_AudioDelayOffset);
+                break;	
             default:
                 break;
         }
