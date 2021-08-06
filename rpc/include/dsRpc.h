@@ -105,6 +105,7 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsGetMS12AudioProfileList  "dsGetMS12AudioProfileList"	
 #define  IARM_BUS_DSMGR_API_dsGetMS12AudioProfile  "dsGetMS12AudioProfile"
 #define  IARM_BUS_DSMGR_API_dsSetMS12AudioProfile  "dsSetMS12AudioProfile"
+#define  IARM_BUS_DSMGR_API_dsSetMS12SetttingsOverride  "dsSetMS12SetttingsOverride"
 
 
 #define IARM_BUS_DSMGR_API_dsAudioOutIsConnected     "dsAudioOutIsConnected"
@@ -413,6 +414,14 @@ typedef struct _dsMS12AudioProfileParam_t {
 	int handle;
 	char profile [MAX_PROFILE_STRING_LEN];
 } dsMS12AudioProfileParam_t;
+
+typedef struct _dsMS12SetttingsOverrideParam_t {
+        int handle;
+        char profileState[MAX_PROFILE_STRING_LEN];
+        char profileName[MAX_PROFILE_STRING_LEN];
+        char profileSettingsName[MAX_PROFILE_STRING_LEN];
+        char profileSettingValue[MAX_PROFILE_STRING_LEN];
+} dsMS12SetttingsOverrideParam_t;
 
 typedef struct _dsMS12AudioProfileListParam_t {
 	int handle;

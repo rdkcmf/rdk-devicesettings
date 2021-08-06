@@ -192,6 +192,8 @@ public:
         void resetBassEnhancer();
         void resetSurroundVirtualizer();
         void resetVolumeLeveller();
+        void setMS12AudioProfileSetttingsOverride(const std::string ProfileState,const std::string ProfileName,
+                                                   const std::string ProfileSettingsName, const std::string ProfileSettingValue);
 };
 
 }

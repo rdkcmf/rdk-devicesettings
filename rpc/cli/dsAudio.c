@@ -1245,6 +1245,54 @@ dsError_t  dsSetMS12AudioProfile(int handle, const char* profile)
         return dsERR_NONE;
 }
 
+dsError_t  dsSetMS12AudioProfileSetttingsOverride(int handle,const char* profileState,const char* profileName,
+                                                   const char* profileSettingsName,const char* profileSettingValue)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsMS12SetttingsOverrideParam_t param;
+        param.handle = handle;
+        
+        memset( param.profileState, 0, sizeof(param.profileState) );
+        errno_t rc = -1;
+        rc = strcpy_s (param.profileState,sizeof(param.profileState), profileState );
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+
+        memset( param.profileName, 0, sizeof(param.profileName) );
+        rc = strcpy_s (param.profileName,sizeof(param.profileName), profileName );
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+
+        memset( param.profileSettingsName, 0, sizeof(param.profileSettingsName) );
+        rc = strcpy_s (param.profileSettingsName,sizeof(param.profileSettingsName), profileSettingsName );
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+
+        memset( param.profileSettingValue, 0, sizeof(param.profileSettingValue) );
+        rc = strcpy_s (param.profileSettingValue,sizeof(param.profileSettingValue),profileSettingValue);
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+ 
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsSetMS12SetttingsOverride,
+                                                        (void *)&param,
+                                                        sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+
+}
+
 dsError_t dsGetSupportedARCTypes(int handle, int *types)
 {
         IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;

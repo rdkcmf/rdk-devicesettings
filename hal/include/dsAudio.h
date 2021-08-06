@@ -972,6 +972,24 @@ dsError_t dsResetSurroundVirtualizer(int handle);
  * @return dsError_t Error code.
  */
 dsError_t dsResetVolumeLeveller(int handle);
+
+/**
+ * @brief To Set/override a specific audio setting in 
+ *  a specific profile
+ *
+ * This function will override a specific audio setting in a
+ * specific profile
+ *
+ * @param [in] handle       Handle for the Output Audio port
+ * @param [in] *profileState possible values ADD and REMOVE setting from the persistence
+ * @param [in] *profileName  ProfileName 
+ * @param [in] *profileSettingsName MS12 property name
+ * @param [in] *profileSettingValue MS12 property value 
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsSetMS12AudioProfileSetttingsOverride(int handle,const char* profileState,const char* profileName,
+                                                   const char* profileSettingsName,const char* profileSettingValue);
 /**
  * @}
  */

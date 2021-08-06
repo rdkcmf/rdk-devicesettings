@@ -1803,6 +1803,34 @@ void AudioOutputPort::resetVolumeLeveller()
         }
 }
 
+/**
+ * @fn AudioOutputPort::setMS12AudioProfileSetttings()
+ * @brief This API is used to Set the particular property of specific profile
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ *
+ * @return None
+ */
+
+void AudioOutputPort::setMS12AudioProfileSetttingsOverride(const std::string ProfileState,const std::string ProfileName,
+                                                   const std::string ProfileSettingsName, const std::string ProfileSettingValue)
+{
+
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsSetMS12AudioProfileSetttingsOverride(_handle, ProfileState.c_str(),ProfileName.c_str(),
+                                                   ProfileSettingsName.c_str(),ProfileSettingValue.c_str())) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+
+    
+}
+
 }
 
 /** @} */
