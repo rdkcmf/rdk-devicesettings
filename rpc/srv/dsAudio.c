@@ -1875,13 +1875,13 @@ IARM_Result_t dsAudioMgr_init()
 	    catch(...) {
 	        _AudioModeAuto = false;
 	    }
-           std::string _ARCAudioModeAuto("TRUE");
+           std::string _ARCAudioModeAuto("FALSE");
 	   std::string _SPDIFAudioModeAuto("FALSE");
 	   try {
-		_ARCAudioModeAuto = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.AudioMode.AUTO",_ARCAudioModeAuto);
+		_ARCAudioModeAuto = device::HostPersistence::getInstance().getDefaultProperty("HDMI_ARC0.AudioMode.AUTO");
 	   }
 	   catch(...) {
-	       _ARCAudioModeAuto = true;
+	       _ARCAudioModeAuto = "FALSE";
 	   }
 
            try {
