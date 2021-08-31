@@ -371,6 +371,8 @@ typedef enum StereoMode{
     dsAUDIO_STEREO_STEREO,    /**< Normal stereo mode (L+R).             */
     dsAUDIO_STEREO_SURROUND,  /**< Surround mode.                        */
     dsAUDIO_STEREO_PASSTHRU,  /**< Passthrough mode.                     */
+    dsAUDIO_STEREO_DD,        /**< Dolby Digital.                        */
+    dsAUDIO_STEREO_DDPLUS,    /**< Dolby Digital Plus.                   */
     dsAUDIO_STEREO_MAX        /**< Maximum index for audio stereo types. */
 } dsAudioStereoMode_t;
 

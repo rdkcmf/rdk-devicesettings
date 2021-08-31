@@ -1891,10 +1891,18 @@ IARM_Result_t dsAudioMgr_init()
 		{
 			_srv_HDMI_Audiomode = dsAUDIO_STEREO_PASSTHRU;
 		}
-        else 
-        {
+                else if (_AudioModeSettings.compare("DOLBYDIGITAL") == 0)
+                {
+                        _srv_HDMI_Audiomode = dsAUDIO_STEREO_DD;
+                }
+                else if (_AudioModeSettings.compare("DOLBYDIGITALPLUS") == 0)
+                {
+                        _srv_HDMI_Audiomode = dsAUDIO_STEREO_DDPLUS;
+                }
+                else
+                {
 			_srv_HDMI_Audiomode = dsAUDIO_STEREO_STEREO;
-        }
+                }
 
 		/* Get the AutoModesettings FOR HDMI from Persistence */
                 /* If HDMI persistence is surround, Auto defaults to true */
@@ -2280,6 +2288,36 @@ IARM_Result_t _dsSetStereoMode(void *arg)
                 }
 
                 eventData.data.Audioport.mode = dsAUDIO_STEREO_SURROUND;
+                eventData.data.Audioport.type = _APortType;
+                IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,(IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_MODE,(void *)&eventData, sizeof(eventData));
+            }
+            else if(param->mode == dsAUDIO_STEREO_DD)
+            {
+                __TIMESTAMP();printf("Setting Audio Mode Dolby Digital with persistent value %d \r\n",param->toPersist);
+
+                if (_APortType == dsAUDIOPORT_TYPE_HDMI)
+                {
+                    if (param->toPersist)
+                    device::HostPersistence::getInstance().persistHostProperty("HDMI0.AudioMode","DOLBYDIGITAL");
+
+                    _srv_HDMI_Audiomode = dsAUDIO_STEREO_DD;
+                }
+                eventData.data.Audioport.mode = dsAUDIO_STEREO_DD;
+                eventData.data.Audioport.type = _APortType;
+                IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,(IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_MODE,(void *)&eventData, sizeof(eventData));
+            }
+            else if(param->mode == dsAUDIO_STEREO_DDPLUS)
+            {
+                __TIMESTAMP();printf("Setting Audio Mode Dolby Digital Plus with persistent value %d \r\n",param->toPersist);
+
+                if (_APortType == dsAUDIOPORT_TYPE_HDMI)
+                {
+                    if (param->toPersist)
+                    device::HostPersistence::getInstance().persistHostProperty("HDMI0.AudioMode","DOLBYDIGITALPLUS");
+
+                    _srv_HDMI_Audiomode = dsAUDIO_STEREO_DDPLUS;
+                }
+                eventData.data.Audioport.mode = dsAUDIO_STEREO_DDPLUS;
                 eventData.data.Audioport.type = _APortType;
                 IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,(IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_MODE,(void *)&eventData, sizeof(eventData));
             }
@@ -5070,7 +5108,15 @@ static void _GetAudioModeFromPersistent(void *arg)
         {
             param->mode = dsAUDIO_STEREO_PASSTHRU;
         }
-        else 
+        else if (_AudioModeSettings.compare("DOLBYDIGITAL") == 0)
+        {
+            param->mode = dsAUDIO_STEREO_DD;
+        }
+        else if (_AudioModeSettings.compare("DOLBYDIGITALPLUS") == 0)
+        {
+            param->mode = dsAUDIO_STEREO_DDPLUS;
+        }
+        else
         {
             param->mode = dsAUDIO_STEREO_STEREO;
         } 

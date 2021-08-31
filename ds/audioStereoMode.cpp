@@ -50,6 +50,8 @@ namespace {
 			"STEREO",
 			"SURROUND",
 			"PASSTHRU",
+			"DOLBYDIGITAL",
+			"DOLBYDIGITALPLUS",
 	};
 
 	inline const bool isValid(int id) {
@@ -64,6 +66,8 @@ const int AudioStereoMode::kMono 			= dsAUDIO_STEREO_MONO;
 const int AudioStereoMode::kStereo 			= dsAUDIO_STEREO_STEREO;
 const int AudioStereoMode::kSurround 		= dsAUDIO_STEREO_SURROUND;
 const int AudioStereoMode::kPassThru 		= dsAUDIO_STEREO_PASSTHRU;
+const int AudioStereoMode::kDD   		= dsAUDIO_STEREO_DD;
+const int AudioStereoMode::kDDPlus 		= dsAUDIO_STEREO_DDPLUS;
 const int AudioStereoMode::kMax 			= dsAUDIO_STEREO_MAX;
 
 

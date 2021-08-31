@@ -56,6 +56,8 @@ public:
 	static const int kStereo;     //!< Indicates audio mode of type stereo.
 	static const int kSurround;   //!< Indicates audio mode of type surround.
 	static const int kPassThru;   //!< Indicates audio mode of type pass through.
+	static const int kDD;         //!< Indicates audio mode of type dolby digital.
+	static const int kDDPlus;     //!< Indicates audio mode of type dolby digital plus.
 	static const int kMax;        //!< Indicates maximum number of audio modes supported.
 
 	static const AudioStereoMode & getInstance(int id);
