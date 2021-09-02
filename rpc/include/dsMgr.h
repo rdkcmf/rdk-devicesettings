@@ -62,6 +62,7 @@ typedef enum _DSMgr_EventId_t {
 	IARM_BUS_DSMGR_EVENT_AUDIO_LEVEL_CHANGED,           /*!< Audio Level Change Event*/
 	IARM_BUS_DSMGR_EVENT_AUDIO_OUT_HOTPLUG,            /*!< AUDIO OUT HPD change event */
 	IARM_BUS_DSMGR_EVENT_AUDIO_FORMAT_UPDATE,  /*!< Audio Format change event */
+	IARM_BUS_DSMGR_EVENT_VIDEO_FORMAT_UPDATE,  /*!< Video Format change event */
 	IARM_BUS_DSMGR_EVENT_DISPLAY_FRAMRATE_PRECHANGE,   /*!< Frame rate pre change */
 	IARM_BUS_DSMGR_EVENT_DISPLAY_FRAMRATE_POSTCHANGE,     /*!< Frame rate post change */
         IARM_BUS_DSMGR_EVENT_AUDIO_PORT_STATE,  /*!< Audio Port Init State */
@@ -172,6 +173,11 @@ typedef struct _DSMgr_EventData_t {
 	{
 	    dsAudioFormat_t audioFormat;
 	}AudioFormatInfo;
+
+        struct _VIDEO_FORMAT_DATA
+	{
+	    dsHDRStandard_t videoFormat;
+	}VideoFormatInfo;
 
         struct _AUDIO_PORTSTATE_DATA
         {

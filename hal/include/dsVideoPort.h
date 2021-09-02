@@ -42,6 +42,18 @@ extern "C" {
 #include "dsTypes.h"
 
 
+/**
+ * @brief Callback function used to notify applications of Video Format change
+ *
+ * HAL Implementation should call this method to deliver updated Video Format info
+ * to the application
+ *
+ * @param audioFormat     Current video format of the content playing
+ *
+ *
+ * @return None.
+ */
+typedef void (*dsVideoFormatUpdateCB_t)(dsHDRStandard_t videoFormat);
 /** 
  * @addtogroup DSHAL_VIDEOPORT_API Device Settings HAL Video Port Public API
  * @ingroup devicesettingshalapi

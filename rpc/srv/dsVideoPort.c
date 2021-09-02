@@ -111,9 +111,11 @@ IARM_Result_t _dsGetCurrentOutputSettings(void* arg);
 IARM_Result_t _dsSetBackgroundColor(void *arg);
 
 
+void _dsVideoFormatUpdateCB(dsHDRStandard_t videoFormat);
 static dsVideoPortType_t _GetVideoPortType(int handle);
 static int  _dsVideoPortPreResolutionCall(dsVideoPortResolution_t *resolution);
 static int  _dsSendVideoPortPostResolutionCall(dsVideoPortResolution_t *resolution);
+static dsError_t _dsVideoFormatUpdateRegisterCB (dsVideoFormatUpdateCB_t cbFun);
 void _dsHdcpCallback(int handle, dsHdcpStatus_t event);
 static void persistResolution(dsVideoPortSetResolutionParam_t *param);
 
@@ -235,6 +237,10 @@ IARM_Result_t _dsVideoPortInit(void *arg)
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings,_dsGetCurrentOutputSettings);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetBackgroundColor,_dsSetBackgroundColor);
 	
+        dsError_t eRet = _dsVideoFormatUpdateRegisterCB (_dsVideoFormatUpdateCB) ;
+        if (dsERR_NONE != eRet) {
+            printf ("%s: _dsVideoFormatUpdateRegisterCB eRet:%04x", __FUNCTION__, eRet);
+        }
         m_isInitialized = 1;
     }
 
@@ -1759,7 +1765,54 @@ IARM_Result_t _dsSetBackgroundColor(void *arg)
     return IARM_RESULT_SUCCESS;
 
 }
+void _dsVideoFormatUpdateCB(dsHDRStandard_t videoFormat)
+{
+    IARM_Bus_DSMgr_EventData_t video_format_event_data;
+    printf("%s: VideoOutPort format:%d \r\n", __FUNCTION__, videoFormat);
+    video_format_event_data.data.VideoFormatInfo.videoFormat = videoFormat;
 
+    IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                           (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_VIDEO_FORMAT_UPDATE,
+                           (void *)&video_format_event_data,
+                           sizeof(video_format_event_data));
+}
+
+static dsError_t _dsVideoFormatUpdateRegisterCB (dsVideoFormatUpdateCB_t cbFun) {
+    dsError_t eRet = dsERR_GENERAL;
+    printf("%s: %d - Inside \n", __FUNCTION__, __LINE__);
+
+    typedef dsError_t (*dsVideoFormatUpdateRegisterCB_t)(dsVideoFormatUpdateCB_t cbFunArg);
+    static dsVideoFormatUpdateRegisterCB_t dsVideoFormatUpdateRegisterCBFun = 0;
+    if (dsVideoFormatUpdateRegisterCBFun == 0) {
+        printf("%s: %d - dlerror: %s\n", __FUNCTION__, __LINE__, dlerror());
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            dsVideoFormatUpdateRegisterCBFun = (dsVideoFormatUpdateRegisterCB_t) dlsym(dllib, "dsVideoFormatUpdateRegisterCB");
+            if(dsVideoFormatUpdateRegisterCBFun == 0) {
+                printf("%s: dsVideoFormatUpdateRegisterCB is not defined %s\r\n", __FUNCTION__, dlerror());
+                eRet = dsERR_GENERAL;
+            }
+            else {
+                printf("%s: dsVideoFormatUpdateRegisterCB is loaded\r\n", __FUNCTION__);
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("%s: Opening RDK_DSHAL_NAME [%s] failed %s\r\n",
+                   __FUNCTION__, RDK_DSHAL_NAME, dlerror());
+            eRet = dsERR_GENERAL;
+        }
+    }
+    if (0 != dsVideoFormatUpdateRegisterCBFun) {
+        eRet = dsVideoFormatUpdateRegisterCBFun (cbFun);
+        printf("%s: dsVideoFormatUpdateRegisterCBFun registered\r\n", __FUNCTION__);
+    }
+    else {
+        printf("%s: dsVideoFormatUpdateRegisterCBFun NULL\r\n", __FUNCTION__);
+    }
+
+    return eRet;
+}
 
 bool isComponentPortPresent()
 {

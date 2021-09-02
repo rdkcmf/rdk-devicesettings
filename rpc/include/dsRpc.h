@@ -684,6 +684,13 @@ typedef struct _dsGetHDRCapabilitiesParam_t
     int                     capabilities;
 } dsGetHDRCapabilitiesParam_t;
 
+typedef struct _dsGetVideoFormatsParam_t
+{
+    dsError_t               result;
+    int                     handle;
+    int                     videoFormats;
+} dsGetVideoFormatsParam_t;
+
 typedef struct _dsGetAudioCapabilitiesParam_t
 {
     dsError_t               result;
