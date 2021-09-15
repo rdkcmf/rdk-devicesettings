@@ -902,7 +902,12 @@ typedef enum _dsDisplayMatrixCoefficients_t
     dsDISPLAY_MATRIXCOEFFICIENT_XvYCC_709,    /* XvYCC_709 Matrix Coefficient. */
     dsDISPLAY_MATRIXCOEFFICIENT_eXvYCC_601,   /* XvYCC_601 Matrix Coefficient. */
     dsDISPLAY_MATRIXCOEFFICIENT_BT_2020_NCL,  /* ITU BT 2020 non constant luminance Matrix Coefficient. */
-    dsDISPLAY_MATRIXCOEFFICIENT_BT_2020_CL    /* ITU BT 2020 constant luminance Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_BT_2020_CL,    /* ITU BT 2020 constant luminance Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_eDVI_FR_RGB,   /* eDVI Full Range RGB Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_eHDMI_RGB,           /* eHDMI RGB Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_eFCC,                /* eFCC Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_eSMPTE_240M,         /* eSMPTE 240M Matrix Coefficient. */
+    dsDISPLAY_MATRIXCOEFFICIENT_eHDMI_FR_YCbCr       /* eHDMI Full Range YcbCr Matrix Coefficient. */
 } dsDisplayMatrixCoefficients_t;
 
 typedef enum _dsDisplayColorimetryInfo_t
