@@ -1929,10 +1929,17 @@ IARM_Result_t dsAudioMgr_init()
            std::string _ARCAudioModeAuto("FALSE");
 	   std::string _SPDIFAudioModeAuto("FALSE");
 	   try {
-		_ARCAudioModeAuto = device::HostPersistence::getInstance().getDefaultProperty("HDMI_ARC0.AudioMode.AUTO");
+		_ARCAudioModeAuto = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.AudioMode.AUTO");
 	   }
 	   catch(...) {
-	       _ARCAudioModeAuto = "FALSE";
+               try {
+                   printf("HDMI_ARC0.AudioMode.AUTO not found in persistence store. Try system default\n");
+                   _ARCAudioModeAuto = device::HostPersistence::getInstance().getDefaultProperty("HDMI_ARC0.AudioMode.AUTO");
+               }
+               catch(...) {
+                   _ARCAudioModeAuto = "FALSE";
+               }
+
 	   }
 
            try {
