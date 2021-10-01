@@ -221,6 +221,10 @@ typedef enum _dsAudioFormat_t {
     dsAUDIO_FORMAT_DOLBY_TRUEHD_ATMOS,
     dsAUDIO_FORMAT_DOLBY_MAT_ATMOS,
     dsAUDIO_FORMAT_DOLBY_AC4_ATMOS,
+    dsAUDIO_FORMAT_AAC,
+    dsAUDIO_FORMAT_VORBIS,
+    dsAUDIO_FORMAT_WMA,
+    dsAUDIO_FORMAT_UNKNOWN,
     dsAUDIO_FORMAT_MAX     /**< Maximum . */
 }dsAudioFormat_t;
 
