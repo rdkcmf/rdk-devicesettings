@@ -905,7 +905,7 @@ void _dsInitialisedMS12Setting(std::string _AProfile , std::string _AProfileSupp
                         std::string _Propertylevel = _dsGetCurrentProfileProperty("VolumeLeveller.level"); 
                         try {
                             _volLevellerMode = device::HostPersistence::getInstance().getProperty(_PropertyMode);
-                            _volLevellerLevel = device::HostPersistence::getInstance().getProperty(_PropertyMode);
+                            _volLevellerLevel = device::HostPersistence::getInstance().getProperty(_Propertylevel);
                             m_volumeLeveller.mode = atoi(_volLevellerMode.c_str());
 			    m_volumeLeveller.level = atoi(_volLevellerLevel.c_str());
                 //SPEAKER init
