@@ -264,6 +264,7 @@ public:
 	void getTVHDRCapabilities(int *capabilities) const;
 	void getSupportedTvResolutions(int *resolutions) const;
 	int forceDisable4KSupport(bool disable);
+	bool setForceHDRMode(dsHDRStandard_t status);
         bool IsOutputHDR();
         void ResetOutputToSDR();
         bool SetHdmiPreference(dsHdcpProtocolVersion_t hdcpProtocol);

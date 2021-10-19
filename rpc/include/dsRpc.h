@@ -180,6 +180,7 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsGetQuantizationRange "dsGetQuantizationRange"
 #define IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings "dsGetCurrentOutputSettings"
 #define IARM_BUS_DSMGR_API_dsSetBackgroundColor "dsSetBackgroundColor"
+#define IARM_BUS_DSMGR_API_dsSetForceHDRMode "dsSetForceHDRMode"
 /*
  * Declare RPC FP  API names 
  */
@@ -748,6 +749,13 @@ typedef struct
 	int handle;
 	bool disable;
 } dsForceDisableHDRParam_t;
+
+typedef struct
+{
+        dsError_t result;
+        int handle;
+        dsHDRStandard_t  hdrMode;
+} dsForceHDRModeParam_t;
 
 typedef struct
 {

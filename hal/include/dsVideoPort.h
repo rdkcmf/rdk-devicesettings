@@ -569,6 +569,19 @@ dsError_t dsGetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentPr
 dsError_t dsSetBackgroundColor(int handle, dsVideoBackgroundColor_t color);
 
 /**
+ * @brief This API is used to set/reset force HDR mode
+ *
+ * This function set/reset force HDR mode for  video port.
+ *
+ * @param [in] handle                   Handle of the video port.
+ * @param [in] mode                   dsHDRStandard_t type
+ *
+ * @return    Error Code.
+ * @retval    ::dsError_t
+ */
+dsError_t dsSetForceHDRMode(int handle, dsHDRStandard_t mode);
+
+/**
  * @}
  */
 

@@ -109,6 +109,7 @@ IARM_Result_t _dsGetColorSpace(void* arg);
 IARM_Result_t _dsGetQuantizationRange(void* arg);
 IARM_Result_t _dsGetCurrentOutputSettings(void* arg);
 IARM_Result_t _dsSetBackgroundColor(void *arg);
+IARM_Result_t _dsSetForceHDRMode(void *arg);
 
 
 void _dsVideoFormatUpdateCB(dsHDRStandard_t videoFormat);
@@ -236,6 +237,7 @@ IARM_Result_t _dsVideoPortInit(void *arg)
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetQuantizationRange,_dsGetQuantizationRange);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings,_dsGetCurrentOutputSettings);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetBackgroundColor,_dsSetBackgroundColor);
+                IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetForceHDRMode,_dsSetForceHDRMode);
 	
         dsError_t eRet = _dsVideoFormatUpdateRegisterCB (_dsVideoFormatUpdateCB) ;
         if (dsERR_NONE != eRet) {
@@ -1508,6 +1510,44 @@ IARM_Result_t _dsSetForceDisable4K(void *arg)
 	{
 		device::HostPersistence::getInstance().persistHostProperty("VideoDevice.force4KDisabled","false");
 	}
+
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+
+IARM_Result_t _dsSetForceHDRMode(void *arg)
+{
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+    dsForceHDRModeParam_t *param = (dsForceHDRModeParam_t *) arg;
+
+    typedef dsError_t (*dsSetForceHDRMode_t)(int handle, dsHDRStandard_t mode);
+    static dsSetForceHDRMode_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib != NULL) {
+            func = (dsSetForceHDRMode_t) dlsym(dllib, "dsSetForceHDRMode");
+            if (func != NULL) {
+                printf("dsSRV: dsSetForceHDRMode(int handle, dsHDRStandard_t mode ) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSRV: dsSetForceHDRMode(int handle, dsHDRStandard_t mode) is not defined\r\n");
+            }
+            dlclose(dllib);  //CID:83238 - Resource leak
+        }
+        else {
+            printf("dsSRV: Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    if (param != NULL) {
+        param->result = dsERR_GENERAL;
+
+        if (func != NULL) {
+            param->result = func(param->handle, param->hdrMode);
+        }
+    }
 
     IARM_BUS_Unlock(lock);
     return IARM_RESULT_SUCCESS;

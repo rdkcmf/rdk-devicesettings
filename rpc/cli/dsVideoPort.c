@@ -896,5 +896,27 @@ dsError_t dsGetCurrentOutputSettings(int handle, dsHDRStandard_t* video_eotf, ds
   return dsERR_GENERAL ;
 }
 
+dsError_t dsSetForceHDRMode(int handle, dsHDRStandard_t mode)
+{
+        _DEBUG_ENTER();
+
+        dsForceHDRModeParam_t param;
+        memset(&param, 0, sizeof(param));
+        param.handle = handle;
+        param.hdrMode = mode;
+
+        IARM_Result_t rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                        (char *) IARM_BUS_DSMGR_API_dsSetForceHDRMode,
+                        (void *) &param,
+                        sizeof(param));
+
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                return param.result;
+        }
+
+        return dsERR_GENERAL ;
+}
+
 /** @} */
 /** @} */

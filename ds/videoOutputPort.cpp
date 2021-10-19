@@ -791,6 +791,17 @@ int VideoOutputPort::forceDisable4KSupport(bool disable)
 }
 
 /**
+ * @fn  const int VideoOutputPort::setForceHDRMode(dsHDRStandard_t mode)
+ * @brief This API is used to set/reset force HDR mode.
+ *
+ * @return bool status
+ */
+bool VideoOutputPort::setForceHDRMode(dsHDRStandard_t mode)
+{
+    return dsSetForceHDRMode(_handle, mode) == dsERR_NONE;
+}
+
+/**
  * @fn  const void VideoOutputPort::IsOutputHDR()
  * @brief This API is used to check if Video output is HDR or not.
  *
