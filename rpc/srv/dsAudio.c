@@ -1866,7 +1866,63 @@ void AudioConfigInit()
                }
            }
     }
+    /* HDMI ARC digital audio mode settings */
+    handle = 0;
+    if(dsGetAudioPort(dsAUDIOPORT_TYPE_HDMI_ARC,0,&handle) == dsERR_NONE) {
+       std::string _ARCAudioModeAuto("FALSE");
+       try {
+          _ARCAudioModeAuto = device::HostPersistence::getInstance().getProperty("HDMI_ARC0.AudioMode.AUTO");
+       }
+       catch(...) {
+          try {
+                printf("HDMI_ARC0.AudioMode.AUTO not found in persistence store. Try system default\n");
+                _ARCAudioModeAuto = device::HostPersistence::getInstance().getDefaultProperty("HDMI_ARC0.AudioMode.AUTO");
+          }
+          catch(...) {
+                   _ARCAudioModeAuto = "FALSE";
+         }
+      }
+      if (_ARCAudioModeAuto.compare("TRUE") == 0)
+      {
+         typedef dsError_t (*dsSetStereoAuto_t)(int handle, int autoMode);
+         static dsSetStereoAuto_t func = 0;
+         if (func == 0) {
+            void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+            if (dllib) {
+                func = (dsSetStereoAuto_t) dlsym(dllib, "dsSetStereoAuto");
+                if (func) {
+                    printf("dsSetStereoAuto_t(int, int *) is defined and loaded\r\n");
+                }
+                else {
+                    printf("dsSetStereoAuto_t(int, int *) is not defined\r\n");
+                }
+                dlclose(dllib);
+            }
+            else {
+                    printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+            }
+        }
 
+        if (func != 0 && handle != NULL)
+        {
+            if (func(handle, 1) == dsERR_NONE)
+            {
+                 printf("dsSetStereoAuto Port HDMI_0ARC Audio Mode is set to Auto \n");
+            }
+        }
+
+    }
+    else if (_ARCAudioModeAuto.compare("FALSE") == 0)
+    {
+       if (NULL != handle) {
+           if (dsSetStereoMode(handle, _srv_HDMI_ARC_Audiomode) == dsERR_NONE)
+           {
+              printf("dsSetStereoMode The HDMI ARC Port Audio Settings Mode is %d \r\n",_srv_HDMI_ARC_Audiomode);
+           }
+      }
+   }
+ }
+ 
 
 #endif //DS_AUDIO_SETTINGS_PERSISTENCE
 }
