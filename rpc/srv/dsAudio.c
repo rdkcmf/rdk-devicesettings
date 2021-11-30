@@ -5883,34 +5883,34 @@ static std::string _dsGenerateProfileProperty(std::string profile,std::string pr
 
 void _dsMS12ProfileSettingOverride(int handle)
 {
-   typedef dsError_t (*dsSetDialogEnhancementdsSetBassEnhancerFunc_t)(int handle, int enhancerLevel);
-   static dsSetDialogEnhancementdsSetBassEnhancerFunc_t dsSetDialogEnhancementdsSetBassEnhancerFunc = 0;
-   if (dsSetDialogEnhancementdsSetBassEnhancerFunc == 0) {
-        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
-        if (dllib) {
-            dsSetDialogEnhancementdsSetBassEnhancerFunc = (dsSetDialogEnhancementdsSetBassEnhancerFunc_t) dlsym(dllib, "dsSetDialogEnhancementdsSetBassEnhancerFunc");
-            if (dsSetDialogEnhancementdsSetBassEnhancerFunc) {
-                printf("dsSetDialogEnhancementdsSetBassEnhancerFunc_t(int, int) is defined and loaded\r\n");
-            }
-            else {
-                printf("dsSetDialogEnhancementdsSetBassEnhancerFunc_t(int, int ) is not defined\r\n");
-            }
-            dlclose(dllib);
-        }
-        else {
-            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
-        }
+
+    typedef dsError_t (*dsSetDialogEnhancement_t)(int handle, int enhancerLevel);
+    static dsSetDialogEnhancement_t dsSetDialogEnhancementfunc = 0;
+    if (dsSetDialogEnhancementfunc == 0) {
+       void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+       if (dllib) {
+          dsSetDialogEnhancementfunc = (dsSetDialogEnhancement_t) dlsym(dllib, "dsSetDialogEnhancement");
+          if (dsSetDialogEnhancementfunc) {
+             printf("dsSetDialogEnhancement_t(int, int) is defined and loaded\r\n");
+          }
+          else {
+             printf("dsSetDialogEnhancement_t(int, int ) is not defined\r\n");
+          }
+          dlclose(dllib);
+       }
+       else {
+          printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+       }
     }
-  
-    if (dsSetDialogEnhancementdsSetBassEnhancerFunc != 0)
-    {
-        std::string _EnhancerLevel("0");
-        int m_enhancerLevel = 0;
-        std::string _Property = _dsGetCurrentProfileProperty("EnhancerLevel");
-        try {
-             _EnhancerLevel = device::HostPersistence::getInstance().getProperty(_Property);
-        }
-        catch(...) {
+
+    if (dsSetDialogEnhancementfunc) {
+       std::string _EnhancerLevel("0");
+       int m_enhancerLevel = 0;
+       std::string _Property = _dsGetCurrentProfileProperty("EnhancerLevel");
+       try {
+          _EnhancerLevel = device::HostPersistence::getInstance().getProperty(_Property);
+       }
+       catch(...) {
             try {
                 printf("audio.EnhancerLevel not found in persistence store. Try system default\n");
                 _EnhancerLevel = device::HostPersistence::getInstance().getDefaultProperty(_Property);
@@ -5918,15 +5918,14 @@ void _dsMS12ProfileSettingOverride(int handle)
             catch(...) {
                 _EnhancerLevel = "0";
             }
-        }
-        m_enhancerLevel = atoi(_EnhancerLevel.c_str());
-        if (dsSetDialogEnhancementdsSetBassEnhancerFunc(handle, m_enhancerLevel) == dsERR_NONE)
-        {
-            printf("%s: persist enhancer level: %d\n",__func__,m_enhancerLevel );
-            device::HostPersistence::getInstance().persistHostProperty(_Property ,_EnhancerLevel);
-        }
+       }
+       m_enhancerLevel = atoi(_EnhancerLevel.c_str());
+       if (dsSetDialogEnhancementfunc(handle, m_enhancerLevel) == dsERR_NONE) {
+           device::HostPersistence::getInstance().persistHostProperty(_Property ,_EnhancerLevel);
+           printf("%s: persist enhancer level: %d\n",__func__,m_enhancerLevel );
+       }
     }
-
+ 
     typedef dsError_t (*dsSetBassEnhancer_t)(int handle, int boost);
     static dsSetBassEnhancer_t dsSetBassEnhancerFunc = 0;
     if (dsSetBassEnhancerFunc == 0) {
