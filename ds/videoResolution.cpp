@@ -61,16 +61,17 @@ const VideoResolution & VideoResolution::getInstance(int id)
 
 
 /**
- * @fn const VideoResolution & VideoResolution::getInstance(const std::string &name)
+ * @fn const VideoResolution & VideoResolution::getInstance(const std::string &name, bool isIgnoreEdid)
  * @brief This API is used to get the instance of the video resolution port with the name as passed parameter and comparing name with the
  * supported resolution . If matched, it returns the supported resolution.
  *
  * @param[in] name Name of the port
+ * @param[in] isIgnoreEdid request to ignore Edid Check.
  * @return Reference to the instance of the name of the port
  */
-const VideoResolution & VideoResolution::getInstance(const std::string &name)
+const VideoResolution & VideoResolution::getInstance(const std::string &name, bool isIgnoreEdid)
 {
-	const List<VideoResolution> supportedResollutions = VideoOutputPortConfig::getInstance().getSupportedResolutions();
+	const List<VideoResolution> supportedResollutions = VideoOutputPortConfig::getInstance().getSupportedResolutions(isIgnoreEdid);
 
 	for (size_t i = 0; i < supportedResollutions.size(); i++) {
 		if (name.compare(std::string(supportedResollutions.at(i).getName())) == 0) {

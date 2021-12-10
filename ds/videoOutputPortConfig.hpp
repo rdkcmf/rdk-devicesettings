@@ -72,7 +72,7 @@ public:
 	List<VideoOutputPort> 		 getPorts();
 
 	List<VideoOutputPortType> getSupportedTypes();
-	List<VideoResolution> getSupportedResolutions();
+	List<VideoResolution> getSupportedResolutions(bool isIgnoreEdid=false);
 
 	void load();
 	void release();

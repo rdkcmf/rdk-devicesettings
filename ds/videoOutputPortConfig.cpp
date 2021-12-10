@@ -133,7 +133,7 @@ List<VideoOutputPortType>  VideoOutputPortConfig::getSupportedTypes()
 	return supportedTypes;
 }
 
-List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions()
+List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgnoreEdid)
 {
 	List<VideoResolution> supportedResolutions;
 	int isDynamicList = 0;

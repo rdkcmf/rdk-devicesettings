@@ -302,7 +302,7 @@ const VideoResolution & VideoOutputPort::getResolution()
 	std::string temp( resolution.name,strlen(resolution.name));
 	_resolution = string(temp);
 	
-	return VideoResolution::getInstance(_resolution);
+	return VideoResolution::getInstance(_resolution,true);
 }
 
 
@@ -314,7 +314,7 @@ const VideoResolution & VideoOutputPort::getResolution()
  */
 const VideoResolution & VideoOutputPort::getDefaultResolution() const
 {
-	return VideoResolution::getInstance(_defaultResolution);
+	return VideoResolution::getInstance(_defaultResolution,true);
 }
 
 
@@ -452,13 +452,13 @@ bool VideoOutputPort::isDynamicResolutionSupported() const
  *
  * @return None
  */
-void VideoOutputPort::setResolution(const std::string &resolutionName, bool persist/* = true*/)
+void VideoOutputPort::setResolution(const std::string &resolutionName, bool persist/* = true*/, bool isIgnoreEdid/* = false*/)
 {
 	if (0 && resolutionName.compare(_resolution) == 0) {
 		return;
 	}
 
-	VideoResolution newResolution = VideoResolution::getInstance(resolutionName);
+	VideoResolution newResolution = VideoResolution::getInstance(resolutionName, isIgnoreEdid);
 
 	dsVideoPortResolution_t resolution;
 	resolution.aspectRatio 		= (dsVideoAspectRatio_t)		newResolution.getAspectRatio().getId();

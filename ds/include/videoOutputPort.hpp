@@ -253,7 +253,7 @@ public:
  * @return None.
  */
 	void setAudioPort(int id) { _aPortId = id; };
-	void setResolution(const std::string &resolution, bool persist = true);
+	void setResolution(const std::string &resolution, bool persist = true, bool isIgnoreEdid=false);
 	void setDisplayConnected(const bool connected);
 	void enable();
 	void disable();
