@@ -294,6 +294,11 @@ typedef struct _dsAudioSetMutedParam_t {
 	bool mute;
 } dsAudioSetMutedParam_t;
 
+typedef struct _dsEdidIgnoreParam_t {
+	int handle;
+	bool ignoreEDID;
+} dsEdidIgnoreParam_t;
+
 typedef struct _dsAudioSetLevelParam_t {
         int handle;
         float level;

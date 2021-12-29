@@ -34,7 +34,6 @@
 #include <string>
 #include "dslogger.h"
 
-
 /**
  * @file videoResolution.cpp
  * @brief This file defines the videoResolution objects by the device settings module  upon intialization.

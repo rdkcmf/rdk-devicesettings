@@ -61,7 +61,6 @@ using namespace std;
  * Each VideoOutputPort is associated with an instance of VideoOutputPortType.
  */
 
-
 namespace device {
 
 const char * VideoOutputPort::kPropertyResolution = ".resolution";
@@ -454,6 +453,7 @@ bool VideoOutputPort::isDynamicResolutionSupported() const
  */
 void VideoOutputPort::setResolution(const std::string &resolutionName, bool persist/* = true*/, bool isIgnoreEdid/* = false*/)
 {
+        printf("ResOverride VideoOutputPort::setResolution resolutionName:%s persist:%d isIgnoreEdid:%d line:%d\r\n", resolutionName.c_str(), persist, isIgnoreEdid, __LINE__);
 	if (0 && resolutionName.compare(_resolution) == 0) {
 		return;
 	}
@@ -472,7 +472,7 @@ void VideoOutputPort::setResolution(const std::string &resolutionName, bool pers
         {
                 ERR_CHK(rc);
         }
-	dsError_t ret = dsSetResolution(_handle, &resolution, persist);
+       dsError_t ret = dsSetResolution(_handle, &resolution, persist);
 
 	if (ret != dsERR_NONE) {
 		throw Exception(ret);

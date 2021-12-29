@@ -142,7 +142,9 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgn
 	bool force_disable_4K = true;
 	
 	_supportedResolutions.clear(); /*Clear the Vector */
-	try {
+	printf ("\nResOverride VideoOutputPortConfig::getSupportedResolutions isIgnoreEdid:%d\n", isIgnoreEdid);
+	if (!isIgnoreEdid) {
+	    try {
                 std::string strVideoPort = device::Host::getInstance().getDefaultVideoPortName();
 		device::VideoOutputPort vPort = VideoOutputPortConfig::getInstance().getPort(strVideoPort.c_str());
 		if (vPort.isDisplayConnected())
@@ -178,12 +180,13 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgn
 							resolution->interlaced));
 			}	
 		}
-	}catch (...) 
+	    }catch (...)
 		{
 			isDynamicList = 0;
 			cout << "VideoOutputPortConfig::getSupportedResolutions Thrown. Exception..."<<endl;
 		}
-	
+	}
+	//If isIgnoreEdid is true isDynamicList is zero. Edid logic is skipped.
 	if (0 == isDynamicList )
 	{
 		size_t numResolutions = dsUTL_DIM(kResolutions);
@@ -201,15 +204,15 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgn
 					resolution->interlaced));
 		}
 	}
-
-	try {
+	if (!isIgnoreEdid) {
+	    try {
 			dsGetForceDisable4KSupport(_handle, &force_disable_4K);
-	}
-	catch(...)
-	{
+	    }
+	    catch(...)
+	    {
 		cout<<"Failed to get status of forceDisable4K!"<<endl;
-	}
-	for (std::vector<VideoResolution>::iterator it = _supportedResolutions.begin(); it != _supportedResolutions.end(); it++) {
+	    }
+	    for (std::vector<VideoResolution>::iterator it = _supportedResolutions.begin(); it != _supportedResolutions.end(); it++) {
 		if (it->isEnabled()) {
 			if((true == force_disable_4K) && (((it->getName() == "2160p60") || (it->getName() == "2160p30"))))
 			{
@@ -217,6 +220,11 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgn
 			}
 			supportedResolutions.push_back(*it);
 		}
+	    }
+	} else {
+	    for (std::vector<VideoResolution>::iterator it = _supportedResolutions.begin(); it != _supportedResolutions.end(); it++) {
+		    supportedResolutions.push_back(*it);
+	    }
 	}
 	return supportedResolutions;
 }

@@ -110,6 +110,7 @@ IARM_Result_t _dsGetQuantizationRange(void* arg);
 IARM_Result_t _dsGetCurrentOutputSettings(void* arg);
 IARM_Result_t _dsSetBackgroundColor(void *arg);
 IARM_Result_t _dsSetForceHDRMode(void *arg);
+IARM_Result_t _dsGetIgnoreEDIDStatus(void *arg);
 
 
 void _dsVideoFormatUpdateCB(dsHDRStandard_t videoFormat);
@@ -734,7 +735,14 @@ IARM_Result_t _dsGetResolution(void *arg)
 			__TIMESTAMP();printf("Reading HDMI  persistent resolution %s\r\n",_Resolution.c_str());
 		}
 		else{
-			_Resolution = _dsHDMIResolution;
+			dsError_t error = dsGetResolution(_VPortType,resolution);
+			if(error == dsERR_NONE) {
+				_Resolution = resolution->name;
+				__TIMESTAMP();printf("ResOverride platform reported resolution is: %s. Cached resolution is: %s\r\n",_Resolution.c_str(), _dsHDMIResolution.c_str());
+			}
+			else {
+				_Resolution = _dsHDMIResolution;
+                        }
 		}
 	}
 	else if (_VPortType == dsVIDEOPORT_TYPE_COMPONENT)
@@ -826,23 +834,32 @@ IARM_Result_t _dsSetResolution(void *arg)
 		   * If the platform Resolution is same as requested , Do not set new resolution
 		   * Needed to avoid setting resolution during multiple hot plug  
 		 */
-
-		dsVideoPortResolution_t platresolution;
-		memset(platresolution.name,'\0',sizeof(platresolution.name));
-		dsGetResolution(param->handle,&platresolution);
-		__TIMESTAMP();printf("Resolution Requested ..%s Platform Resolution - %s\r\n",resolution.name,platresolution.name);
-		if ((strcmp(resolution.name,platresolution.name) == 0 ))
-		{
+		IARM_BUS_Unlock(lock);
+                dsEdidIgnoreParam_t ignoreEdidParam;
+                memset(&ignoreEdidParam,0,sizeof(ignoreEdidParam));
+                ignoreEdidParam.handle = _VPortType;
+                _dsGetIgnoreEDIDStatus(&ignoreEdidParam);
+		bool IsIgnoreEdid = ignoreEdidParam.ignoreEDID;
+		IARM_BUS_Lock(lock);
+		__TIMESTAMP();printf("ResOverride _dsSetResolution IsIgnoreEdid:%d\n", IsIgnoreEdid);
+		//IsIgnoreEdid is true platform will take care of current resolution cache.
+		if (!IsIgnoreEdid) {
+			dsVideoPortResolution_t platresolution;
+			memset(platresolution.name,'\0',sizeof(platresolution.name));
+			dsGetResolution(param->handle,&platresolution);
+			__TIMESTAMP();printf("Resolution Requested ..%s Platform Resolution - %s\r\n",resolution.name,platresolution.name);
+			if ((strcmp(resolution.name,platresolution.name) == 0 ))
+			{
 			
-			printf("Same Resolution ..Ignoring Resolution Request------\r\n");
-                        _dsHDMIResolution = platresolution.name;
-                        /*!< Persist Resolution Settings */
-			persistResolution(param);
-                        param->result = ret;
-			IARM_BUS_Unlock(lock);
-			return IARM_RESULT_SUCCESS;
+				printf("Same Resolution ..Ignoring Resolution Request------\r\n");
+				_dsHDMIResolution = platresolution.name;
+				/*!< Persist Resolution Settings */
+				persistResolution(param);
+				param->result = ret;
+				IARM_BUS_Unlock(lock);
+				return IARM_RESULT_SUCCESS;
+			}
 		}
-	
 		/*!< Resolution Pre Change Event  - IARM_BUS_DSMGR_EVENT_RES_POSTCHANGE */
 		_dsVideoPortPreResolutionCall(&param->resolution);
 
@@ -1869,6 +1886,41 @@ bool isComponentPortPresent()
     }
     printf(" componentPortPresent :%d\n",componentPortPresent);
     return componentPortPresent;
+}
+
+IARM_Result_t _dsGetIgnoreEDIDStatus(void* arg)
+{
+    dsEdidIgnoreParam_t *param = (dsEdidIgnoreParam_t*) arg;
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+    //Default status is false
+    typedef dsError_t (*dsGetIgnoreEDIDStatus_t)(int handleArg, bool* statusArg);
+    static dsGetIgnoreEDIDStatus_t func = NULL;
+    if (func == NULL) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib != NULL) {
+            func = (dsGetIgnoreEDIDStatus_t) dlsym(dllib, "dsGetIgnoreEDIDStatus");
+            if (func != NULL) {
+                printf("dsSRV: dsError_t dsGetIgnoreEDIDStatus(int handle, bool* status)  is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSRV: dsError_t dsGetIgnoreEDIDStatus(int handle, bool* status) is not defined\r\n");
+            }
+	    dlclose(dllib);
+        }
+        else {
+            printf("dsSRV: Opening RDK_DSHAL_NAME [%s] dsGetIgnoreEDIDStatus failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    if (func != NULL) {
+          func(param->handle, &param->ignoreEDID);
+    }
+    printf("dsSRV: _dsGetIgnoreEDIDStatus status: %d\r\n", param->ignoreEDID);
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
 }
 /** @} */
 /** @} */

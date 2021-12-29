@@ -555,6 +555,8 @@ dsError_t dsSetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentPr
  */
 dsError_t dsGetHdmiPreference(int handle, dsHdcpProtocolVersion_t *hdcpCurrentProtocol);
 
+dsError_t dsGetIgnoreEDIDStatus(int handle, bool* status);
+
 /**
  * @brief This API is used to set the background color for video port
  *
