@@ -475,6 +475,22 @@ std::string HdmiInput::getCurrentVideoMode () const
     return resolutionStr;
 }
 
+void HdmiInput::getCurrentVideoModeObj (dsVideoPortResolution_t& resolution)
+{
+
+    memset(&resolution, 0, sizeof(resolution));
+
+    dsError_t eError = dsHdmiInGetCurrentVideoMode (&resolution);
+
+	// Throw an exception if there was an error
+	if (dsERR_NONE != eError)
+	{
+		throw Exception(eError);
+	}
+
+    printf("%s:%d - pixelResolution =%d interlaced:%d frameRate:%d\n", __PRETTY_FUNCTION__, __LINE__, resolution.pixelResolution, resolution.interlaced, resolution.frameRate);
+}
+
 void HdmiInput::getEDIDBytesInfo (int iHdmiPort, std::vector<uint8_t> &edidArg) const
 {
 

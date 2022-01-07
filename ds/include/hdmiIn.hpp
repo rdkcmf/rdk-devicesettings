@@ -51,6 +51,7 @@
 #include <stdint.h>
 #include <vector>
 
+#include "dsTypes.h"
 /**
  * @file hdmiIn.hpp
  * @brief Structures and classes for HDMI Input are defined here
@@ -84,6 +85,7 @@ public:
     void    pauseAudio               () const;
     void    resumeAudio              () const;
     std::string  getCurrentVideoMode () const;
+    void getCurrentVideoModeObj (dsVideoPortResolution_t& resolution);
     void getEDIDBytesInfo (int iHdmiPort, std::vector<uint8_t> &edid) const;
     void getHDMISPDInfo (int iHdmiPort, std::vector<uint8_t> &data);
     void setEdidVersion (int iHdmiPort, int iEdidVersion);
