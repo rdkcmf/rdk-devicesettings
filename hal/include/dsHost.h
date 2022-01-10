@@ -62,7 +62,9 @@ extern "C" {
 #include "dsError.h"
 #include "dsTypes.h"
 
-
+#define EDID_DATA_SIZE 256
+#define EDID_MAX_DATA_SIZE 512
+  
 /** @addtogroup DSHAL_HOST_API Device Settings HAL Host Public API
  *  @ingroup devicesettingshalapi
  *
@@ -188,6 +190,16 @@ dsError_t dsSetVersion(uint32_t versionNumber);
  */
 
 dsError_t dsGetSocIDFromSDK(char *socID);
+
+/**
+ * @brief This function is used to get the host EDID and length.
+ * @param[out] edid  host EDID.
+ * @param[out] length length of host EDID
+ * @return Device Settings error code
+ * @retval dsERR_NONE If sucessfully dsGetHostEDID api has been called using IARM support.
+ * @retval dsERR_GENERAL General failure.
+ */
+dsError_t dsGetHostEDID(unsigned char *edid, int *length);
 
 /**
  * @}

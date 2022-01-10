@@ -188,6 +188,41 @@ dsError_t dsGetSocIDFromSDK(char *socID)
 
 }
 
+dsError_t dsGetHostEDID( unsigned char *edid, int *length)
+{
+   errno_t rc = -1;
+   IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+   _DEBUG_ENTER();
+
+   dsDisplayGetEDIDBytesParam_t param;
+   printf("dsCLI::getHostEDID \r\n");
+
+   rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                        (char *)IARM_BUS_DSMGR_API_dsGetHostEDID,
+                                                        (void *)&param,
+                                                        sizeof(param));
+
+   if (IARM_RESULT_SUCCESS == rpcRet)
+   {
+        if (param.result == dsERR_NONE) {
+            printf("dsCLI ::getHostEDID returns %d bytes\r\n", param.length);
+                rc = memcpy_s((void *)edid,param.length, param.bytes, param.length);
+                if(rc!=EOK)
+                {
+                        ERR_CHK(rc);
+                }
+                *length = param.length;
+                return dsERR_NONE;
+        }
+        else {
+            return (dsError_t)param.result;
+        }
+    }
+    else {
+        return dsERR_GENERAL;
+    }
+}
 
 /** @} */
 /** @} */

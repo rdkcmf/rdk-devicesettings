@@ -46,6 +46,7 @@
 #include "dsHost.h"
 #include <dlfcn.h>
 
+#include "safec_lib.h"
 
 static int m_isInitialized = 0;
 static pthread_mutex_t hostLock = PTHREAD_MUTEX_INITIALIZER;
@@ -60,6 +61,8 @@ IARM_Result_t _dsGetCPUTemperature(void *arg);
 IARM_Result_t _dsGetVersion(void *arg);
 IARM_Result_t _dsSetVersion(void *arg);
 IARM_Result_t _dsGetSocIDFromSDK(void *arg);
+IARM_Result_t _dsGetHostEDID(void *arg);
+
 
 static dsSleepMode_t _SleepMode = dsHOST_SLEEP_MODE_LIGHT;
 
@@ -93,6 +96,8 @@ IARM_Result_t dsHostMgr_init()
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetVersion,_dsGetVersion);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetVersion,_dsSetVersion);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetSocIDFromSDK,_dsGetSocIDFromSDK);
+	IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetHostEDID,_dsGetHostEDID);
+
         
         uint32_t  halVersion = 0x10000;
         if (dsERR_NONE != dsGetVersion(&halVersion))
@@ -303,6 +308,65 @@ IARM_Result_t _dsGetSocIDFromSDK(void *arg)
 
     return IARM_RESULT_SUCCESS;
 }
+
+IARM_Result_t _dsGetHostEDID(void *arg)
+{
+
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    errno_t rc = -1;
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+
+    printf("dsSRV::getHostEDID \r\n");
+
+    typedef dsError_t (*dsGetHostEDID_t)(unsigned char *edid, int *length);
+    static dsGetHostEDID_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetHostEDID_t) dlsym(dllib, "dsGetHostEDID");
+            if (func) {
+                printf("dsGetHostEDID(void) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetHostEDID(void) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsDisplayGetEDIDBytesParam_t *param = (dsDisplayGetEDIDBytesParam_t *)arg;
+
+    if (func != 0) {
+        unsigned char edidBytes[EDID_MAX_DATA_SIZE] ;
+        int length = 0;
+        dsError_t ret = func(edidBytes, &length);
+        if (ret == dsERR_NONE && length <= 1024) {
+            printf("dsSRV ::getHostEDID returns %d bytes\r\n", length);
+            rc = memcpy_s(param->bytes,sizeof(param->bytes),edidBytes,length);
+            if(rc!=EOK){
+                    ERR_CHK(rc);
+            }
+            param->length = length;
+        }
+        param->result = ret;
+    }
+    else {
+        param->result = dsERR_OPERATION_NOT_SUPPORTED;
+    }
+
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+}
+
 
 /** @} */
 /** @} */

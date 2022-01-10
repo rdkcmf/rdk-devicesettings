@@ -511,11 +511,25 @@ namespace device
  */
     void Host::getHostEDID(std::vector<uint8_t> &edid) const
     {
-        if (sizeof(m_hostEDID) != 0) {
-            edid.insert(edid.begin(), &m_hostEDID[0], &m_hostEDID[sizeof(m_hostEDID)]);
-        }
-        else {
+	printf("Host::getHostEDID \r\n");
+        dsError_t ret = dsERR_NONE;
+        int length = 0;
+	unsigned char edidBytes[EDID_MAX_DATA_SIZE];
+
+    	const char* exceptionstr = "";
+
+        ret = dsGetHostEDID( edidBytes, &length);
+
+        printf("Host::getHostEDID has ret %d\r\n", ret);
+        if (ret == dsERR_NONE) {
             edid.clear();
+            edid.insert(edid.begin(), edidBytes, edidBytes + length);
+        } else {
+            exceptionstr = "getHostEDID failed";
+        }
+
+        if (ret != dsERR_NONE) {
+            throw Exception(ret, exceptionstr);
         }
     }
 

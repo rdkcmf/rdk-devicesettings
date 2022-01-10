@@ -245,6 +245,7 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsGetVersion				"dsGetVersion"
 #define IARM_BUS_DSMGR_API_dsSetVersion				"dsSetVersion"
 #define IARM_BUS_DSMGR_API_dsGetSocIDFromSDK               "dsGetSocIDFromSDK"
+#define IARM_BUS_DSMGR_API_dsGetHostEDID               "dsGetHostEDID"
 
 /*
  * Declare Reset MS12 setting  Interface  API names
