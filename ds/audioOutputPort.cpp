@@ -1197,6 +1197,203 @@ std::vector<std::string> AudioOutputPort::getMS12AudioProfileList() const
 
 
 /**
+ * @fn AudioOutputPort::setAssociatedAudioMixing(const bool mixing)
+ * @brief This API is used to enable/disable Associated Audio Mixing.
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] mixing enable/disable Associated Audio Mixing.
+ *
+ * @return None
+ */
+void AudioOutputPort::setAssociatedAudioMixing(const bool mixing)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsSetAssociatedAudioMixing(_handle, mixing)) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+
+
+/**
+ * @fn  bool AudioOutputPort::getAssociatedAudioMixing()
+ * @brief This API is used to get status of Associated Audio Mixing
+ *
+ * @return Current status of Associated Audio Mixing
+ */
+void AudioOutputPort::getAssociatedAudioMixing(bool *mixing)
+{
+        dsError_t ret = dsERR_NONE;
+        bool _mixing = false;
+
+        if(mixing == NULL) {
+            ret = dsERR_INVALID_PARAM;
+            throw Exception(ret);
+        }
+
+        if ( (ret = dsGetAssociatedAudioMixing(_handle, &_mixing)) == dsERR_NONE)
+        {
+            *mixing = _mixing;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+
+/**
+ * @fn AudioOutputPort::setFaderControl(const int mixerBalance)
+ * @brief This API is used to set the mixerbalance betweeen main and associated audio
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[in] New mixerbalance betweeen main and associated audio.
+ *
+ * @return None
+ */
+void AudioOutputPort::setFaderControl(const int mixerBalance)
+{
+        dsError_t ret = dsERR_NONE;
+                ret = dsSetFaderControl(_handle, mixerBalance);
+
+        if (ret != dsERR_NONE) {
+            throw Exception(ret);
+        }
+}
+
+
+
+/**
+ * @fn void AudioOutputPort::getFaderControl(int *mixerBalance)
+ * @brief This API is used to get the mixerbalance betweeen main and associated audio
+ *
+ * @return Current mixerbalance betweeen main and associated audio
+ */
+void AudioOutputPort::getFaderControl(int *mixerBalance)
+{
+        dsError_t ret = dsERR_NONE;
+        int _mixerBalance = 0;
+
+        if(mixerBalance == NULL) {
+            ret = dsERR_INVALID_PARAM;
+            throw Exception(ret);
+        }
+
+        if ( (ret = dsGetFaderControl(_handle, &_mixerBalance)) == dsERR_NONE)
+        {
+            *mixerBalance = _mixerBalance;
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+
+/**
+ * @fn AudioOutputPort::setPrimaryLanguage(const std::string pLang)
+ * @brief This API is used to set Primary language
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[string] Primary language to be set
+ *
+ * @return None
+ */
+void AudioOutputPort::setPrimaryLanguage(const std::string pLang)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsSetPrimaryLanguage(_handle, pLang.c_str())) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+
+/**
+ * @fn  void AudioOutputPort::getPrimaryLanguage(std::string &pLang)
+ * @brief This API is used to get the current Primary language
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @return[string] Primary language
+ */
+void AudioOutputPort::getPrimaryLanguage(std::string &pLang)
+{
+        dsError_t ret = dsERR_NONE;
+        char _pLang[MAX_LANGUAGE_LEN] = {0};
+        if ( (ret = dsGetPrimaryLanguage(_handle, _pLang)) == dsERR_NONE)
+        {
+            pLang.assign(_pLang);
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+/**
+ * @fn AudioOutputPort::setSecondaryLanguage(const std::string sLang)
+ * @brief This API is used to set Secondary language
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @param[string] Secondary language to be set
+ *
+ * @return None
+ */
+void AudioOutputPort::setSecondaryLanguage(const std::string sLang)
+{
+        dsError_t ret = dsERR_NONE;
+
+        if ( (ret = dsSetSecondaryLanguage(_handle, sLang.c_str())) == dsERR_NONE) {
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+
+/**
+ * @fn  void AudioOutputPort::getSecondaryLanguage(std::string &sLang)
+ * @brief This API is used to get the current AC4 Secondary language
+ *
+ * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+ * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+ *
+ * @return[string] AC4 Secondary language
+ */
+void AudioOutputPort::getSecondaryLanguage(std::string &sLang)
+{
+        dsError_t ret = dsERR_NONE;
+        char _sLang[MAX_LANGUAGE_LEN] = {0};
+        if ( (ret = dsGetSecondaryLanguage(_handle, _sLang)) == dsERR_NONE)
+        {
+            sLang.assign(_sLang);
+        }
+        else
+        {
+            throw Exception(ret);
+        }
+}
+
+
+/**
  * @fn AudioOutputPort::setStereoMode(const int newMode,const bool toPersist)
  * @brief This API is used to set the stereo mode to be used in a given audio port.If toPersist is true, the setting will persist after reboots.
  *

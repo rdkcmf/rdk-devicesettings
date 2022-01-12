@@ -716,6 +716,8 @@ typedef struct _dsAudioPortConfig_t {
     const dsVideoPortPortId_t *connectedVOPs;    /**< Connected video port.  */
 } dsAudioPortConfig_t;
 
+#define MAX_LANGUAGE_LEN 10
+
 /**
  * @ingroup DSHAL_VIDEOPORT_TYPES
  * @brief Structure that defines video port configuration settings.

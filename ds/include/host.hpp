@@ -90,6 +90,14 @@ public:
     std::string getSocIDFromSDK();
     void getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCapability);
     void setAudioAtmosOutputMode(bool enable);
+    void setAssociatedAudioMixing(const bool mixing);
+    void getAssociatedAudioMixing(bool *mixing);
+    void setFaderControl(const int mixerbalance);
+    void getFaderControl(int *mixerBalance);
+    void setPrimaryLanguage(const std::string pLang);
+    void getPrimaryLanguage(std::string &pLang);
+    void setSecondaryLanguage(const std::string sLang);
+    void getSecondaryLanguage(std::string &sLang);
     bool isHDMIOutPortPresent();
     std::string getDefaultVideoPortName();
     void getCurrentAudioFormat(dsAudioFormat_t &audioFormat);

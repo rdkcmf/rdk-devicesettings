@@ -62,6 +62,10 @@ typedef enum _DSMgr_EventId_t {
 	IARM_BUS_DSMGR_EVENT_AUDIO_LEVEL_CHANGED,           /*!< Audio Level Change Event*/
 	IARM_BUS_DSMGR_EVENT_AUDIO_OUT_HOTPLUG,            /*!< AUDIO OUT HPD change event */
 	IARM_BUS_DSMGR_EVENT_AUDIO_FORMAT_UPDATE,  /*!< Audio Format change event */
+        IARM_BUS_DSMGR_EVENT_AUDIO_PRIMARY_LANGUAGE_CHANGED,  /*!< Audio Primary Language change event */
+        IARM_BUS_DSMGR_EVENT_AUDIO_SECONDARY_LANGUAGE_CHANGED,  /*!< Audio Secondary Language change event */
+        IARM_BUS_DSMGR_EVENT_AUDIO_FADER_CONTROL_CHANGED,  /*!< Audio Fader Control change event */
+        IARM_BUS_DSMGR_EVENT_AUDIO_ASSOCIATED_AUDIO_MIXING_CHANGED,  /*!< Audio Associated Audio Mixing change event */
 	IARM_BUS_DSMGR_EVENT_VIDEO_FORMAT_UPDATE,  /*!< Video Format change event */
 	IARM_BUS_DSMGR_EVENT_DISPLAY_FRAMRATE_PRECHANGE,   /*!< Frame rate pre change */
 	IARM_BUS_DSMGR_EVENT_DISPLAY_FRAMRATE_POSTCHANGE,     /*!< Frame rate post change */
@@ -173,6 +177,21 @@ typedef struct _DSMgr_EventData_t {
 	{
 	    dsAudioFormat_t audioFormat;
 	}AudioFormatInfo;
+
+        struct _LANGUAGE_DATA
+        {
+            char audioLanguage[MAX_LANGUAGE_LEN];
+        }AudioLanguageInfo;
+
+        struct _FADER_CONTROL_DATA
+        {
+            int mixerbalance;
+        }FaderControlInfo;
+
+        struct _ASSOCIATED_AUDIO_MIXING_DATA
+        {
+            bool mixing;
+        }AssociatedAudioMixingInfo;
 
         struct _VIDEO_FORMAT_DATA
 	{

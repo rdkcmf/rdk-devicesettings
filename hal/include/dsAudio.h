@@ -990,6 +990,111 @@ dsError_t dsResetVolumeLeveller(int handle);
 
 dsError_t  dsSetMS12AudioProfileSetttingsOverride(int handle,const char* profileState,const char* profileName,
                                                    const char* profileSettingsName,const char* profileSettingValue);
+
+
+/**
+ * @brief Enable/Disable Associated Audio Mixing
+ *
+ * This function will Enable/Disable Associated Audio Mixing
+ *
+ * @param [in] handle      Handle for the Output Audio port (Not Used as setting is not port specific)
+ * @param [in] mixing      mixing enable/disable
+ * @return dsError_t Error code.
+ */
+dsError_t dsSetAssociatedAudioMixing(int handle, bool mixing);
+
+
+/**
+ * @brief To get the Associated Audio Mixing status - enabled/disabled
+ *
+ * This function will get the Associated Audio Mixing status
+ *
+ * @param [in] handle       Handle for the Output Audio port (Not Used as setting is not port specific)
+ * @param [out] *mixing     Associated Audio Mixing status
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetAssociatedAudioMixing(int handle, bool *mixing);
+
+
+/**
+ * @brief To set the mixerbalance betweeen main and associated audio
+ *
+ * This function will set the mixerbalance betweeen main and associated audio
+ *
+ * @param [in] handle       Handle for the Output Audio port (Not Used as setting is not port specific)
+ * @param [in] mixerbalance     int value -32(mute associated) to +32(mute main)
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsSetFaderControl(int handle, int mixerbalance);
+
+
+/**
+ * @brief To get the mixerbalance betweeen main and associated audio
+ *
+ * This function will get the mixerbalance betweeen main and associated audio
+ *
+ * @param [in] handle       Handle for the Output Audio port (Not Used as setting is not port specific)
+ * @param [out] *mixerbalance     int value -32(mute associated) to +32(mute main)
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetFaderControl(int handle, int* mixerbalance);
+
+
+
+/**
+ * @brief To set AC4 Primary language
+ *
+ * This function will set AC4 Primary language
+ *
+ * @param [in] handle       Handle for the Output Audio port (Not Used as setting is not port specific)
+ * @param [in] pLang        char* 3 letter lang code should be used as per ISO 639
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsSetPrimaryLanguage(int handle, const char* pLang);
+
+
+/**
+ * @brief To get AC4 Primary language
+ *
+ * This function will get AC4 Primary language
+ *
+ * @param [in] handle       Handle for the Output Audio port (Not Used as setting is not port specific)
+ * @param [out] *pLang      char* 3 letter lang code should be used as per ISO 639
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetPrimaryLanguage(int handle, char* pLang);
+
+
+/**
+ * @brief To set AC4 Secondary language
+ *
+ * This function will set AC4 Secondary language
+ *
+ * @param [in] handle       Handle for the Output Audio port (Not Used as setting is not port specific)
+ * @param [in] pLang        char* 3 letter lang code should be used as per ISO 639
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsSetSecondaryLanguage(int handle, const char* sLang);
+
+
+/**
+ * @brief To get AC4 Secondary language
+ *
+ * This function will get AC4 Secondary language
+ *
+ * @param [in] handle       Handle for the Output Audio port (Not Used as setting is not port specific)
+ * @param [out] *pLang      char* 3 letter lang code should be used as per ISO 639
+ * @return dsError_t Error code.
+ */
+
+dsError_t  dsGetSecondaryLanguage(int handle, char* sLang);
+
 /**
  * @}
  */

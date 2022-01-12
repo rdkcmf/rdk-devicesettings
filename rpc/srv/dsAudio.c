@@ -135,6 +135,15 @@ IARM_Result_t _dsGetMS12AudioProfileList(void *arg);
 IARM_Result_t _dsGetMS12AudioProfile(void *arg);
 IARM_Result_t _dsSetMS12AudioProfile(void *arg);
 
+IARM_Result_t _dsGetAssociatedAudioMixing(void *arg);
+IARM_Result_t _dsSetAssociatedAudioMixing(void *arg);
+IARM_Result_t _dsGetFaderControl(void *arg);
+IARM_Result_t _dsSetFaderControl(void *arg);
+IARM_Result_t _dsGetPrimaryLanguage(void *arg);
+IARM_Result_t _dsSetPrimaryLanguage(void *arg);
+IARM_Result_t _dsGetSecondaryLanguage(void *arg);
+IARM_Result_t _dsSetSecondaryLanguage(void *arg);
+
 IARM_Result_t _dsGetAudioCapabilities(void *arg);
 IARM_Result_t _dsGetMS12Capabilities(void *arg);
 IARM_Result_t _dsAudioOutIsConnected(void *arg);
@@ -519,6 +528,165 @@ void AudioConfigInit()
             }
             else {
                 printf("dsSetAudioDelayOffset_t(int, uint32_t) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+
+    typedef dsError_t (*dsSetPrimaryLanguage_t)(int handle, const char* pLang);;
+    static dsSetPrimaryLanguage_t dsSetPrimaryLanguageFunc = 0;
+    if (dsSetPrimaryLanguageFunc == 0) {
+        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            dsSetPrimaryLanguageFunc = (dsSetPrimaryLanguage_t) dlsym(dllib, "dsSetPrimaryLanguage");
+            if (dsSetPrimaryLanguageFunc) {
+                printf("dsSetPrimaryLanguage_t(int, char* ) is defined and loaded\r\n");
+                std::string _PrimaryLanguage("eng");
+                handle = 0;
+                try {
+                    _PrimaryLanguage = device::HostPersistence::getInstance().getProperty("audio.PrimaryLanguage");
+                }
+                catch(...) {
+                        try {
+                            printf("audio.PrimaryLanguage not found in persistence store. Try system default\n");
+                            _PrimaryLanguage = device::HostPersistence::getInstance().getDefaultProperty("audio.PrimaryLanguage");
+                        }
+                        catch(...) {
+                            _PrimaryLanguage = "eng";
+                        }
+                }
+                if (dsSetPrimaryLanguageFunc(handle, _PrimaryLanguage.c_str()) == dsERR_NONE) {
+                    printf("Initialized Primary Language : %s\n", _PrimaryLanguage.c_str());
+                }
+            }
+            else {
+                printf("dsSetPrimaryLanguage_t(int, char* ) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+
+    typedef dsError_t (*dsSetSecondaryLanguage_t)(int handle, const char* sLang);;
+    static dsSetSecondaryLanguage_t dsSetSecondaryLanguageFunc = 0;
+    if (dsSetSecondaryLanguageFunc == 0) {
+        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            dsSetSecondaryLanguageFunc = (dsSetSecondaryLanguage_t) dlsym(dllib, "dsSetSecondaryLanguage");
+            if (dsSetSecondaryLanguageFunc) {
+                printf("dsSetSecondaryLanguage_t(int, char* ) is defined and loaded\r\n");
+                std::string _SecondaryLanguage("eng");
+                handle = 0;
+                try {
+                    _SecondaryLanguage = device::HostPersistence::getInstance().getProperty("audio.SecondaryLanguage");
+                }
+                catch(...) {
+                        try {
+                            printf("audio.SecondaryLanguage not found in persistence store. Try system default\n");
+                            _SecondaryLanguage = device::HostPersistence::getInstance().getDefaultProperty("audio.SecondaryLanguage");
+                        }
+                        catch(...) {
+                            _SecondaryLanguage = "eng";
+                        }
+                }
+                if (dsSetSecondaryLanguageFunc(handle, _SecondaryLanguage.c_str()) == dsERR_NONE) {
+                    printf("Initialized Secondary Language : %s\n", _SecondaryLanguage.c_str());
+                }
+            }
+            else {
+                printf("dsSetSecondaryLanguage_t(int, char* ) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+
+    typedef dsError_t (*dsSetFaderControl_t)(int handle, int mixerbalance);
+    static dsSetFaderControl_t dsSetFaderControlFunc = 0;
+    if (dsSetFaderControlFunc == 0) {
+        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            dsSetFaderControlFunc = (dsSetFaderControl_t) dlsym(dllib, "dsSetFaderControl");
+            if (dsSetFaderControlFunc) {
+                printf("dsSetFaderControl_t(int, int) is defined and loaded\r\n");
+                std::string _FaderControl("0");
+                int m_faderControl = 0;
+
+                handle = 0;
+                try {
+                    _FaderControl = device::HostPersistence::getInstance().getProperty("audio.FaderControl");
+                }
+                catch(...) {
+                        try {
+                            printf("audio.FaderControl not found in persistence store. Try system default\n");
+                            _FaderControl = device::HostPersistence::getInstance().getDefaultProperty("audio.FaderControl");
+                        }
+                        catch(...) {
+                            _FaderControl = "0";
+                        }
+                }
+                m_faderControl = atoi(_FaderControl.c_str());
+                if (dsSetFaderControlFunc(handle, m_faderControl) == dsERR_NONE) {
+                    printf("Initialized Fader Control, mixing : %d\n", m_faderControl);
+                }
+
+            }
+            else {
+                printf("dsSetFaderControl_t(int, int) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+
+    typedef dsError_t (*dsSetAssociatedAudioMixing_t)(int handle, bool mixing);
+    static dsSetAssociatedAudioMixing_t dsSetAssociatedAudioMixingFunc = 0;
+    if (dsSetAssociatedAudioMixingFunc == 0) {
+        dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            dsSetAssociatedAudioMixingFunc = (dsSetAssociatedAudioMixing_t) dlsym(dllib, "dsSetAssociatedAudioMixing");
+            if (dsSetAssociatedAudioMixingFunc) {
+                printf("dsSetAssociatedAudioMixing_t (int handle, bool mixing ) is defined and loaded\r\n");
+                std::string _AssociatedAudioMixing("Disabled");
+                bool m_AssociatedAudioMixing = false;
+                try {
+                    _AssociatedAudioMixing = device::HostPersistence::getInstance().getProperty("audio.AssociatedAudioMixing");
+                }
+                catch(...) {
+                    try {
+                        printf("audio.AssociatedAudioMixing not found in persistence store. Try system default\n");
+                        _AssociatedAudioMixing = device::HostPersistence::getInstance().getDefaultProperty("audio.AssociatedAudioMixing");
+                    }
+                    catch(...) {
+                        _AssociatedAudioMixing = "Disabled";
+                    }
+                }
+                if (_AssociatedAudioMixing == "Enabled") {
+                    m_AssociatedAudioMixing = true;
+                }
+                else {
+                    m_AssociatedAudioMixing = false;
+                }
+                handle = 0;
+                if (dsSetAssociatedAudioMixingFunc(handle, m_AssociatedAudioMixing) == dsERR_NONE) {
+                    printf("Initialized AssociatedAudioMixingFunc : %d\n", m_AssociatedAudioMixing);
+                }
+            }
+            else {
+                printf("dsSetAssociatedAudioMixing_t (int handle, bool enable) is not defined\r\n");
             }
             dlclose(dllib);
         }
@@ -2153,6 +2321,15 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMS12AudioProfileList, _dsGetMS12AudioProfileList);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMS12AudioProfile, _dsGetMS12AudioProfile);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetMS12AudioProfile, _dsSetMS12AudioProfile);
+
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetAssociatedAudioMixing, _dsSetAssociatedAudioMixing);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAssociatedAudioMixing, _dsGetAssociatedAudioMixing);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetFaderControl, _dsSetFaderControl);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetFaderControl, _dsGetFaderControl);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetPrimaryLanguage, _dsSetPrimaryLanguage);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetPrimaryLanguage, _dsGetPrimaryLanguage);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetSecondaryLanguage, _dsSetSecondaryLanguage);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetSecondaryLanguage, _dsGetSecondaryLanguage);
 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetAudioCapabilities,_dsGetAudioCapabilities); 
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetMS12Capabilities,_dsGetMS12Capabilities); 
@@ -4891,6 +5068,427 @@ IARM_Result_t _dsSetMS12AudioProfile(void *arg)
     
     _dsMS12ProfileSettingOverride(param->handle);
    
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+IARM_Result_t _dsSetAssociatedAudioMixing(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetAssociatedAudioMixing_t)(int handle, bool mixing);
+    static dsSetAssociatedAudioMixing_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetAssociatedAudioMixing_t) dlsym(dllib, "dsSetAssociatedAudioMixing");
+            if (func) {
+                printf("dsSetAssociatedAudioMixing_t(int, bool) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetMS12AudioProfile_t(int, bool) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAssociatedAudioMixingParam_t *param = (dsAssociatedAudioMixingParam_t*)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->mixing) == dsERR_NONE)
+        {
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+            printf("%s: persist Associated Audio Mixing status : %s\n", __func__, param->mixing ? "Enabled":"Disabled");
+            device::HostPersistence::getInstance().persistHostProperty("audio.AssociatedAudioMixing",param->mixing ? "Enabled":"Disabled");
+#endif
+            IARM_Bus_DSMgr_EventData_t associated_audio_mixing_event_data;
+            printf("%s: Associated Audio Mixing status changed :%d \r\n", __FUNCTION__, param->mixing);
+            associated_audio_mixing_event_data.data.AssociatedAudioMixingInfo.mixing = param->mixing;
+
+            IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                                   (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_ASSOCIATED_AUDIO_MIXING_CHANGED,
+                                   (void *)&associated_audio_mixing_event_data,
+                                   sizeof(associated_audio_mixing_event_data));
+
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+IARM_Result_t _dsGetAssociatedAudioMixing(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetAssociatedAudioMixing_t)(int handle, bool *mixing);
+    static dsGetAssociatedAudioMixing_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetAssociatedAudioMixing_t) dlsym(dllib, "dsGetAssociatedAudioMixing");
+            if (func) {
+                printf("dsGetAssociatedAudioMixing_t(int, bool *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetAssociatedAudioMixing_t(int, bool *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsAssociatedAudioMixingParam_t *param = (dsAssociatedAudioMixingParam_t *)arg;
+    bool mixing = false;
+    if (func != 0 && param != NULL)
+    {
+        param->mixing = false;
+        if (func(param->handle, &mixing) == dsERR_NONE)
+        {
+            param->mixing = mixing;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+IARM_Result_t _dsSetFaderControl(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetFaderControl_t)(int handle, int mixerbalance);
+    static dsSetFaderControl_t func = 0;
+
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetFaderControl_t) dlsym(dllib, "dsSetFaderControl");
+            if (func) {
+                printf("dsSetFaderControl_t(int, int) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetFaderControl_t(int, int) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsFaderControlParam_t *param = (dsFaderControlParam_t *)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->mixerbalance) == dsERR_NONE)
+        {
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+            std::string _mixerbalance = std::to_string(param->mixerbalance);
+            printf("%s: persist fader control level: %d\n",__func__, param->mixerbalance);
+            device::HostPersistence::getInstance().persistHostProperty("audio.FaderControl",_mixerbalance);
+#endif
+            IARM_Bus_DSMgr_EventData_t fader_control_event_data;
+            printf("%s: Fader Control changed :%d \r\n", __FUNCTION__, param->mixerbalance);
+            fader_control_event_data.data.FaderControlInfo.mixerbalance = param->mixerbalance;
+
+            IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                                   (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_FADER_CONTROL_CHANGED,
+                                   (void *)&fader_control_event_data,
+                                   sizeof(fader_control_event_data));
+
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+
+
+IARM_Result_t _dsGetFaderControl(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetFaderControl_t)(int handle, int *mixerbalance);
+    static dsGetFaderControl_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetFaderControl_t) dlsym(dllib, "dsGetFaderControl");
+            if (func) {
+                printf("dsGetFaderControl_t(int, int *) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetFaderControl_t(int, int *) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsFaderControlParam_t *param = (dsFaderControlParam_t *)arg;
+    int mixerbalance = 0;
+    if (func != 0 && param != NULL)
+    {
+        param->mixerbalance = 0;
+        if (func(param->handle, &mixerbalance) == dsERR_NONE)
+        {
+            param->mixerbalance = mixerbalance;
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsSetPrimaryLanguage(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetPrimaryLanguage_t)(int handle, const char* pLang);
+    static dsSetPrimaryLanguage_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetPrimaryLanguage_t) dlsym(dllib, "dsSetPrimaryLanguage");
+            if (func) {
+                printf("dsSetPrimaryLanguage_t(int, const char*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetPrimaryLanguage_t(int, const char*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsPrimaryLanguageParam_t *param = (dsPrimaryLanguageParam_t*)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->primaryLanguage) == dsERR_NONE)
+        {
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+            printf("%s: persist Primary Language : %s\n", __func__, param->primaryLanguage);
+            device::HostPersistence::getInstance().persistHostProperty("audio.PrimaryLanguage",param->primaryLanguage);
+#endif
+            IARM_Bus_DSMgr_EventData_t primary_language_event_data;
+            printf("%s: Primary Language changed :%s \r\n", __FUNCTION__, param->primaryLanguage);
+            strncpy(primary_language_event_data.data.AudioLanguageInfo.audioLanguage, param->primaryLanguage, MAX_LANGUAGE_LEN);
+ 
+            IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                                   (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_PRIMARY_LANGUAGE_CHANGED,
+                                   (void *)&primary_language_event_data,
+                                   sizeof(primary_language_event_data));
+
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsGetPrimaryLanguage(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    errno_t rc = -1;
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetPrimaryLanguage_t)(int handle, char* pLang);
+    static dsGetPrimaryLanguage_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetPrimaryLanguage_t) dlsym(dllib, "dsGetPrimaryLanguage");
+            if (func) {
+                printf("dsGetPrimaryLanguage_t(int, char* ) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetPrimaryLanguage_t(int, char*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsPrimaryLanguageParam_t *param = (dsPrimaryLanguageParam_t *)arg;
+    char primaryLanguage[MAX_LANGUAGE_LEN] = {0};
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, primaryLanguage) == dsERR_NONE)
+        {
+            rc = strcpy_s(param->primaryLanguage,sizeof(param->primaryLanguage), primaryLanguage);
+            if(rc!=EOK)
+            {
+                    ERR_CHK(rc);
+            }
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsSetSecondaryLanguage(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsSetSecondaryLanguage_t)(int handle, const char* sLang);
+    static dsSetSecondaryLanguage_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetSecondaryLanguage_t) dlsym(dllib, "dsSetSecondaryLanguage");
+            if (func) {
+                printf("dsSetSecondaryLanguage_t(int, const char*) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetSecondaryLanguage_t(int, const char*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsSecondaryLanguageParam_t *param = (dsSecondaryLanguageParam_t*)arg;
+
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, param->secondaryLanguage) == dsERR_NONE)
+        {
+#ifdef DS_AUDIO_SETTINGS_PERSISTENCE
+            printf("%s: persist Secondary Language : %s\n", __func__, param->secondaryLanguage);
+            device::HostPersistence::getInstance().persistHostProperty("audio.SecondaryLanguage",param->secondaryLanguage);
+#endif
+            IARM_Bus_DSMgr_EventData_t secondary_language_event_data;
+            printf("%s: Secondary Language changed :%s \r\n", __FUNCTION__, param->secondaryLanguage);
+            strncpy(secondary_language_event_data.data.AudioLanguageInfo.audioLanguage, param->secondaryLanguage, MAX_LANGUAGE_LEN);
+
+            IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,
+                                   (IARM_EventId_t)IARM_BUS_DSMGR_EVENT_AUDIO_SECONDARY_LANGUAGE_CHANGED,
+                                   (void *)&secondary_language_event_data,
+                                   sizeof(secondary_language_event_data));
+
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
+    IARM_BUS_Unlock(lock);
+    return result;
+}
+
+
+IARM_Result_t _dsGetSecondaryLanguage(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    errno_t rc = -1;
+    _DEBUG_ENTER();
+    IARM_Result_t result = IARM_RESULT_INVALID_STATE;
+    IARM_BUS_Lock(lock);
+
+    typedef dsError_t (*dsGetSecondaryLanguage_t)(int handle, char* sLang);
+    static dsGetSecondaryLanguage_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetSecondaryLanguage_t) dlsym(dllib, "dsGetSecondaryLanguage");
+            if (func) {
+                printf("dsGetSecondaryLanguage_t(int, char* ) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetSecondaryLanguage_t(int, char*) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+    dsSecondaryLanguageParam_t *param = (dsSecondaryLanguageParam_t *)arg;
+    char secondaryLanguage[MAX_LANGUAGE_LEN] = {0};
+    if (func != 0 && param != NULL)
+    {
+        if (func(param->handle, secondaryLanguage) == dsERR_NONE)
+        {
+            rc = strcpy_s(param->secondaryLanguage,sizeof(param->secondaryLanguage), secondaryLanguage);
+            if(rc!=EOK)
+            {
+                    ERR_CHK(rc);
+            }
+            result = IARM_RESULT_SUCCESS;
+        }
+    }
+
     IARM_BUS_Unlock(lock);
     return result;
 }

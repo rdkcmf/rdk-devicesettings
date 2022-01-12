@@ -178,7 +178,16 @@ public:
         void setAudioDelay(const uint32_t audioDelayMs);
         void setAudioDelayOffset(const uint32_t audioDelayOffsetMs);
         void getSinkDeviceAtmosCapability(dsATMOSCapability_t & atmosCapability);
-        void setAudioAtmosOutputMode(bool enable);  
+        void setAudioAtmosOutputMode(bool enable);
+
+	void setAssociatedAudioMixing(const bool mixing);
+        void getAssociatedAudioMixing(bool *mixing);
+        void setFaderControl(const int mixerBalance);
+        void getFaderControl(int* mixerBalance);
+        void setPrimaryLanguage(const std::string pLang);
+        void getPrimaryLanguage(std::string &pLang);
+        void setSecondaryLanguage(const std::string sLang);
+        void getSecondaryLanguage(std::string &sLang);
 
 	void setDB(const float db);
         void setGain(const float newGain);

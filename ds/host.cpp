@@ -612,6 +612,199 @@ namespace device
        }
    }
 
+
+    /**
+     * @fn Host::setAssociatedAudioMixing(const bool mixing)
+     * @brief This API is used to enable/disable Associated Audio Mixing.
+     *
+     * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+     * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+     *
+     * @param[in] mixing enable/disable Associated Audio Mixing.
+     *
+     * @return None
+     */
+    void Host::setAssociatedAudioMixing(const bool mixing)
+    {
+            dsError_t ret = dsERR_NONE;
+            if ( (ret = dsSetAssociatedAudioMixing(NULL, mixing)) == dsERR_NONE) {
+            }
+            else
+            {
+                throw Exception(ret);
+            }
+    }
+
+
+    /**
+     * @fn  void Host::getAssociatedAudioMixing(bool *mixing)
+     * @brief This API is used to get status of Associated Audio Mixing
+     *
+     * @return Current status of Associated Audio Mixing
+     */
+    void Host::getAssociatedAudioMixing(bool *mixing)
+    {
+            dsError_t ret = dsERR_NONE;
+            bool _mixing = false;
+
+            if(mixing == NULL) {
+                ret = dsERR_INVALID_PARAM;
+                throw Exception(ret);
+            }
+
+            if ( (ret = dsGetAssociatedAudioMixing(NULL, &_mixing)) == dsERR_NONE)
+            {
+                *mixing = _mixing;
+            }
+            else
+            {
+                throw Exception(ret);
+            }
+    }
+
+
+    /**
+     * @fn Host::setFaderControl(const int mixerBalance)
+     * @brief This API is used to set the mixerbalance betweeen main and associated audio
+     *
+     * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+     * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+     *
+     * @param[in] New mixerbalance betweeen main and associated audio.
+     *
+     * @return None
+     */
+    void Host::setFaderControl(const int mixerBalance)
+    {
+            dsError_t ret = dsERR_NONE;
+            ret = dsSetFaderControl(NULL, mixerBalance);
+            if (ret != dsERR_NONE) {
+                throw Exception(ret);
+            }
+    }
+
+
+    /**
+     * @fn void Host::getFaderControl(int *mixerBalance)
+     * @brief This API is used to get the mixerbalance betweeen main and associated audio
+     *
+     * @return Current mixerbalance betweeen main and associated audio
+     */
+    void Host::getFaderControl(int *mixerBalance)
+    {
+            dsError_t ret = dsERR_NONE;
+            int _mixerBalance = 0;
+
+            if(mixerBalance == NULL) {
+                ret = dsERR_INVALID_PARAM;
+                throw Exception(ret);
+            }
+
+            ret = dsGetFaderControl(NULL, &_mixerBalance);
+            if (ret == dsERR_NONE)
+            {
+                *mixerBalance = _mixerBalance;
+            }
+            else
+            {
+                throw Exception(ret);
+            }
+    }
+
+
+    /**
+     * @fn Host::setPrimaryLanguage(const std::string pLang)
+     * @brief This API is used to set Primary language
+     *
+     * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+     * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+     *
+     * @param[string] Primary language to be set
+     *
+     * @return None
+     */
+    void Host::setPrimaryLanguage(const std::string pLang)
+    {
+            dsError_t ret = dsERR_NONE;
+            if ( (ret = dsSetPrimaryLanguage(NULL, pLang.c_str())) == dsERR_NONE) {
+            }
+            else
+            {
+                throw Exception(ret);
+            }
+    }
+
+
+    /**
+     * @fn  void Host::getPrimaryLanguage(std::string pLang)
+     * @brief This API is used to get the current Primary language
+     *
+     * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+     * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+     *
+     * @return[string] Primary language
+     */
+    void Host::getPrimaryLanguage(std::string &pLang)
+    {
+            dsError_t ret = dsERR_NONE;
+            char _pLang[MAX_LANGUAGE_LEN] = {0};
+            if ( (ret = dsGetPrimaryLanguage(NULL, _pLang)) == dsERR_NONE)
+            {
+                pLang.assign(_pLang);
+            }
+            else
+            {
+                throw Exception(ret);
+            }
+    }
+
+
+    /**
+     * @fn Host::setSecondaryLanguage(const std::string sLang)
+     * @brief This API is used to set Secondary language
+     *
+     * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+     * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+     *
+     * @param[string] Secondary language to be set
+     *
+     * @return None
+     */
+    void Host::setSecondaryLanguage(const std::string sLang)
+    {
+            dsError_t ret = dsERR_NONE;
+            if ( (ret = dsSetSecondaryLanguage(NULL, sLang.c_str())) == dsERR_NONE) {
+            }
+            else
+            {
+                throw Exception(ret);
+            }
+    }
+
+
+    /**
+     * @fn  void Host::getSecondaryLanguage(std::string &sLang)
+     * @brief This API is used to get the current AC4 Secondary language
+     *
+     * If return is not equal to dsERR_NONE, it will throw the ret to IllegalArgumentException Handler and
+     * it will pass the message as "No message for this exception" with the value of "dsERR_INVALID_PARAM" from dsError type.
+     *
+     * @return[string] AC4 Secondary language
+     */
+    void Host::getSecondaryLanguage(std::string &sLang)
+    {
+            dsError_t ret = dsERR_NONE;
+            char _sLang[MAX_LANGUAGE_LEN] = {0};
+            if ( (ret = dsGetSecondaryLanguage(NULL, _sLang)) == dsERR_NONE)
+            {
+                sLang.assign(_sLang);
+            }
+            else
+            {
+                throw Exception(ret);
+            }
+    }
+
    bool  Host::isHDMIOutPortPresent()
    {
        bool isHDMIOutPort = false;

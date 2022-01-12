@@ -107,6 +107,14 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsSetMS12AudioProfile  "dsSetMS12AudioProfile"
 #define  IARM_BUS_DSMGR_API_dsSetMS12SetttingsOverride  "dsSetMS12SetttingsOverride"
 
+#define  IARM_BUS_DSMGR_API_dsSetAssociatedAudioMixing  "dsSetAssociatedAudioMixing"
+#define  IARM_BUS_DSMGR_API_dsGetAssociatedAudioMixing  "dsGetAssociatedAudioMixing"
+#define  IARM_BUS_DSMGR_API_dsSetFaderControl  "dsSetFaderControl"
+#define  IARM_BUS_DSMGR_API_dsGetFaderControl  "dsGetFaderControl"
+#define  IARM_BUS_DSMGR_API_dsSetPrimaryLanguage  "dsSetPrimaryLanguage"
+#define  IARM_BUS_DSMGR_API_dsGetPrimaryLanguage  "dsGetPrimaryLanguage"
+#define  IARM_BUS_DSMGR_API_dsSetSecondaryLanguage  "dsSetSecondaryLanguage"
+#define  IARM_BUS_DSMGR_API_dsGetSecondaryLanguage  "dsGetSecondaryLanguage"
 
 #define IARM_BUS_DSMGR_API_dsAudioOutIsConnected     "dsAudioOutIsConnected"
 
@@ -415,6 +423,27 @@ typedef struct _dsGrpahicEqualizerModeParam_t {
        int handle;
        int mode;
 } dsGraphicEqualizerModeParam_t;
+
+typedef struct _dsAssociatedAudioMixingParam_t {
+       int handle;
+       bool mixing;
+} dsAssociatedAudioMixingParam_t;
+
+typedef struct _dsFaderControlParam_t {
+       int handle;
+       int mixerbalance;
+} dsFaderControlParam_t;
+
+typedef struct _dsPrimaryLanguageParam_t {
+        int handle;
+        char primaryLanguage[MAX_LANGUAGE_LEN];
+} dsPrimaryLanguageParam_t;
+
+typedef struct _dsSecondaryLanguageParam_t {
+        int handle;
+        char secondaryLanguage[MAX_LANGUAGE_LEN];
+} dsSecondaryLanguageParam_t;
+
 
 #define MAX_PROFILE_STRING_LEN 32
 typedef struct _dsMS12AudioProfileParam_t {

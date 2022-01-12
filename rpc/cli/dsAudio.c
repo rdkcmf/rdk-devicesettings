@@ -1245,6 +1245,214 @@ dsError_t  dsSetMS12AudioProfile(int handle, const char* profile)
         return dsERR_NONE;
 }
 
+dsError_t  dsSetAssociatedAudioMixing(int handle, bool mixing)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsAssociatedAudioMixingParam_t param;
+        param.handle = handle;
+        param.mixing = mixing;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                  (char *)IARM_BUS_DSMGR_API_dsSetAssociatedAudioMixing,
+                                                  (void *)&param,
+                                                  sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+
+dsError_t dsGetAssociatedAudioMixing(int handle, bool *mixing)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsAssociatedAudioMixingParam_t param;
+
+        param.handle = handle;
+        param.mixing = false;
+
+	if(mixing == NULL) {
+            printf("%s: (GET) Invalid Param error\n", __FUNCTION__);
+            return dsERR_INVALID_PARAM;
+        }
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                  (char *)IARM_BUS_DSMGR_API_dsGetAssociatedAudioMixing,
+                                                  (void *)&param,
+                                                  sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *mixing = param.mixing;
+        return dsERR_NONE;
+}
+
+dsError_t dsSetFaderControl(int handle, int mixerbalance)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsFaderControlParam_t param;
+        param.handle = handle;
+        param.mixerbalance = mixerbalance;
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                  (char *)IARM_BUS_DSMGR_API_dsSetFaderControl,
+                                                  (void *)&param,
+                                                  sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+
+dsError_t dsGetFaderControl(int handle, int *mixerbalance)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsFaderControlParam_t param;
+
+        param.handle = handle;
+        param.mixerbalance = 0;
+
+        if(mixerbalance == NULL) {
+            printf("%s: (GET) Invalid Param error\n", __FUNCTION__);
+            return dsERR_INVALID_PARAM;
+        }
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetFaderControl,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: mixerbalance (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+        *mixerbalance = param.mixerbalance;
+        return dsERR_NONE;
+}
+
+dsError_t  dsSetPrimaryLanguage(int handle, const char* pLang)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsPrimaryLanguageParam_t param;
+        param.handle = handle;
+
+        if(pLang == NULL) {
+            printf("%s: (SET) Invalid Param error\n", __FUNCTION__);
+            return dsERR_INVALID_PARAM;
+        }
+
+        memset(param.primaryLanguage, '\0', sizeof(param.primaryLanguage));
+        errno_t rc = -1;
+        rc = strcpy_s (param.primaryLanguage,sizeof(param.primaryLanguage), pLang);
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                  (char *)IARM_BUS_DSMGR_API_dsSetPrimaryLanguage,
+                                                  (void *)&param,
+                                                  sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsGetPrimaryLanguage(int handle, char *pLang)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsPrimaryLanguageParam_t param;
+
+        param.handle = handle;
+
+        if(pLang == NULL) {
+            printf("%s: (GET) Invalid Param error\n", __FUNCTION__);
+            return dsERR_INVALID_PARAM;
+        }
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetPrimaryLanguage,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+
+        strcpy_s(pLang, sizeof(param.primaryLanguage), param.primaryLanguage);
+        return dsERR_NONE;
+}
+
+dsError_t  dsSetSecondaryLanguage(int handle, const char* sLang)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsSecondaryLanguageParam_t param;
+        param.handle = handle;
+
+        if(sLang == NULL) {
+            printf("%s: (SET) Invalid Param error\n", __FUNCTION__);
+            return dsERR_INVALID_PARAM;
+        }
+
+        memset(param.secondaryLanguage, '\0', sizeof(param.secondaryLanguage));
+        errno_t rc = -1;
+        rc = strcpy_s (param.secondaryLanguage,sizeof(param.secondaryLanguage), sLang);
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                  (char *)IARM_BUS_DSMGR_API_dsSetSecondaryLanguage,
+                                                  (void *)&param,
+                                                  sizeof(param));
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                return dsERR_GENERAL;
+        }
+        return dsERR_NONE;
+}
+
+dsError_t dsGetSecondaryLanguage(int handle, char *sLang)
+{
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+        dsSecondaryLanguageParam_t param;
+
+        param.handle = handle;
+
+        if(sLang == NULL) {
+            printf("%s: (GET) Invalid Param error\n", __FUNCTION__);
+            return dsERR_INVALID_PARAM;
+        }
+
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                                                (char *)IARM_BUS_DSMGR_API_dsGetSecondaryLanguage,
+                                                (void *)&param,
+                                                sizeof(param));
+
+        if (IARM_RESULT_SUCCESS != rpcRet)
+        {
+                printf("%s: (GET) GENERAL ERROR\n", __FUNCTION__);
+                return dsERR_GENERAL;
+        }
+
+
+        strcpy_s(sLang, sizeof(param.secondaryLanguage), param.secondaryLanguage);
+        return dsERR_NONE;
+}
+
 dsError_t  dsSetMS12AudioProfileSetttingsOverride(int handle,const char* profileState,const char* profileName,
                                                    const char* profileSettingsName,const char* profileSettingValue)
 {
