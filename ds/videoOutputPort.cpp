@@ -448,6 +448,8 @@ bool VideoOutputPort::isDynamicResolutionSupported() const
  * if the specified name or ID of the resolution is not recognized.
  *
  * @param[in] resolutionName Name of the Resoultion
+ * @param[in] persist Flag to inform whether or not to persist the resolution
+ * @param[in] isIgnoreEdid Flag to inform whether to ignore the EDID data or not
  *
  * @return None
  */
