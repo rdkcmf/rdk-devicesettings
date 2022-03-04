@@ -674,7 +674,7 @@ void _dsHdmiInVideoModeUpdateCB(dsHdmiInPort_t port, dsVideoPortResolution_t vid
 {
     IARM_Bus_DSMgr_EventData_t hdmi_in_videoMode_eventData;
     __TIMESTAMP();
-    printf("%s:%d - HDMI In video mode info  update!!!!!! Port: %d, Pixel Resolution : %d, Interlaced : %d, Frame Rate: %d \r\n", __PRETTY_FUNCTION__,__LINE__,port, videoResolution.pixelResolution, videoResolution.frameRate, videoResolution.interlaced);
+    printf("%s:%d - HDMI In video mode info  update, Port: %d, Pixel Resolution: %d, Interlaced: %d, Frame Rate: %d \n", __PRETTY_FUNCTION__,__LINE__,port, videoResolution.pixelResolution, videoResolution.interlaced, videoResolution.frameRate);
     hdmi_in_videoMode_eventData.data.hdmi_in_video_mode.port = port;
     hdmi_in_videoMode_eventData.data.hdmi_in_video_mode.resolution.pixelResolution = videoResolution.pixelResolution;
     hdmi_in_videoMode_eventData.data.hdmi_in_video_mode.resolution.interlaced = videoResolution.interlaced;
