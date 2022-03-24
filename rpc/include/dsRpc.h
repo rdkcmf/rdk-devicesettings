@@ -160,6 +160,9 @@ extern "C" {
 #define IARM_BUS_DSMGR_API_dsEnableVideoPort		 "dsEnableVideoPort"
 #define IARM_BUS_DSMGR_API_dsSetResolution			"dsSetResolution"
 #define IARM_BUS_DSMGR_API_dsGetResolution			"dsGetResolution"
+#define IARM_BUS_DSMGR_API_dsColorDepthCapabilities			"dsColorDepthCapabilities"
+#define IARM_BUS_DSMGR_API_dsGetPreferredColorDepth			"dsGetPreferredColorDepth"
+#define IARM_BUS_DSMGR_API_dsSetPreferredColorDepth			"dsSetPreferredColorDepth"
 #define IARM_BUS_DSMGR_API_dsVideoPortTerm			"dsVideoPortTerm"
 #define IARM_BUS_DSMGR_API_dsEnableHDCP    		"dsEnableHDCP"
 #define IARM_BUS_DSMGR_API_dsIsHDCPEnabled    		"dsIsHDCPEnabled"
@@ -528,6 +531,19 @@ typedef struct _dsVideoPortSetResolutionParam_t {
     bool forceCompatible;
 	dsVideoPortResolution_t resolution;
 } dsVideoPortSetResolutionParam_t;
+
+typedef struct {
+	dsError_t result;
+	int handle;
+	unsigned int colorDepthCapability;
+} dsColorDepthCapabilitiesParam_t;
+
+typedef struct {
+	dsError_t result;
+	int handle;
+	dsDisplayColorDepth_t colorDepth;
+	bool toPersist;
+} dsPreferredColorDepthParam_t;
 
 typedef struct _dsVideoDeviceGetHandleParam_t {
 	int index;

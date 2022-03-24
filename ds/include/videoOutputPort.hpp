@@ -277,6 +277,9 @@ public:
 	int getColorDepth() const;
         int getQuantizationRange() const;
         void getCurrentOutputSettings(int &videoEOTF, int &matrixCoefficients, int &colorSpace, int &colorDepth, int &quantizationRange) const;
+	const unsigned int getPreferredColorDepth(bool persist = true) ;
+	void setPreferredColorDepth(const unsigned int colordepth, bool persist = true);
+	void getColorDepthCapabilities (unsigned int *capabilities) const;
 
 private:
 	Display _display;

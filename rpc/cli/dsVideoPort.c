@@ -433,6 +433,81 @@ dsError_t  dsSetResolution(int handle, dsVideoPortResolution_t *resolution, bool
 	return dsERR_GENERAL ;
 }
 
+dsError_t  dsGetPreferredColorDepth (int handle, dsDisplayColorDepth_t *colorDepth, bool persist)
+{
+    _DEBUG_ENTER();
+    _RETURN_IF_ERROR(colorDepth != NULL, dsERR_INVALID_PARAM);
+
+    dsPreferredColorDepthParam_t param;
+
+    param.handle = handle;
+    param.toPersist = persist;
+    param.colorDepth = *colorDepth;
+
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+							(char *)IARM_BUS_DSMGR_API_dsGetPreferredColorDepth,
+							(void *)&param,
+							sizeof(param));
+
+    *colorDepth = param.colorDepth;
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+        return dsERR_NONE;
+    }
+    return dsERR_GENERAL ;
+}
+
+dsError_t  dsSetPreferredColorDepth (int handle, dsDisplayColorDepth_t colorDepth, bool persist)
+{
+    _DEBUG_ENTER();
+
+    dsPreferredColorDepthParam_t param;
+
+    param.handle = handle;
+    param.toPersist = persist;
+    param.colorDepth = colorDepth;
+
+    IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+    rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+							(char *)IARM_BUS_DSMGR_API_dsSetPreferredColorDepth,
+							(void *)&param,
+							sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet && (dsERR_NONE == param.result))
+    {
+        return dsERR_NONE;
+    }
+
+    return dsERR_GENERAL ;
+}
+
+dsError_t dsColorDepthCapabilities(int handle, unsigned int *capabilities)
+{
+    _DEBUG_ENTER();
+
+    dsColorDepthCapabilitiesParam_t param;
+    memset(&param, 0, sizeof(param));
+    param.handle = handle;
+
+    IARM_Result_t rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+			(char *) IARM_BUS_DSMGR_API_dsColorDepthCapabilities,
+			(void *) &param,
+			sizeof(param));
+
+    if (IARM_RESULT_SUCCESS == rpcRet)
+    {
+        *capabilities = param.colorDepthCapability;
+        return param.result;
+    }
+
+    return dsERR_GENERAL ;
+}
+
+
 dsError_t dsVideoPortTerm(void)
 {
     _DEBUG_ENTER();

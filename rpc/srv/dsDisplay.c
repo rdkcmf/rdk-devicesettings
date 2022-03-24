@@ -68,6 +68,8 @@ IARM_Result_t _dsDisplayTerm(void *arg);
 void _dsDisplayEventCallback(int handle, dsDisplayEvent_t event, void *eventData);
 static void  filterEDIDResolution(int handle, dsDisplayEDID_t *edid);
 static dsVideoPortType_t _GetDisplayPortType(int handle);
+extern void resetColorDepthOnHdmiReset(int handle);
+static int _hdmiVideoPortHandle = 0;
 
 IARM_Result_t dsDisplayMgr_init()
 {
@@ -290,6 +292,20 @@ void _dsDisplayEventCallback(int handle, dsDisplayEvent_t event, void *eventData
 			
 	}
     IARM_Bus_BroadcastEvent(IARM_BUS_DSMGR_NAME,(IARM_EventId_t)_eventId,(void *)&_eventData, sizeof(_eventData));
+    if (dsDISPLAY_EVENT_CONNECTED == event) {
+        dsError_t eRet = dsERR_NONE;
+        if (!_hdmiVideoPortHandle){
+            eRet = dsGetVideoPort(dsVIDEOPORT_TYPE_HDMI,0,&_hdmiVideoPortHandle);
+            if (dsERR_NONE != eRet) {
+                _hdmiVideoPortHandle = 0;
+            }
+        }
+        if (_hdmiVideoPortHandle){
+            resetColorDepthOnHdmiReset(_hdmiVideoPortHandle);
+        } else {
+            __TIMESTAMP();printf("HDMI get port handle failed %d \r\n", eRet);
+	}
+    }
 }
 
 static void filterEDIDResolution(int handle, dsDisplayEDID_t *edid)

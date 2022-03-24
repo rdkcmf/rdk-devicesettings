@@ -72,6 +72,8 @@ static std::string _dsRFResolution(DEFAULT_SD_RESOLUTION);
 static dsHdcpStatus_t _hdcpStatus = dsHDCP_STATUS_UNAUTHENTICATED;
 static bool force_disable_4K = false;
 extern bool enableHDRDVStatus;
+static const dsDisplayColorDepth_t DEFAULT_COLOR_DEPTH = dsDISPLAY_COLORDEPTH_AUTO;
+static dsDisplayColorDepth_t hdmiColorDept = DEFAULT_COLOR_DEPTH;
 #define NULL_HANDLE 0
 #define IARM_BUS_Lock(lock) pthread_mutex_lock(&dsLock)
 #define IARM_BUS_Unlock(lock) pthread_mutex_unlock(&dsLock)
@@ -85,6 +87,9 @@ IARM_Result_t _dsGetSurroundMode(void *arg);
 IARM_Result_t _dsEnableVideoPort(void *arg);
 IARM_Result_t _dsSetResolution(void *arg);
 IARM_Result_t _dsGetResolution(void *arg);
+IARM_Result_t _dsColorDepthCapabilities(void *arg);
+IARM_Result_t _dsGetPreferredColorDepth(void *arg);
+IARM_Result_t _dsSetPreferredColorDepth(void *arg);
 IARM_Result_t _dsVideoPortTerm(void *arg);
 IARM_Result_t _dsEnableHDCP(void *arg);
 IARM_Result_t _dsIsHDCPEnabled(void *arg);
@@ -120,12 +125,31 @@ static int  _dsSendVideoPortPostResolutionCall(dsVideoPortResolution_t *resoluti
 static dsError_t _dsVideoFormatUpdateRegisterCB (dsVideoFormatUpdateCB_t cbFun);
 void _dsHdcpCallback(int handle, dsHdcpStatus_t event);
 static void persistResolution(dsVideoPortSetResolutionParam_t *param);
+void resetColorDepthOnHdmiReset(int handle);
+static dsDisplayColorDepth_t getPersistentColorDepth ();
+static dsDisplayColorDepth_t getBestSupportedColorDepth (int handle, dsDisplayColorDepth_t inColorDepth);
 
+//Call this functions from locked function calls in srv
+static IARM_Result_t setPreferredColorDepth(void *arg);
+static dsError_t handleDsColorDepthCapabilities(int handle, unsigned int *colorDepthCapability );
+static dsError_t handleDsGetPreferredColorDepth(int handle, dsDisplayColorDepth_t *colorDepth, bool persist);
+static dsError_t handleDsSetPreferredColorDepth(int handle,dsDisplayColorDepth_t colorDepth, bool persist);
 
 #define IsHDCompatible(p)  (((p) >= dsVIDEO_PIXELRES_1280x720 ) && ((p) < dsVIDEO_PIXELRES_MAX))
 static  std::string getCompatibleResolution(dsVideoPortResolution_t *SrcResn);
 static bool    IsCompatibleResolution(dsVideoResolution_t pixelResolution1,dsVideoResolution_t pixelResolution2);
 static dsVideoResolution_t getPixelResolution(std::string &resolution);
+
+void VideoConfigInit()
+{
+	int handle = 0;
+	dsError_t eRet = dsGetVideoPort(dsVIDEOPORT_TYPE_HDMI,0,&handle);
+	if (dsERR_NONE == eRet) {
+		resetColorDepthOnHdmiReset(handle);
+	}else {
+		__TIMESTAMP();printf("HDMI get port handle failed %d \r\n", eRet);
+	}
+}
 
 IARM_Result_t dsVideoPortMgr_init()
 {
@@ -159,6 +183,7 @@ IARM_Result_t dsVideoPortMgr_init()
 		{
 			/*Initialize the Video Ports */
 			dsVideoPortInit();
+			VideoConfigInit();
 		}
 		/*coverity[missing_lock]  CID-18497 using Coverity Annotation to ignore error*/
 		m_isPlatInitialized ++;
@@ -239,6 +264,9 @@ IARM_Result_t _dsVideoPortInit(void *arg)
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetCurrentOutputSettings,_dsGetCurrentOutputSettings);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetBackgroundColor,_dsSetBackgroundColor);
                 IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetForceHDRMode,_dsSetForceHDRMode);
+		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsColorDepthCapabilities,_dsColorDepthCapabilities);
+		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetPreferredColorDepth,_dsGetPreferredColorDepth);
+		IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsSetPreferredColorDepth,_dsSetPreferredColorDepth);
 	
         dsError_t eRet = _dsVideoFormatUpdateRegisterCB (_dsVideoFormatUpdateCB) ;
         if (dsERR_NONE != eRet) {
@@ -249,7 +277,8 @@ IARM_Result_t _dsVideoPortInit(void *arg)
 
     if (!m_isPlatInitialized) {
     	/* Nexus init, if any here */
-    	dsVideoPortInit();
+        dsVideoPortInit();
+        VideoConfigInit();
     }
     m_isPlatInitialized++;
 
@@ -880,6 +909,313 @@ IARM_Result_t _dsSetResolution(void *arg)
     IARM_BUS_Unlock(lock);
 	
 	return IARM_RESULT_SUCCESS;
+}
+
+dsDisplayColorDepth_t getPersistentColorDepth ()
+{
+    dsDisplayColorDepth_t _colorDepth = DEFAULT_COLOR_DEPTH;
+    std::string strColorDept = std::to_string (_colorDepth);
+    strColorDept = device::HostPersistence::getInstance().getProperty("HDMI0.colorDepth", strColorDept);
+    try {
+       _colorDepth = (dsDisplayColorDepth_t)stoi (strColorDept);
+    }
+    catch (...) {
+        __TIMESTAMP();printf("Reading HDMI  persistent color dept %s conversion failed\r\n", strColorDept.c_str());
+    }
+    __TIMESTAMP();printf("Reading HDMI  persistent color dept %d\r\n", _colorDepth);
+    return _colorDepth;
+}
+
+dsError_t handleDsGetPreferredColorDepth(int handle, dsDisplayColorDepth_t *colorDepth, bool persist)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+
+    dsError_t ret = dsERR_GENERAL;
+    typedef dsError_t (*dsGetPreferredColorDepth_t)(int handle, dsDisplayColorDepth_t *colorDepth, bool persist);
+    static dsGetPreferredColorDepth_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsGetPreferredColorDepth_t) dlsym(dllib, "dsGetPreferredColorDepth");
+            if (func) {
+                printf("dsGetPreferredColorDepth(int handle, dsDisplayColorDepth_t *colorDepth, bool persist ) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsGetPreferredColorDepth(int handle, dsDisplayColorDepth_t *colorDepth, bool persist ) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+
+    if (func != 0) {
+        ret = func(handle, colorDepth, persist);
+    }
+    else {
+        printf("%s:%d not able to load funtion func:%p\r\n", func);
+        ret = dsERR_GENERAL;
+    }
+    return ret;
+}
+
+IARM_Result_t _dsGetPreferredColorDepth(void *arg)
+{
+    errno_t rc = -1;
+    _DEBUG_ENTER();
+    IARM_BUS_Lock(lock);
+
+    dsDisplayColorDepth_t _colorDepth = DEFAULT_COLOR_DEPTH;
+    dsPreferredColorDepthParam_t *param = (dsPreferredColorDepthParam_t *)arg;
+    dsDisplayColorDepth_t *pcolorDepth = &param->colorDepth;
+
+    dsVideoPortType_t _VPortType = _GetVideoPortType(param->handle);
+
+    if (_VPortType == dsVIDEOPORT_TYPE_HDMI)
+    {
+        if(param->toPersist)
+        {
+            _colorDepth = getPersistentColorDepth ();
+        }
+        else{
+            //Get actual color depth here.
+            dsError_t error = handleDsGetPreferredColorDepth (param->handle, &_colorDepth, false);
+            if(error == dsERR_NONE) {
+                __TIMESTAMP();printf("ColorDepthOverride platform reported color dept is: 0x%x. Cached color dept is: 0x%x\r\n", _colorDepth, hdmiColorDept);
+            }
+            else {
+                _colorDepth = hdmiColorDept;
+            }
+        }
+    }
+    else {
+        __TIMESTAMP();printf("%s:%d not supported for video port: %d\r\n",__FUNCTION__, __LINE__, _VPortType);
+    }
+    *pcolorDepth =  _colorDepth;
+    printf("%s _VPortType:%d  color dept::0x%x \n",__FUNCTION__,_VPortType, *pcolorDepth);
+    param->result = dsERR_NONE;
+    IARM_BUS_Unlock(lock);
+
+    return IARM_RESULT_SUCCESS;
+
+}
+
+dsDisplayColorDepth_t getBestSupportedColorDepth (int handle, dsDisplayColorDepth_t inColorDepth)
+{
+    unsigned int colorDepthCapability = 0;
+    //Get sink color depth capabilities.
+    int ret = handleDsColorDepthCapabilities (handle,&(colorDepthCapability));
+    __TIMESTAMP();printf("dsColorDepthCapabilities returned: %d  colorDepthCapability: 0x%x\r\n",
+		    ret, colorDepthCapability);
+
+    if ((colorDepthCapability & inColorDepth) &&
+          (inColorDepth!=dsDISPLAY_COLORDEPTH_AUTO)) {
+        return inColorDepth;
+    } else {
+        //This condition happens if inColorDepth not supported by edid
+	//Or it is in auto mode.
+        __TIMESTAMP();printf("getBestSupportedColorDepth inColorDepth:0x%x not supported by edid searching in auto mode.\r\n", inColorDepth);
+        if ((colorDepthCapability & dsDISPLAY_COLORDEPTH_12BIT)){
+             return dsDISPLAY_COLORDEPTH_12BIT;
+        } else if ((colorDepthCapability & dsDISPLAY_COLORDEPTH_10BIT)){
+            return dsDISPLAY_COLORDEPTH_10BIT;
+        }else if ((colorDepthCapability & dsDISPLAY_COLORDEPTH_8BIT)) {
+            return dsDISPLAY_COLORDEPTH_8BIT;
+        } else {
+            //Not expecting here.
+        }
+	//if none of the edid supported color mode supports RDK defined vaules return
+	//widely accepted default value.
+        return dsDISPLAY_COLORDEPTH_8BIT;
+    }
+}
+
+dsError_t handleDsSetPreferredColorDepth(int handle,dsDisplayColorDepth_t colorDepth, bool persist)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+
+    dsError_t ret = dsERR_GENERAL;
+    typedef dsError_t (*dsSetPreferredColorDepth_t)(int handle,dsDisplayColorDepth_t colorDepth, bool persist);
+    static dsSetPreferredColorDepth_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsSetPreferredColorDepth_t) dlsym(dllib, "dsSetPreferredColorDepth");
+            if (func) {
+                printf("dsSetPreferredColorDepth(int handle,dsDisplayColorDepth_t colorDepth, bool persist) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsSetPreferredColorDepth(int handle,dsDisplayColorDepth_t colorDepth, bool persist) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+
+    if (func != 0) {
+        ret = func(handle, colorDepth, persist);
+    }
+    else {
+        printf("%s:%d not able to load funtion func:%p\r\n", func);
+        ret = dsERR_GENERAL;
+    }
+    return ret;
+}
+
+IARM_Result_t setPreferredColorDepth(void *arg)
+{
+    _DEBUG_ENTER();
+    dsError_t ret = dsERR_NONE;
+
+
+    dsPreferredColorDepthParam_t *param = (dsPreferredColorDepthParam_t *)arg;
+    if (param != NULL)
+    {
+        dsVideoPortType_t _VPortType = _GetVideoPortType(param->handle);
+        bool isConnected = 0;
+        dsIsDisplayConnected(param->handle,&isConnected);
+        if(!isConnected)
+        {
+            printf("Port _VPortType:%d  not connected..Ignoring Set color dept Request------\r\n",_VPortType);
+            ret = dsERR_OPERATION_NOT_SUPPORTED;
+            param->result = ret;
+            return IARM_RESULT_SUCCESS;
+        }
+
+        dsDisplayColorDepth_t colorDepth = param->colorDepth;
+
+	dsDisplayColorDepth_t platColorDept;
+
+	//Get actual color depth
+        handleDsGetPreferredColorDepth (param->handle,&platColorDept, false);
+        __TIMESTAMP();printf("Color dept Requested ..0x%x Platform color dept - 0x%x\r\n",colorDepth,platColorDept);
+        if (colorDepth == platColorDept)
+        {
+            printf("Same color dept ..Ignoring color dept Request------\r\n");
+            hdmiColorDept = platColorDept;
+            /*!< Persist Resolution Settings */
+            if(param->toPersist){
+                std::string strColorDept = std::to_string (param->colorDepth);
+                device::HostPersistence::getInstance().persistHostProperty("HDMI0.colorDepth", strColorDept);
+            }
+            param->result = ret;
+            return IARM_RESULT_SUCCESS;
+        }
+
+        //Getting the best supported color depth based on i/p color depth and edid support.
+	dsDisplayColorDepth_t colorDepthToSet = getBestSupportedColorDepth (param->handle, param->colorDepth);
+
+        /*!< Set Platform color depth  */
+        ret = handleDsSetPreferredColorDepth (param->handle, colorDepthToSet, param->toPersist);
+        if (ret == dsERR_NONE)
+        {
+            /*!< Persist Resolution Settings */
+            hdmiColorDept = param->colorDepth;
+            if(param->toPersist){
+                //Persist the user selected colordepth
+                std::string strColorDept = std::to_string (param->colorDepth);
+                device::HostPersistence::getInstance().persistHostProperty("HDMI0.colorDepth", strColorDept);
+            }
+	}
+        param->result = ret;
+    }
+    return IARM_RESULT_SUCCESS;
+
+}
+
+IARM_Result_t _dsSetPreferredColorDepth(void *arg)
+{
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+    IARM_Result_t ret = setPreferredColorDepth (arg);
+    IARM_BUS_Unlock(lock);
+    return ret;
+
+}
+
+dsError_t handleDsColorDepthCapabilities(int handle, unsigned int *colorDepthCapability )
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+
+    dsError_t ret = dsERR_GENERAL;
+    typedef dsError_t (*dsColorDepthCapabilities_t)(int handle, unsigned int *colorDepthCapability);
+    static dsColorDepthCapabilities_t func = 0;
+    if (func == 0) {
+        void *dllib = dlopen(RDK_DSHAL_NAME, RTLD_LAZY);
+        if (dllib) {
+            func = (dsColorDepthCapabilities_t) dlsym(dllib, "dsColorDepthCapabilities");
+            if (func) {
+                printf("dsColorDepthCapabilities(int handle, unsigned int *colorDepthCapability ) is defined and loaded\r\n");
+            }
+            else {
+                printf("dsColorDepthCapabilities(int handle, unsigned int *colorDepthCapability ) is not defined\r\n");
+            }
+            dlclose(dllib);
+        }
+        else {
+            printf("Opening RDK_DSHAL_NAME [%s] failed\r\n", RDK_DSHAL_NAME);
+        }
+    }
+
+
+    if (func != 0) {
+        ret = func(handle, colorDepthCapability);
+    }
+    else {
+        printf("%s:%d not able to load funtion func:%p\r\n", func);
+        ret = dsERR_GENERAL;
+    }
+    return ret;
+}
+
+IARM_Result_t _dsColorDepthCapabilities(void *arg)
+{
+    _DEBUG_ENTER();
+    dsError_t ret = dsERR_NONE;
+    IARM_BUS_Lock(lock);
+    dsColorDepthCapabilitiesParam_t *param = (dsColorDepthCapabilitiesParam_t *)arg;
+    ret = handleDsColorDepthCapabilities (param->handle,&(param->colorDepthCapability));
+    __TIMESTAMP();printf("dsColorDepthCapabilities returned:%d  colorDepthCapability: 0x%x\r\n",
+		    ret, param->colorDepthCapability);
+    //Add auto by default
+    param->colorDepthCapability = (param->colorDepthCapability|dsDISPLAY_COLORDEPTH_AUTO);
+
+    param->result = ret;
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
+//Call this function on hotplug scenario in dsmgr
+//and resume from standby
+void resetColorDepthOnHdmiReset(int handle)
+{
+    //get color from persist location. then set the value
+    dsDisplayColorDepth_t colorDepth = getPersistentColorDepth ();
+    __TIMESTAMP();printf("resetColorDepthOnHdmiReset: resetting colordepth:0x%x \r\n", colorDepth);
+
+    dsPreferredColorDepthParam_t colorDepthParam;
+    colorDepthParam.handle = handle;
+    colorDepthParam.colorDepth = colorDepth;
+    //this is just a reset no need to persist
+    colorDepthParam.toPersist = false;
+
+    //call this function outside the lock
+    IARM_Result_t ret = setPreferredColorDepth ((void*)(&colorDepthParam));
 }
 
 IARM_Result_t _dsVideoPortTerm(void *arg)

@@ -483,6 +483,30 @@ void VideoOutputPort::setResolution(const std::string &resolutionName, bool pers
 	_resolution = newResolution.getName();
 }
 
+void VideoOutputPort::setPreferredColorDepth(const unsigned int colordepth, bool persist/* = true*/)
+{
+    dsError_t ret = dsSetPreferredColorDepth (_handle, (dsDisplayColorDepth_t)colordepth, persist);
+
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+}
+
+const unsigned int VideoOutputPort::getPreferredColorDepth(bool persist/* = true*/)
+{
+    dsDisplayColorDepth_t colordepth = dsDISPLAY_COLORDEPTH_AUTO;
+    dsError_t ret = dsGetPreferredColorDepth (_handle,&colordepth, persist);
+    if (ret != dsERR_NONE) {
+        throw Exception(ret);
+    }
+
+    return (unsigned int)colordepth;
+}
+
+void VideoOutputPort::getColorDepthCapabilities (unsigned int *capabilities) const
+{
+    dsColorDepthCapabilities (_handle, capabilities);
+}
 
 /**
  * @fn VideoOutputPort::setDisplayConnected(const bool connected)

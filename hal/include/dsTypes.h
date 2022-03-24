@@ -947,6 +947,15 @@ typedef enum _dsDisplayQuantizationRange_t
     dsDISPLAY_QUANTIZATIONRANGE_FULL = 2
 } dsDisplayQuantizationRange_t;
 
+typedef enum _dsDisplayColorDepth_t
+{
+    dsDISPLAY_COLORDEPTH_UNKNOWN = 0x0,     /* Unknown color depth */
+    dsDISPLAY_COLORDEPTH_8BIT = 0x01,       /* 8 bit color depth */
+    dsDISPLAY_COLORDEPTH_10BIT = 0x02,      /* 10 bit color depth */
+    dsDISPLAY_COLORDEPTH_12BIT = 0x04,      /* 12 bit color depth */
+    dsDISPLAY_COLORDEPTH_AUTO = 0x08        /* Automatic color depth */
+} dsDisplayColorDepth_t;
+
 /**
  * Sleep mode validation check.
  */

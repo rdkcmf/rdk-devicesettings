@@ -584,6 +584,40 @@ dsError_t dsSetBackgroundColor(int handle, dsVideoBackgroundColor_t color);
 dsError_t dsSetForceHDRMode(int handle, dsHDRStandard_t mode);
 
 /**
+ * @brief To find the color depth capabilities.
+ *
+ * This function is used to get the supported color depth capabilities.
+ *
+ * @param [in] handle   Handle for the video port.
+ * @param [out] *capabilities OR-ed value of supported color depth  standards.
+ * @return dsError_t Error code.
+ */
+dsError_t dsColorDepthCapabilities(int handle, unsigned int *colorDepthCapability );
+
+/**
+ * @brief To get the preffered color depth mode.
+ *
+ * This function is used to get the preffered color depth mode.
+ *
+ * @param [in] handle   Handle for the video port.
+ * @param [out] colorDepth color depth value.
+ * @return dsError_t Error code.
+ */
+dsError_t dsGetPreferredColorDepth(int handle, dsDisplayColorDepth_t *colorDepth, bool persist );
+
+/**
+ * @brief To set the preffered color depth mode.
+ *
+ * This function is used to set the preffered color depth mode.
+ *
+ * @param [in] handle   Handle for the video port.
+ * @param [in] colorDepth color depth value.
+ * @param [in] persist  to persist value
+ * @return dsError_t Error code.
+ */
+dsError_t dsSetPreferredColorDepth(int handle,dsDisplayColorDepth_t colorDepth, bool persist );
+
+/**
  * @}
  */
 
