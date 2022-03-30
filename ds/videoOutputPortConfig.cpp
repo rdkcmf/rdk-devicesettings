@@ -45,18 +45,27 @@
 
 #include <iostream>
 #include <string.h>
-
 using namespace std;
 
 namespace device {
 
-
+static VideoResolution* defaultVideoResolution;
 VideoOutputPortConfig::VideoOutputPortConfig() {
 	// TODO Auto-generated constructor stub
+	defaultVideoResolution = new   VideoResolution(
+				0, /* id */
+				std::string("720p"),
+				dsVIDEO_PIXELRES_1280x720,
+				dsVIDEO_ASPECT_RATIO_16x9,
+				dsVIDEO_SSMODE_2D,
+				dsVIDEO_FRAMERATE_59dot94,
+				_PROGRESSIVE);
+
 }
 
 VideoOutputPortConfig::~VideoOutputPortConfig() {
 	// TODO Auto-generated destructor stub
+	delete defaultVideoResolution;
 }
 
 VideoOutputPortConfig & VideoOutputPortConfig::getInstance() {
@@ -81,7 +90,14 @@ const StereoScopicMode &VideoOutputPortConfig::getSSMode(int id) const
 
 const VideoResolution &VideoOutputPortConfig::getVideoResolution (int id) const
 {
-	return _supportedResolutions.at(id);
+	if (id < _supportedResolutions.size()){
+		return _supportedResolutions.at(id);
+	}
+	else {
+		cout<<"returns default resolution 720p"<<endl;
+		//If id not found return the 720p default resolution.
+		return  *defaultVideoResolution;
+	}
 }
 
 const FrameRate &VideoOutputPortConfig::getFrameRate(int id) const
@@ -136,12 +152,12 @@ List<VideoOutputPortType>  VideoOutputPortConfig::getSupportedTypes()
 List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgnoreEdid)
 {
 	List<VideoResolution> supportedResolutions;
+	std::vector<VideoResolution> tmpsupportedResolutions;
 	int isDynamicList = 0;
 	dsError_t dsError = dsERR_NONE;
 	int _handle = 0;  //CID:98922 - Uninit
 	bool force_disable_4K = true;
 	
-	_supportedResolutions.clear(); /*Clear the Vector */
 	printf ("\nResOverride VideoOutputPortConfig::getSupportedResolutions isIgnoreEdid:%d\n", isIgnoreEdid);
 	if (!isIgnoreEdid) {
 	    try {
@@ -169,7 +185,7 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgn
 				dsVideoPortResolution_t *resolution = &edid.suppResolutionList[i];
 				isDynamicList = 1;
 
-				_supportedResolutions.push_back(
+				tmpsupportedResolutions.push_back(
 							VideoResolution(
 							i, /* id */
 							std::string(resolution->name),
@@ -178,7 +194,7 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgn
 							resolution->stereoScopicMode,
 							resolution->frameRate,
 							resolution->interlaced));
-			}	
+			}
 		}
 	    }catch (...)
 		{
@@ -193,7 +209,7 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgn
 		for (size_t i = 0; i < numResolutions; i++) 
 		{
 			dsVideoPortResolution_t *resolution = &kResolutions[i];
-			_supportedResolutions.push_back(
+			tmpsupportedResolutions.push_back(
 					VideoResolution(
 					i, /* id */
 					std::string(resolution->name),
@@ -212,7 +228,7 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgn
 	    {
 		cout<<"Failed to get status of forceDisable4K!"<<endl;
 	    }
-	    for (std::vector<VideoResolution>::iterator it = _supportedResolutions.begin(); it != _supportedResolutions.end(); it++) {
+	    for (std::vector<VideoResolution>::iterator it = tmpsupportedResolutions.begin(); it != tmpsupportedResolutions.end(); it++) {
 		if (it->isEnabled()) {
 			if((true == force_disable_4K) && (((it->getName() == "2160p60") || (it->getName() == "2160p30"))))
 			{
@@ -222,9 +238,14 @@ List<VideoResolution>  VideoOutputPortConfig::getSupportedResolutions(bool isIgn
 		}
 	    }
 	} else {
-	    for (std::vector<VideoResolution>::iterator it = _supportedResolutions.begin(); it != _supportedResolutions.end(); it++) {
+	    for (std::vector<VideoResolution>::iterator it = tmpsupportedResolutions.begin(); it != tmpsupportedResolutions.end(); it++) {
 		    supportedResolutions.push_back(*it);
 	    }
+	}
+	cout<<"_supportedResolutions cache updated"<<endl;
+	_supportedResolutions.clear ();
+	for (VideoResolution resolution : tmpsupportedResolutions){
+		_supportedResolutions.push_back(resolution);
 	}
 	return supportedResolutions;
 }
