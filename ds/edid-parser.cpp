@@ -295,7 +295,7 @@ static void parse_ext_video(const unsigned char* bytes, edid_res_t* edid_res, co
 }
 
 static void parse_colorimetry_block(unsigned char* bytes, edid_data_t* data_ptr) {
-    data_ptr->colorimetry_info = ((uint32_t)bytes[2] << 8) | ((uint32_t)bytes[3]);
+    data_ptr->colorimetry_info = ((uint32_t)bytes[2]) | ((uint32_t)bytes[3] << 8);
     INT_DEBUG("colorimetry info:0x%x\n", data_ptr->colorimetry_info);
 }
 
