@@ -152,6 +152,7 @@ IARM_Result_t _dsResetSurroundVirtualizer(void *arg);
 IARM_Result_t _dsResetVolumeLeveller(void *arg);
 IARM_Result_t _dsResetDialogEnhancement(void *arg);
 IARM_Result_t _dsSetMS12SetttingsOverride(void *arg);
+IARM_Result_t _dsGetHDMIARCPortId(void *arg);
 
 static void _GetAudioModeFromPersistent(void *arg);
 static dsAudioPortType_t _GetAudioPortType(int handle);
@@ -2340,6 +2341,7 @@ IARM_Result_t _dsAudioPortInit(void *arg)
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsResetBassEnhancer,_dsResetBassEnhancer);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsResetSurroundVirtualizer,_dsResetSurroundVirtualizer);
         IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsResetVolumeLeveller,_dsResetVolumeLeveller);
+        IARM_Bus_RegisterCall(IARM_BUS_DSMGR_API_dsGetHDMIARCPortId, _dsGetHDMIARCPortId);
 
         dsError_t eRet = _dsAudioOutRegisterConnectCB (_dsAudioOutPortConnectCB);
         if (dsERR_NONE != eRet) {
@@ -6708,5 +6710,29 @@ bool _dsMs12ProfileSupported(int handle,std::string profile)
     }
     return result;
 }
+
+IARM_Result_t _dsGetHDMIARCPortId(void *arg)
+{
+#ifndef RDK_DSHAL_NAME
+#warning   "RDK_DSHAL_NAME is not defined"
+#define RDK_DSHAL_NAME "RDK_DSHAL_NAME is not defined"
+#endif
+    _DEBUG_ENTER();
+
+    IARM_BUS_Lock(lock);
+    std::string _HDMIARCPortId("0");
+    dsGetHDMIARCPortIdParam_t *param = ( dsGetHDMIARCPortIdParam_t *)arg;
+    try {
+            _HDMIARCPortId = device::HostPersistence::getInstance().getDefaultProperty("HDMIARC.port.Id");
+    }
+    catch(...) {
+            _HDMIARCPortId = "-1";
+    }
+    param->portId = atoi(_HDMIARCPortId.c_str());
+    printf("The HDMI ARC Port Id is %d \r\n",param->portId);
+    IARM_BUS_Unlock(lock);
+    return IARM_RESULT_SUCCESS;
+}
+
 /** @} */
 /** @} */

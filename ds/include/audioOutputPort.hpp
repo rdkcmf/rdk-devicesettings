@@ -203,6 +203,7 @@ public:
         void resetVolumeLeveller();
         void setMS12AudioProfileSetttingsOverride(const std::string ProfileState,const std::string ProfileName,
                                                    const std::string ProfileSettingsName, const std::string ProfileSettingValue);
+        void getHdmiArcPortId(int *portId);
 };
 
 }

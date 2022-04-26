@@ -575,8 +575,13 @@ bool AudioOutputPort::isConnected() const
         return device::VideoOutputPortConfig::getInstance().getPort("HDMI0").isDisplayConnected();
     }
     else if (dsAUDIOPORT_TYPE_HDMI_ARC == _type) {
-        /*Considering 1 is ARC/eARC port*/
-        return device::HdmiInput::getInstance().isPortConnected(1);
+        /*get the ARC/eARC port Id*/
+        int portId = -1;
+        dsError_t ret = dsGetHDMIARCPortId(&portId);
+        if (ret != dsERR_NONE) {
+                throw Exception(ret);
+        }
+        return device::HdmiInput::getInstance().isPortConnected(portId);
     }
     else if (dsAUDIOPORT_TYPE_HEADPHONE == _type) {
         bool isConn = true;
@@ -2027,6 +2032,23 @@ void AudioOutputPort::setMS12AudioProfileSetttingsOverride(const std::string Pro
 
     
 }
+
+/**
+ * @fn void AudioOutputPort::getHdmiArcPortId(int *portId)
+ * @brief This API is used to query the HDMI ARC Port ID
+ *
+ * @return void
+ */
+
+void AudioOutputPort::getHdmiArcPortId(int *portId)
+{
+        dsError_t ret = dsGetHDMIARCPortId(portId);
+        if (ret != dsERR_NONE) {
+                throw Exception(ret);
+        }
+}
+
+
 
 }
 

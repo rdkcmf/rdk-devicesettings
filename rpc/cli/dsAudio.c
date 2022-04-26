@@ -1827,5 +1827,22 @@ dsError_t dsResetVolumeLeveller(int handle)
 
 }
 
+dsError_t dsGetHDMIARCPortId(int *portId)
+{
+        dsGetHDMIARCPortIdParam_t param;
+        IARM_Result_t rpcRet = IARM_RESULT_SUCCESS;
+
+        param.portId = -1;
+        rpcRet = IARM_Bus_Call(IARM_BUS_DSMGR_NAME,
+                            (char *)IARM_BUS_DSMGR_API_dsGetHDMIARCPortId,
+                            (void *)&param,
+                            sizeof(param));
+        if (IARM_RESULT_SUCCESS == rpcRet)
+        {
+                *portId = param.portId;
+                return dsERR_NONE;
+        }
+        return dsERR_GENERAL ;
+}
 /** @} */
 /** @} */

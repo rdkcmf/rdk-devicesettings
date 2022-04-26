@@ -117,6 +117,7 @@ extern "C" {
 #define  IARM_BUS_DSMGR_API_dsGetSecondaryLanguage  "dsGetSecondaryLanguage"
 
 #define IARM_BUS_DSMGR_API_dsAudioOutIsConnected     "dsAudioOutIsConnected"
+#define IARM_BUS_DSMGR_API_dsGetHDMIARCPortId  "dsGetHDMIARCPortId"
 
 /*
  * Declare RPC dsAudio Device API names 
@@ -936,6 +937,11 @@ typedef struct _dsEdidVersionParam_t
     int                     iHdmiPort;
     int                     iEdidVersion;
 }dsEdidVersionParam_t;
+
+typedef struct _dsGetHDMIARCPortIdParam_t {
+        dsError_t result;
+        int portId;
+} dsGetHDMIARCPortIdParam_t;
 
 #ifdef __cplusplus
 }

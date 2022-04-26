@@ -1096,6 +1096,17 @@ dsError_t  dsSetSecondaryLanguage(int handle, const char* sLang);
 dsError_t  dsGetSecondaryLanguage(int handle, char* sLang);
 
 /**
+ * @brief Get the audio HDMI ARC port ID for each platform
+ *
+ * This function will get audio HDMI ARC port ID
+ *
+ * @param [in] portId get audio HDMI ARC port ID
+ * @return dsError_t Error code.
+ */
+dsError_t dsGetHDMIARCPortId(int *portId);
+
+
+/**
  * @}
  */
 
